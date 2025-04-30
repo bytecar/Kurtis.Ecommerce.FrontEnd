@@ -4,7 +4,11 @@ import { FeaturedProductsProps } from '@/types/component.types';
 import { ProductGrid } from '@/components/products/ProductGrid';
 import { AnimatedHeading } from './AnimatedHeading';
 
+// Import CSS
+import './styles/FeaturedProducts.css';
+
 export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, isLoading }) => {
+  // The HTML structure is maintained in './html/FeaturedProducts.html'
   return (
     <section className="featured-section">
       <div className="container mx-auto px-4">

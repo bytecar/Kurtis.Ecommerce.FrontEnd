@@ -1,0 +1,55 @@
+.featured-section {
+  padding: 5rem 0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.view-all-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--primary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.view-all-link:hover {
+  color: var(--primary-hover);
+  transform: translateX(2px);
+}
+
+.view-all-icon {
+  height: 1rem;
+  width: 1rem;
+}
+
+/* Animation for product grid */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .featured-section {
+    padding: 3rem 0;
+  }
+}
