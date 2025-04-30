@@ -19,18 +19,18 @@ export function Footer() {
               a rich blend of culture and contemporary fashion.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="text-gray-400 hover:text-white">
+              <button className="text-gray-400 hover:text-white">
                 <Facebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white">
+              </button>
+              <button className="text-gray-400 hover:text-white">
                 <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white">
+              </button>
+              <button className="text-gray-400 hover:text-white">
                 <Twitter className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white">
+              </button>
+              <button className="text-gray-400 hover:text-white">
                 <Mail className="h-5 w-5" />
-              </a>
+              </button>
             </div>
           </div>
           
@@ -40,22 +40,22 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link href="/products/women">
-                  <a className="text-gray-400 hover:text-white">Women's Wear</a>
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Women's Wear</div>
                 </Link>
               </li>
               <li>
                 <Link href="/products/men">
-                  <a className="text-gray-400 hover:text-white">Men's Wear</a>
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Men's Wear</div>
                 </Link>
               </li>
               <li>
                 <Link href="/products/new">
-                  <a className="text-gray-400 hover:text-white">New Arrivals</a>
+                  <div className="text-gray-400 hover:text-white cursor-pointer">New Arrivals</div>
                 </Link>
               </li>
               <li>
                 <Link href="/products/sale">
-                  <a className="text-gray-400 hover:text-white">Sale</a>
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Sale</div>
                 </Link>
               </li>
             </ul>
@@ -67,27 +67,27 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link href="/contact">
-                  <a className="text-gray-400 hover:text-white">Contact Us</a>
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Contact Us</div>
                 </Link>
               </li>
               <li>
                 <Link href="/faq">
-                  <a className="text-gray-400 hover:text-white">FAQs</a>
+                  <div className="text-gray-400 hover:text-white cursor-pointer">FAQs</div>
                 </Link>
               </li>
               <li>
                 <Link href="/returns">
-                  <a className="text-gray-400 hover:text-white">Shipping & Returns</a>
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Shipping & Returns</div>
                 </Link>
               </li>
               <li>
                 <Link href="/size-guide">
-                  <a className="text-gray-400 hover:text-white">Size Guide</a>
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Size Guide</div>
                 </Link>
               </li>
               <li>
                 <Link href="/track-order">
-                  <a className="text-gray-400 hover:text-white">Track Order</a>
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Track Order</div>
                 </Link>
               </li>
             </ul>
@@ -99,27 +99,27 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link href="/our-story">
-                  <a className="text-gray-400 hover:text-white">Our Story</a>
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Our Story</div>
                 </Link>
               </li>
               <li>
                 <Link href="/careers">
-                  <a className="text-gray-400 hover:text-white">Careers</a>
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Careers</div>
                 </Link>
               </li>
               <li>
                 <Link href="/privacy">
-                  <a className="text-gray-400 hover:text-white">Privacy Policy</a>
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Privacy Policy</div>
                 </Link>
               </li>
               <li>
                 <Link href="/terms">
-                  <a className="text-gray-400 hover:text-white">Terms & Conditions</a>
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Terms & Conditions</div>
                 </Link>
               </li>
               <li>
                 <Link href="/store-locator">
-                  <a className="text-gray-400 hover:text-white">Store Locator</a>
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Store Locator</div>
                 </Link>
               </li>
             </ul>
