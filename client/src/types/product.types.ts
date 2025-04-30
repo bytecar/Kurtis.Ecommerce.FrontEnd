@@ -37,8 +37,11 @@ export const calculateDiscountPercentage = (price: number, discountedPrice: numb
 };
 
 // Check if product is new (less than 30 days old)
-export const isProductNew = (createdAt: Date | null): boolean => {
+export const isProductNew = (createdAt: Date | string | null): boolean => {
   if (!createdAt) return false;
+  
   const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
-  return Date.now() - createdAt.getTime() < thirtyDaysInMs;
+  const createdDate = typeof createdAt === 'string' ? new Date(createdAt) : createdAt;
+  
+  return Date.now() - createdDate.getTime() < thirtyDaysInMs;
 };
