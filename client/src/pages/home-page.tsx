@@ -306,6 +306,25 @@ export default function HomePage() {
                             <div className="absolute top-2 left-2">
                               <span className="bg-primary text-white text-xs px-2 py-1 rounded-full">New</span>
                             </div>
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              <Button 
+                                size="sm" 
+                                className="bg-white/90 text-primary hover:bg-white transition-all duration-300 hover:shadow-lg hover:scale-105"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }}
+                              >
+                                Add to Cart
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="bg-primary/80 text-white border-0 hover:bg-primary transition-all duration-300 hover:shadow-lg hover:scale-105"
+                              >
+                                View
+                              </Button>
+                            </div>
                           </div>
                           <div className="mt-3 transition-all duration-300">
                             <h3 className="font-medium group-hover:text-primary transition-colors duration-300 transform group-hover:translate-x-1">{product.name}</h3>
