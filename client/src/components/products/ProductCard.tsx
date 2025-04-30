@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { ProductCardProps } from "../../types/product.types";
-import { calculateDiscountPercentage, isProductNew } from "../../types/product.types";
-import { useWishlist } from "@/hooks/use-wishlist";
-import { useCart } from "@/hooks/use-cart";
-import { useAuth } from "@/hooks/use-auth";
+import { ProductCardProps } from "@/types/component.types";
+import { calculateDiscountPercentage, isProductNew } from "@/utils/product-utils";
+import { useWishlist, useCart, useAuth } from "@/hooks";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { StarRating } from "./StarRating";
 import { Heart } from "lucide-react";
