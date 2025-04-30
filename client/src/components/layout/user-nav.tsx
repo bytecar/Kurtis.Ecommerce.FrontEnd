@@ -43,17 +43,17 @@ export function UserNav() {
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
                   <Link href="/profile">
-                    <a className="w-full cursor-pointer">My Profile</a>
+                    <div className="w-full cursor-pointer">My Profile</div>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/orders">
-                    <a className="w-full cursor-pointer">My Orders</a>
+                    <div className="w-full cursor-pointer">My Orders</div>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/wishlist">
-                    <a className="w-full cursor-pointer">My Wishlist</a>
+                    <div className="w-full cursor-pointer">My Wishlist</div>
                   </Link>
                 </DropdownMenuItem>
                 
@@ -63,12 +63,12 @@ export function UserNav() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link href="/admin/dashboard">
-                        <a className="w-full cursor-pointer">Admin Dashboard</a>
+                        <div className="w-full cursor-pointer">Admin Dashboard</div>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/admin/reviews">
-                        <a className="w-full cursor-pointer">Review Management</a>
+                        <div className="w-full cursor-pointer">Review Management</div>
                       </Link>
                     </DropdownMenuItem>
                   </>
@@ -80,7 +80,7 @@ export function UserNav() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link href="/admin/inventory">
-                        <a className="w-full cursor-pointer">Inventory Management</a>
+                        <div className="w-full cursor-pointer">Inventory Management</div>
                       </Link>
                     </DropdownMenuItem>
                   </>
