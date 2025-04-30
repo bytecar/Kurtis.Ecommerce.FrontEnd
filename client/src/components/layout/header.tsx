@@ -44,7 +44,7 @@ export function Header() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           </div>
         </form>
         
@@ -53,7 +53,7 @@ export function Header() {
           {/* Search button (mobile only) */}
           <button 
             onClick={() => setMobileSearchVisible(!mobileSearchVisible)}
-            className="md:hidden text-gray-700 hover:text-primary"
+            className="md:hidden text-foreground/70 hover:text-primary"
           >
             <Search className="h-5 w-5" />
           </button>
@@ -67,7 +67,7 @@ export function Header() {
       {mobileSearchVisible && (
         <form 
           onSubmit={handleSearch}
-          className="md:hidden p-3 border-t border-gray-200"
+          className="md:hidden p-3 border-t border-border"
         >
           <Input
             type="text"
