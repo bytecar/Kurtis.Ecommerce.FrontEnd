@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProductGridProps } from '../../types/product.types';
+import { ProductGridProps } from '@/types/component.types';
 import { ProductCard } from './ProductCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Package } from 'lucide-react';
