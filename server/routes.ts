@@ -57,6 +57,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch user" });
     }
   });
+  
+  // ======= User Preferences Routes =======
+  
+  // Get user preferences
+  app.get("/api/user/preferences", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      const userId = req.user.id;
+      const preferences = await storage.getUserPreferences(userId);
+      
+      if (!preferences) {
+        return res.status(404).json({ error: "Preferences not found" });
+      }
+      
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error getting user preferences:", error);
+      res.status(500).json({ error: "Failed to get user preferences" });
+    }
+  });
+  
+  // Create or update user preferences
+  app.post("/api/user/preferences", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      const userId = req.user.id;
+      const { favoriteCategories, favoriteColors, favoriteOccasions, priceRangeMin, priceRangeMax } = req.body;
+      
+      // Validate input
+      if (!Array.isArray(favoriteCategories) || !Array.isArray(favoriteColors) || !Array.isArray(favoriteOccasions)) {
+        return res.status(400).json({ error: "Invalid input data" });
+      }
+      
+      // Create new preferences
+      const preferences = {
+        userId,
+        favoriteCategories,
+        favoriteColors,
+        favoriteOccasions,
+        priceRangeMin: priceRangeMin || null,
+        priceRangeMax: priceRangeMax || null
+      };
+      
+      const userPreferences = await storage.createUserPreferences(preferences);
+      res.status(201).json(userPreferences);
+    } catch (error) {
+      console.error("Error saving user preferences:", error);
+      res.status(500).json({ error: "Failed to save user preferences" });
+    }
+  });
 
   // ======= Product Routes =======
   
@@ -179,13 +235,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const products = await storage.getAllProducts();
-      // Find products in the same category
+      let userPreferences = null;
+      
+      // If user is authenticated, get their preferences and recently viewed products
+      if (req.isAuthenticated()) {
+        userPreferences = await storage.getUserPreferences(req.user.id);
+        const recentlyViewed = await storage.getRecentlyViewedByUser(req.user.id);
+        
+        // If we have user preferences, use OpenAI for AI-powered recommendations
+        if (userPreferences) {
+          try {
+            // Import the OpenAI recommendation function
+            const { getAIRecommendations } = await import('./openai');
+            
+            // Prepare user preference data for the AI
+            const preferenceData = {
+              favoriteCategories: userPreferences.favoriteCategories,
+              favoriteColors: userPreferences.favoriteColors,
+              priceRange: userPreferences.priceRangeMin && userPreferences.priceRangeMax ? 
+                { min: userPreferences.priceRangeMin, max: userPreferences.priceRangeMax } : undefined,
+              previouslyViewed: recentlyViewed.map(p => p.id)
+            };
+            
+            // Get AI-powered recommendations
+            const aiRecommendations = await getAIRecommendations(product, products, preferenceData);
+            return res.json(aiRecommendations);
+          } catch (aiError) {
+            console.error("AI recommendation error:", aiError);
+            // Fall back to basic recommendations if AI fails
+          }
+        }
+      }
+      
+      // Basic recommendation fallback - find products in the same category
       const recommendations = products
         .filter(p => p.id !== id && p.category === product.category)
         .slice(0, 4);
       
       res.json(recommendations);
     } catch (error) {
+      console.error("Recommendation error:", error);
       res.status(500).json({ error: "Failed to retrieve product recommendations" });
     }
   });
@@ -697,6 +786,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).end();
     } catch (error) {
       res.status(500).json({ error: "Failed to remove from wishlist" });
+    }
+  });
+  
+  // ======= Collections Routes =======
+  
+  // Get product collections (personalized if user is logged in)
+  app.get("/api/collections", async (req, res) => {
+    try {
+      const products = await storage.getAllProducts();
+      let collections;
+      
+      // Check if user is authenticated to get personalized collections
+      if (req.isAuthenticated()) {
+        try {
+          const userPreferences = await storage.getUserPreferences(req.user.id);
+          
+          // If user has preferences, try to get personalized collections using AI
+          if (userPreferences) {
+            try {
+              // Import the OpenAI personalized collections function
+              const { getPersonalizedCollections } = await import('./openai');
+              
+              // Prepare user preference data for the AI
+              const preferenceData = {
+                favoriteCategories: userPreferences.favoriteCategories,
+                favoriteColors: userPreferences.favoriteColors,
+                gender: req.user.gender,
+                priceRange: userPreferences.priceRangeMin && userPreferences.priceRangeMax ? 
+                  { min: userPreferences.priceRangeMin, max: userPreferences.priceRangeMax } : undefined
+              };
+              
+              // Get AI-powered collections
+              const aiCollections = await getPersonalizedCollections(products, preferenceData);
+              
+              if (aiCollections && aiCollections.length > 0) {
+                // Transform to expected response format
+                collections = aiCollections.map((collection, index) => ({
+                  id: `ai_${index}`,
+                  name: collection.name,
+                  description: collection.description,
+                  items: collection.products
+                }));
+                
+                return res.json(collections);
+              }
+            } catch (aiError) {
+              console.error("AI collection error:", aiError);
+              // Fall back to default collections if AI fails
+            }
+          }
+        } catch (prefError) {
+          console.error("Error getting user preferences:", prefError);
+          // Fall back to default collections
+        }
+      }
+      
+      // Default collections if not authenticated or AI failed
+      collections = [
+        {
+          id: "festival",
+          name: "Festival Ready",
+          description: "Elegant ethnic wear for celebrating special occasions in style",
+          items: products.filter(p => p.category === "lehengas" || p.category === "sarees").slice(0, 6)
+        },
+        {
+          id: "summer",
+          name: "Summer Essentials",
+          description: "Stay cool and elegant with our summer ethnic fashion collection",
+          items: products.filter(p => p.category === "kurtis" || p.category === "tops").slice(0, 6)
+        },
+        {
+          id: "wedding",
+          name: "Wedding Season",
+          description: "Stunning wedding outfits for the bride, groom, and wedding party",
+          items: products.filter(p => p.category === "lehengas" || p.category === "sherwanis").slice(0, 6)
+        }
+      ];
+      
+      res.json(collections);
+    } catch (error) {
+      console.error("Collection error:", error);
+      res.status(500).json({ error: "Failed to retrieve collections" });
     }
   });
   
