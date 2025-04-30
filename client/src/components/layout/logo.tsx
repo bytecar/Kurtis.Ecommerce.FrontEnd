@@ -3,7 +3,7 @@ import { Link } from "wouter";
 export function Logo() {
   return (
     <Link href="/">
-      <a className="flex items-center gap-2">
+      <div className="flex items-center gap-2 cursor-pointer">
         <svg 
           className="h-8 w-8 text-primary" 
           viewBox="0 0 24 24" 
@@ -42,7 +42,7 @@ export function Logo() {
         <span className="text-xl font-serif font-bold">
           Kurtis <span className="text-primary">&</span> More...
         </span>
-      </a>
+      </div>
     </Link>
   );
 }
