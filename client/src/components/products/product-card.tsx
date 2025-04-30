@@ -75,7 +75,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
             <img 
               src={Array.isArray(product.imageUrls) && product.imageUrls.length > 0
                 ? product.imageUrls[0]
-                : "https://images.unsplash.com/photo-1612722432474-b971cdcea546"}
+                : "https://images.unsplash.com/photo-1612722432474-b971cdcea546?auto=format&fit=crop&q=80&w=500"}
               alt={product.name}
               className="h-64 md:h-72 w-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
             />

@@ -95,7 +95,7 @@ export function ProductGrid({ products, isLoading, emptyMessage = "No products f
                 <img
                   src={Array.isArray(selectedProduct.imageUrls) && selectedProduct.imageUrls.length > 0
                     ? selectedProduct.imageUrls[0]
-                    : "https://images.unsplash.com/photo-1612722432474-b971cdcea546"}
+                    : "https://images.unsplash.com/photo-1612722432474-b971cdcea546?auto=format&fit=crop&q=80&w=500"}
                   alt={selectedProduct.name}
                   className="w-full h-auto object-cover"
                 />

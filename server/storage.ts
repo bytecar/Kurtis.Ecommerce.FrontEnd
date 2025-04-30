@@ -671,6 +671,7 @@ export class MemStorage implements IStorage {
     const genders = ['women', 'men'];
     
     const imageUrls = [
+      // Women's ethnic wear
       'https://images.unsplash.com/photo-1610030469668-ad73b5f315fa?auto=format&fit=crop&q=80&w=500',
       'https://images.unsplash.com/photo-1612722432474-b971cdcea546?auto=format&fit=crop&q=80&w=500',
       'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=500',
@@ -680,7 +681,34 @@ export class MemStorage implements IStorage {
       'https://images.unsplash.com/photo-1586423702505-b13505519074?auto=format&fit=crop&q=80&w=500',
       'https://images.unsplash.com/photo-1585428126359-117dfe284ddb?auto=format&fit=crop&q=80&w=500',
       'https://images.unsplash.com/photo-1561795823-9a97d6b30cfc?auto=format&fit=crop&q=80&w=500',
-      'https://images.unsplash.com/photo-1610099733390-47bb77acbbbf?auto=format&fit=crop&q=80&w=500'
+      'https://images.unsplash.com/photo-1610099733390-47bb77acbbbf?auto=format&fit=crop&q=80&w=500',
+      
+      // Sarees
+      'https://images.unsplash.com/photo-1606902168692-BF5954ba5a5d?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1594387903898-7d1235079332?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1610030473192-f4bac2c6124f?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1665077722106-51388e8d9f3c?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1610030473192-f4bac2c6124f?auto=format&fit=crop&q=80&w=500',
+      
+      // Kurtis and suits
+      'https://images.unsplash.com/photo-1636628266722-d5448ca44f5a?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1610189025554-708a149676b8?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1581222375407-e19e9f791fff?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1606751071446-d3343720dedf?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1578148541106-219e9b56eb28?auto=format&fit=crop&q=80&w=500',
+      
+      // Lehengas and bridal wear
+      'https://images.unsplash.com/photo-1623000963328-6eb604d3f15f?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1596387451750-8a6c93efcdab?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1639680254855-3073add7fa54?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1652384046585-15d13c0b750c?auto=format&fit=crop&q=80&w=500',
+      
+      // Men's ethnic wear
+      'https://images.unsplash.com/photo-1625301840055-7c4d6f04b5d5?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1566483232762-b3d5c4b45d3c?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1624032786592-2ade942c727f?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1625301950614-a3c4085f420d?auto=format&fit=crop&q=80&w=500'
     ];
     
     // Create 100 products
