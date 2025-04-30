@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Logo } from "./logo";
 import { MainNav } from "./main-nav";
 import { UserNav } from "./user-nav";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useLocation } from "wouter";
@@ -19,7 +20,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm">
+    <header className="sticky top-0 z-50 bg-background shadow-sm">
       {/* Top announcement bar */}
       <div className="bg-primary text-white px-4 py-1 text-xs md:text-sm flex justify-center">
         <p>Free shipping on orders above ₹999 | Use code FIRST10 for 10% off on your first order</p>
@@ -57,6 +58,7 @@ export function Header() {
             <Search className="h-5 w-5" />
           </button>
           
+          <ThemeToggle />
           <UserNav />
         </div>
       </div>
