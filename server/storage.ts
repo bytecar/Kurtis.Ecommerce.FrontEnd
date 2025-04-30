@@ -68,6 +68,11 @@ export interface IStorage {
   createReturn(returnData: InsertReturn): Promise<Return>;
   updateReturnStatus(id: number, status: string): Promise<Return | undefined>;
   
+  // User preferences
+  getUserPreferences(userId: number): Promise<UserPreferences | undefined>;
+  createUserPreferences(preferences: InsertUserPreferences): Promise<UserPreferences>;
+  updateUserPreferences(userId: number, preferencesData: Partial<UserPreferences>): Promise<UserPreferences | undefined>;
+  
   // Session store
   sessionStore: session.Store;
 }
@@ -82,6 +87,7 @@ export class MemStorage implements IStorage {
   private wishlists: Map<number, Wishlist>;
   private recentlyViewed: Map<number, RecentlyViewed>;
   private returns: Map<number, Return>;
+  private userPreferences: Map<number, UserPreferences>;
   
   sessionStore: session.Store;
   
@@ -95,6 +101,7 @@ export class MemStorage implements IStorage {
   currentWishlistId: number;
   currentRecentlyViewedId: number;
   currentReturnId: number;
+  currentUserPreferencesId: number;
   
   constructor() {
     this.users = new Map();
@@ -106,6 +113,7 @@ export class MemStorage implements IStorage {
     this.wishlists = new Map();
     this.recentlyViewed = new Map();
     this.returns = new Map();
+    this.userPreferences = new Map();
     
     this.currentUserId = 1;
     this.currentProductId = 1;
@@ -116,6 +124,7 @@ export class MemStorage implements IStorage {
     this.currentWishlistId = 1;
     this.currentRecentlyViewedId = 1;
     this.currentReturnId = 1;
+    this.currentUserPreferencesId = 1;
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000, // prune expired entries every 24h
@@ -486,6 +495,44 @@ export class MemStorage implements IStorage {
     };
     this.returns.set(id, updatedReturn);
     return updatedReturn;
+  }
+  
+  // User preferences methods
+  async getUserPreferences(userId: number): Promise<UserPreferences | undefined> {
+    return Array.from(this.userPreferences.values()).find(
+      (pref) => pref.userId === userId
+    );
+  }
+  
+  async createUserPreferences(preferences: InsertUserPreferences): Promise<UserPreferences> {
+    // Remove existing preferences for the user if they exist
+    const existing = await this.getUserPreferences(preferences.userId);
+    if (existing) {
+      this.userPreferences.delete(existing.id);
+    }
+    
+    const id = this.currentUserPreferencesId++;
+    const now = new Date();
+    const newPreferences: UserPreferences = {
+      ...preferences,
+      id,
+      updatedAt: now
+    };
+    this.userPreferences.set(id, newPreferences);
+    return newPreferences;
+  }
+  
+  async updateUserPreferences(userId: number, preferencesData: Partial<UserPreferences>): Promise<UserPreferences | undefined> {
+    const existing = await this.getUserPreferences(userId);
+    if (!existing) return undefined;
+    
+    const updatedPreferences = {
+      ...existing,
+      ...preferencesData,
+      updatedAt: new Date()
+    };
+    this.userPreferences.set(existing.id, updatedPreferences);
+    return updatedPreferences;
   }
   
   // Initialize with 15 users with random profiles

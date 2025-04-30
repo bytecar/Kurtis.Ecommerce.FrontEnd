@@ -9,6 +9,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   setupAuth(app);
 
+  // ======= Admin Routes =======
+  
+  // Get all users (admin only)
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (!req.isAuthenticated() || req.user.role !== "admin") {
+        return res.status(403).json({ error: "Unauthorized: Admin access required" });
+      }
+      
+      const users = await storage.getAllUsers();
+      // Remove sensitive information
+      const safeUsers = users.map(user => {
+        const { password, ...safeUser } = user;
+        return safeUser;
+      });
+      
+      res.json(safeUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+  
+  // Public endpoint to get basic user information by ID
+  app.get("/api/users/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const user = await storage.getUser(id);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Return only public user info
+      const publicInfo = {
+        id: user.id,
+        username: user.username,
+        fullName: user.fullName,
+        role: user.role
+      };
+      
+      res.json(publicInfo);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ error: "Failed to fetch user" });
+    }
+  });
+
   // ======= Product Routes =======
   
   // Get all products
