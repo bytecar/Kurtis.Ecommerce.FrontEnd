@@ -575,6 +575,68 @@ export class MemStorage implements IStorage {
   }
 
   // Initialize with 100 ethnic clothing products organized by genres
+  private initializeUserPreferences() {
+    // Create preferences for a few sample users
+    const colors = [
+      'Red', 'Blue', 'Green', 'Yellow', 'Black', 'White', 'Pink', 'Purple', 
+      'Orange', 'Brown', 'Gold', 'Silver', 'Maroon', 'Navy', 'Beige', 'Turquoise'
+    ];
+    
+    const occasions = [
+      'Casual', 'Festive', 'Wedding', 'Party', 'Office', 'Evening', 'Bridal', 
+      'Traditional', 'Diwali', 'Holi'
+    ];
+    
+    // Add preferences for 5 users (more can be added via the API)
+    for (let userId = 1; userId <= 5; userId++) {
+      // Randomize favorite categories
+      const allCategories = [
+        'sarees', 'kurtis', 'lehengas', 'salwar_kameez', 'anarkali_suits', 'palazzo_suits', 
+        'kurtas', 'sherwanis', 'nehru_jackets', 'dhoti_sets', 'indo_western'
+      ];
+      
+      // Select 3-5 random categories
+      const numCategories = Math.floor(Math.random() * 3) + 3;
+      const shuffledCategories = [...allCategories].sort(() => 0.5 - Math.random());
+      const favoriteCategories = shuffledCategories.slice(0, numCategories);
+      
+      // Select 3-5 random colors
+      const numColors = Math.floor(Math.random() * 3) + 3;
+      const shuffledColors = [...colors].sort(() => 0.5 - Math.random());
+      const favoriteColors = shuffledColors.slice(0, numColors);
+      
+      // Select 2-4 random occasions
+      const numOccasions = Math.floor(Math.random() * 3) + 2;
+      const shuffledOccasions = [...occasions].sort(() => 0.5 - Math.random());
+      const favoriteOccasions = shuffledOccasions.slice(0, numOccasions);
+      
+      // Random price range
+      const priceRangeMin = Math.floor(Math.random() * 1000) + 500;
+      const priceRangeMax = priceRangeMin + Math.floor(Math.random() * 4000) + 2000;
+      
+      // Create preference object
+      const preferences: InsertUserPreferences = {
+        userId,
+        favoriteCategories,
+        favoriteColors,
+        favoriteOccasions,
+        priceRangeMin,
+        priceRangeMax
+      };
+      
+      const id = this.currentUserPreferencesId++;
+      const now = new Date();
+      
+      const userPreference: UserPreferences = {
+        ...preferences,
+        id,
+        updatedAt: now
+      };
+      
+      this.userPreferences.set(id, userPreference);
+    }
+  }
+  
   private initializeProducts() {
     const categories = [
       // Women's ethnic wear
