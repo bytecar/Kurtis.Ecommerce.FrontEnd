@@ -196,3 +196,27 @@ export type InsertReturn = z.infer<typeof insertReturnSchema>;
 
 export type RecentlyViewed = typeof recentlyViewed.$inferSelect;
 export type InsertRecentlyViewed = z.infer<typeof insertRecentlyViewedSchema>;
+
+// User preferences for recommendations
+export const userPreferences = pgTable("user_preferences", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  favoriteCategories: json("favorite_categories").notNull().$type<string[]>(),
+  favoriteColors: json("favorite_colors").notNull().$type<string[]>(),
+  favoriteOccasions: json("favorite_occasions").notNull().$type<string[]>(),
+  priceRangeMin: integer("price_range_min"),
+  priceRangeMax: integer("price_range_max"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertUserPreferencesSchema = createInsertSchema(userPreferences).pick({
+  userId: true,
+  favoriteCategories: true,
+  favoriteColors: true,
+  favoriteOccasions: true,
+  priceRangeMin: true,
+  priceRangeMax: true
+});
+
+export type UserPreferences = typeof userPreferences.$inferSelect;
+export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
