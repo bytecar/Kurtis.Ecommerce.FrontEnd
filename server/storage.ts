@@ -1,23 +1,19 @@
+import express from "express";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 import { 
-  users, products, inventory, reviews, orders, orderItems, wishlists, recentlyViewed, returns,
-  type User, type InsertUser, 
-  type Product, type InsertProduct,
-  type Inventory, type InsertInventory,
-  type Review, type InsertReview,
-  type Order, type InsertOrder,
-  type OrderItem, type InsertOrderItem,
-  type Wishlist, type InsertWishlist,
-  type RecentlyViewed, type InsertRecentlyViewed,
-  type Return, type InsertReturn
+  User, InsertUser, 
+  Product, InsertProduct, 
+  Inventory, InsertInventory, 
+  Review, InsertReview, 
+  Order, InsertOrder, 
+  OrderItem, InsertOrderItem, 
+  Wishlist, InsertWishlist, 
+  Return, InsertReturn, 
+  RecentlyViewed, InsertRecentlyViewed 
 } from "@shared/schema";
 
-// Session store
 const MemoryStore = createMemoryStore(session);
-
-// modify the interface with any CRUD methods
-// you might need
 
 export interface IStorage {
   // User management
@@ -73,7 +69,7 @@ export interface IStorage {
   updateReturnStatus(id: number, status: string): Promise<Return | undefined>;
   
   // Session store
-  sessionStore: session.SessionStore;
+  sessionStore: session.Store;
 }
 
 export class MemStorage implements IStorage {
@@ -87,7 +83,7 @@ export class MemStorage implements IStorage {
   private recentlyViewed: Map<number, RecentlyViewed>;
   private returns: Map<number, Return>;
   
-  sessionStore: session.SessionStore;
+  sessionStore: session.Store;
   
   // IDs for auto-increment
   currentUserId: number;
@@ -99,7 +95,7 @@ export class MemStorage implements IStorage {
   currentWishlistId: number;
   currentRecentlyViewedId: number;
   currentReturnId: number;
-
+  
   constructor() {
     this.users = new Map();
     this.products = new Map();
@@ -125,7 +121,8 @@ export class MemStorage implements IStorage {
       checkPeriod: 86400000, // prune expired entries every 24h
     });
     
-    // Initialize with some products
+    // Initialize with users and products
+    this.initializeUsers();
     this.initializeProducts();
   }
   
@@ -413,7 +410,7 @@ export class MemStorage implements IStorage {
   async getRecentlyViewedByUser(userId: number): Promise<Product[]> {
     const recentItems = Array.from(this.recentlyViewed.values())
       .filter((item) => item.userId === userId)
-      .sort((a, b) => new Date(b.viewedAt).getTime() - new Date(a.viewedAt).getTime())
+      .sort((a, b) => b.viewedAt.getTime() - a.viewedAt.getTime())
       .slice(0, 10); // Limit to 10 items
     
     // Get product details for each item
@@ -491,22 +488,94 @@ export class MemStorage implements IStorage {
     return updatedReturn;
   }
   
-  // Initialize with demo products
+  // Initialize with 15 users with random profiles
+  private initializeUsers() {
+    const roles = ['admin', 'user', 'content_manager'];
+    const fullNames = [
+      'Aditya Sharma', 'Priya Patel', 'Rahul Singh', 'Neha Gupta', 'Vikram Mehta',
+      'Anjali Desai', 'Rajesh Kumar', 'Meera Joshi', 'Sanjay Verma', 'Divya Kapoor',
+      'Arjun Malhotra', 'Pooja Reddy', 'Kiran Rao', 'Shweta Bansal', 'Deepak Nair'
+    ];
+    
+    // Generate 15 users with random roles
+    for (let i = 0; i < 15; i++) {
+      const username = `user${i + 1}`;
+      const email = `user${i + 1}@example.com`;
+      const fullName = fullNames[i];
+      const role = roles[i % 3]; // Distribute roles evenly
+      
+      // Simple password hash for demonstration (not secure for production)
+      const password = `d6531055b2ded682b68092a73ed224053e4150c2a8b12a0b5348a408f6ac0d8138e4a9af6096ad85deb1919a1b3e7d0d6e9131c6d1b022bca815079b2bcce539.fae8c366301e57c4b2e9ffe22587818c`;
+      
+      const insertUser: InsertUser = {
+        username,
+        email,
+        password,
+        fullName,
+        role
+      };
+      
+      const id = this.currentUserId++;
+      const now = new Date();
+      const user: User = { 
+        ...insertUser, 
+        id,
+        createdAt: now,
+        updatedAt: now
+      };
+      this.users.set(id, user);
+    }
+  }
+
+  // Initialize with 100 ethnic clothing products organized by genres
   private initializeProducts() {
-    const categories = ['sarees', 'kurtis', 'lehengas', 'dresses', 'tops', 'pants', 'skirts'];
-    const brands = ['Fabindia', 'Biba', 'W', 'Global Desi', 'Anokhi', 'Aurelia', 'Manyavar'];
+    const categories = [
+      // Women's ethnic wear
+      'sarees', 'kurtis', 'lehengas', 'salwar_kameez', 'anarkali_suits', 'palazzo_suits', 
+      'gowns', 'dupattas', 'blouses', 'skirts', 'dresses',
+      // Men's ethnic wear
+      'kurtas', 'sherwanis', 'nehru_jackets', 'dhoti_sets', 'indo_western',
+      // Accessories
+      'jewelry', 'footwear', 'bags', 'scarves'
+    ];
+    
+    const brands = [
+      'Fabindia', 'Biba', 'W', 'Global Desi', 'Anokhi', 'Aurelia', 'Manyavar', 
+      'Ritu Kumar', 'Soch', 'Khaadi', 'Jaypore', 'House of Masaba', 'Sabyasachi',
+      'Tarun Tahiliani', 'Anita Dongre', 'Raymond', 'Rangriti', 'Ethnic Basket',
+      'Libas', 'Neerus', 'Meena Bazaar', 'Chhabra 555', 'Tikhi Imli', 'Sangria'
+    ];
+    
+    const fabrics = [
+      'Cotton', 'Silk', 'Linen', 'Chiffon', 'Georgette', 'Chanderi', 'Banarasi', 
+      'Khadi', 'Rayon', 'Crepe', 'Organza', 'Velvet', 'Brocade', 'Kota', 'Tussar',
+      'Patola', 'Pashmina', 'Kanjeevaram', 'Maheshwari', 'Ikat', 'Pochampally', 'Bandhani'
+    ];
+    
+    const occasions = [
+      'Casual', 'Festive', 'Wedding', 'Party', 'Office', 'Evening', 'Bridal', 
+      'Reception', 'Engagement', 'Cocktail', 'Traditional', 'Mehendi', 'Diwali',
+      'Holi', 'Pongal', 'Onam', 'Navratri', 'Durga Puja', 'Eid'
+    ];
+    
     const genders = ['women', 'men'];
+    
     const imageUrls = [
       'https://images.unsplash.com/photo-1610030469668-ad73b5f315fa?auto=format&fit=crop&q=80&w=500',
       'https://images.unsplash.com/photo-1612722432474-b971cdcea546?auto=format&fit=crop&q=80&w=500',
       'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=500',
       'https://images.unsplash.com/photo-1611404332938-92111acded8f?auto=format&fit=crop&q=80&w=500',
-      'https://images.unsplash.com/photo-1583392522145-6536faa2ded3?auto=format&fit=crop&q=80&w=500'
+      'https://images.unsplash.com/photo-1583392522145-6536faa2ded3?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1604507410202-99a234ed767e?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1586423702505-b13505519074?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1585428126359-117dfe284ddb?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1561795823-9a97d6b30cfc?auto=format&fit=crop&q=80&w=500',
+      'https://images.unsplash.com/photo-1610099733390-47bb77acbbbf?auto=format&fit=crop&q=80&w=500'
     ];
     
-    // Create 20 products
-    for (let i = 0; i < 20; i++) {
-      const price = Math.floor(Math.random() * 4000) + 1000;
+    // Create 100 products
+    for (let i = 0; i < 100; i++) {
+      const price = Math.floor(Math.random() * 5000) + 1000;
       const discountRate = Math.random() < 0.3 ? 0 : Math.floor(Math.random() * 30) + 5;
       const discountedPrice = discountRate > 0 ? Math.floor(price * (100 - discountRate) / 100) : null;
       
