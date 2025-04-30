@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Product } from "@shared/schema";
 import { ProductGrid } from "@/components/products/product-grid";
+import { ProductCard } from "@/components/products/product-card";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -293,51 +294,13 @@ export default function HomePage() {
                 {(newArrivals || []).map((product) => (
                   <CarouselItem key={product.id} className="md:basis-1/3 lg:basis-1/4">
                     <div className="p-1">
-                      <Link href={`/product/${product.id}`}>
-                        <a className="block group">
-                          <div className="relative overflow-hidden rounded-lg">
-                            <img 
-                              src={Array.isArray(product.imageUrls) && product.imageUrls.length > 0
-                                ? product.imageUrls[0]
-                                : "https://placehold.co/400x500"}
-                              alt={product.name}
-                              className="w-full aspect-[3/4] object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
-                            />
-                            <div className="absolute top-2 left-2">
-                              <span className="bg-primary text-white text-xs px-2 py-1 rounded-full">New</span>
-                            </div>
-                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                              <Button 
-                                size="sm" 
-                                className="bg-white/90 text-primary hover:bg-white transition-all duration-300 hover:shadow-lg hover:scale-105"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                }}
-                              >
-                                Add to Cart
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="bg-primary/80 text-white border-0 hover:bg-primary transition-all duration-300 hover:shadow-lg hover:scale-105"
-                              >
-                                View
-                              </Button>
-                            </div>
-                          </div>
-                          <div className="mt-3 transition-all duration-300">
-                            <h3 className="font-medium group-hover:text-primary transition-colors duration-300 transform group-hover:translate-x-1">{product.name}</h3>
-                            <p className="text-gray-600 text-sm transform group-hover:translate-x-1 transition-all duration-300 ease-out">{product.brand}</p>
-                            <div className="mt-1 flex items-center gap-2 transform group-hover:scale-105 transition-all duration-300 ease-out group-hover:text-primary">
-                              <span className="font-medium">₹{product.discountedPrice || product.price}</span>
-                              {product.discountedPrice && (
-                                <span className="text-gray-500 text-sm line-through">₹{product.price}</span>
-                              )}
-                            </div>
-                          </div>
-                        </a>
-                      </Link>
+                      <ProductCard 
+                        product={product}
+                        onQuickView={(product) => {
+                          // Quick view functionality would be added here
+                          console.log("Quick view", product.id);
+                        }}
+                      />
                     </div>
                   </CarouselItem>
                 ))}
