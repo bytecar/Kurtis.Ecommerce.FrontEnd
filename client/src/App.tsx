@@ -28,6 +28,8 @@ import { AdminRoute } from "@/lib/protected-route";
 import { ContentManagerRoute } from "@/lib/protected-route";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+// Add i18next imports
+import { useTranslation } from 'react-i18next';
 
 function Router() {
   return (
