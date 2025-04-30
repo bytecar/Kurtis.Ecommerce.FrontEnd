@@ -3,7 +3,11 @@ import { Link } from 'wouter';
 import { CollectionsProps } from '@/types/component.types';
 import { AnimatedHeading } from './AnimatedHeading';
 
+// Import CSS
+import './styles/Collections.css';
+
 export const Collections: React.FC<CollectionsProps> = ({ collections }) => {
+  // The HTML structure is maintained in './html/Collections.html'
   return (
     <section className="collections-section">
       <div className="container mx-auto px-4">
