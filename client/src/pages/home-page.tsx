@@ -340,17 +340,17 @@ export default function HomePage() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-sm">
+              <div key={index} className="bg-white p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 group">
                 <div className="flex text-amber-400 mb-3">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <svg key={star} xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 fill-current" viewBox="0 0 20 20">
+                    <svg key={star} xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 fill-current transition-transform duration-300 group-hover:scale-110" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   ))}
                 </div>
-                <p className="text-gray-600 mb-4">"{testimonial.text}"</p>
+                <p className="text-gray-600 mb-4 transition-colors duration-300 group-hover:text-gray-700">"{testimonial.text}"</p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden mr-3">
+                  <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden mr-3 transition-transform duration-500 group-hover:scale-105">
                     <img 
                       src={testimonial.image}
                       alt={testimonial.name}
@@ -358,7 +358,7 @@ export default function HomePage() {
                     />
                   </div>
                   <div>
-                    <h4 className="font-medium">{testimonial.name}</h4>
+                    <h4 className="font-medium transition-colors duration-300 group-hover:text-primary">{testimonial.name}</h4>
                     <p className="text-gray-500 text-sm">{testimonial.location}</p>
                   </div>
                 </div>
@@ -373,9 +373,9 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div key={index} className="text-center group transition-all duration-300 hover:-translate-y-1 py-4">
+                <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4 transition-transform duration-500 group-hover:scale-110 group-hover:bg-primary/20 group-hover:shadow-md">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 transition-all duration-500 group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     {feature.icon === "truck" && (
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 100-4h14a2 2 0 100 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                     )}
@@ -390,8 +390,8 @@ export default function HomePage() {
                     )}
                   </svg>
                 </div>
-                <h3 className="font-medium mb-2">{feature.title}</h3>
-                <p className="text-gray-600 text-sm">{feature.description}</p>
+                <h3 className="font-medium mb-2 transition-colors duration-300 group-hover:text-primary">{feature.title}</h3>
+                <p className="text-gray-600 text-sm transition-all duration-500 group-hover:text-gray-800">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -410,7 +410,11 @@ export default function HomePage() {
                 placeholder="Your email address" 
                 className="bg-white/10 border border-white/30 rounded-md px-4 py-3 flex-grow focus:outline-none focus:bg-white/20 placeholder-white/75"
               />
-              <Button type="submit" variant="secondary" className="bg-white text-primary hover:bg-white/90">
+              <Button 
+                type="submit" 
+                variant="secondary" 
+                className="bg-white text-primary hover:bg-white/90 transition-all duration-300 hover:shadow-lg hover:scale-105"
+              >
                 Subscribe
               </Button>
             </form>
