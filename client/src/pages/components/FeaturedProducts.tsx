@@ -1,13 +1,8 @@
 import React from 'react';
 import { Link } from 'wouter';
-import { Product } from '@shared/schema';
+import { FeaturedProductsProps } from '@/types/component.types';
 import { ProductGrid } from '@/components/products/ProductGrid';
 import { AnimatedHeading } from './AnimatedHeading';
-
-interface FeaturedProductsProps {
-  products: Product[];
-  isLoading: boolean;
-}
 
 export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, isLoading }) => {
   return (

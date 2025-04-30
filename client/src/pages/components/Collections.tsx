@@ -1,17 +1,7 @@
 import React from 'react';
 import { Link } from 'wouter';
+import { CollectionsProps } from '@/types/component.types';
 import { AnimatedHeading } from './AnimatedHeading';
-
-interface Collection {
-  name: string;
-  description: string;
-  image: string;
-  href: string;
-}
-
-interface CollectionsProps {
-  collections: Collection[];
-}
 
 export const Collections: React.FC<CollectionsProps> = ({ collections }) => {
   return (
