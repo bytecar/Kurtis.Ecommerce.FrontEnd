@@ -347,14 +347,21 @@ export class MemStorage implements IStorage {
   
   // Wishlist methods
   async getWishlistByUser(userId: number): Promise<Product[]> {
+    console.log("Getting wishlist for user", userId);
+    console.log("All wishlists:", Array.from(this.wishlists.values()));
+    
     const wishlistItems = Array.from(this.wishlists.values()).filter(
       (item) => item.userId === userId
     );
     
+    console.log("Filtered wishlist items:", wishlistItems);
+    
     // Get product details for each wishlist item
     const products: Product[] = [];
     for (const item of wishlistItems) {
+      console.log("Getting product for wishlist item:", item);
       const product = this.products.get(item.productId);
+      console.log("Product found:", product);
       if (product) {
         products.push(product);
       }
