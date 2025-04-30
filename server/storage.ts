@@ -130,9 +130,10 @@ export class MemStorage implements IStorage {
       checkPeriod: 86400000, // prune expired entries every 24h
     });
     
-    // Initialize with users and products
+    // Initialize with users, products, and preferences
     this.initializeUsers();
     this.initializeProducts();
+    this.initializeUserPreferences();
   }
   
   // User management methods
