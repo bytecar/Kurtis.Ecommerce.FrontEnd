@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'wouter';
-import { Product } from '@shared/schema';
+import { NewArrivalsProps } from '@/types/component.types';
 import { ProductCard } from '@/components/products/ProductCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatedHeading } from './AnimatedHeading';
@@ -11,11 +11,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-
-interface NewArrivalsProps {
-  products: Product[];
-  isLoading: boolean;
-}
 
 export const NewArrivals: React.FC<NewArrivalsProps> = ({ products, isLoading }) => {
   return (

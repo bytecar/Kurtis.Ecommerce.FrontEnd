@@ -1,12 +1,7 @@
 import React from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
-
-interface HeroProps {
-  title: string;
-  subtitle: string;
-  image: string;
-}
+import { HeroProps } from '@/types/component.types';
 
 export const Hero: React.FC<HeroProps> = ({ title, subtitle, image }) => {
   return (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StarRatingProps } from '../../types/product.types';
+import { StarRatingProps } from '@/types/component.types';
 import { Star } from 'lucide-react';
 
 // Import CSS
