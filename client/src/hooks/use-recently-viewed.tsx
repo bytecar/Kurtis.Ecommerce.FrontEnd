@@ -52,17 +52,21 @@ export function RecentlyViewedProvider({ children }: { children: ReactNode }) {
     mutationFn: async (productId: number) => {
       if (user) {
         await apiRequest("POST", "/api/recently-viewed", { productId });
-        queryClient.invalidateQueries({ queryKey: ["/api/recently-viewed"] });
+        return queryClient.invalidateQueries({ queryKey: ["/api/recently-viewed"] });
       } else {
         // For guests, handle locally
         const product = await fetch(`/api/products/${productId}`).then(res => res.json());
-        
+        return product;
+      }
+    },
+    onSuccess: (data, productId) => {
+      if (!user && data) {
         setItems(prevItems => {
           // Remove existing instance of the product if it exists
           const filteredItems = prevItems.filter(item => item.id !== productId);
           
           // Add product to the beginning of the array
-          const newItems = [product, ...filteredItems].slice(0, MAX_ITEMS);
+          const newItems = [data, ...filteredItems].slice(0, MAX_ITEMS);
           
           // Save to local storage
           localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newItems));
