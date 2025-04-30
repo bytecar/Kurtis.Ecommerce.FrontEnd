@@ -170,7 +170,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {categories.map((category, index) => (
               <Link key={index} href={category.href}>
-                <a className="group">
+                <div className="group cursor-pointer">
                   <div className="relative rounded-lg overflow-hidden aspect-square">
                     <img 
                       src={category.image}
@@ -183,7 +183,7 @@ export default function HomePage() {
                       <p className="text-white/80 text-sm">{category.count} Products</p>
                     </div>
                   </div>
-                </a>
+                </div>
               </Link>
             ))}
           </div>
@@ -196,12 +196,12 @@ export default function HomePage() {
           <div className="flex justify-between items-center mb-8 group">
             <AnimatedHeading>Featured Products</AnimatedHeading>
             <Link href="/products/featured">
-              <a className="text-primary hover:text-primary/80 flex items-center gap-1 transition-all duration-300 hover:translate-x-1">
+              <div className="text-primary hover:text-primary/80 flex items-center gap-1 transition-all duration-300 hover:translate-x-1 cursor-pointer">
                 View All
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                 </svg>
-              </a>
+              </div>
             </Link>
           </div>
           
@@ -234,7 +234,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {collections.map((collection, index) => (
               <Link key={index} href={collection.href}>
-                <a className="group block relative rounded-lg overflow-hidden h-80">
+                <div className="group block relative rounded-lg overflow-hidden h-80 cursor-pointer">
                   <img 
                     src={collection.image}
                     alt={collection.name}
@@ -248,7 +248,7 @@ export default function HomePage() {
                       Explore Now
                     </span>
                   </div>
-                </a>
+                </div>
               </Link>
             ))}
           </div>
@@ -261,12 +261,12 @@ export default function HomePage() {
           <div className="flex justify-between items-center mb-8 group">
             <AnimatedHeading>New Arrivals</AnimatedHeading>
             <Link href="/products/new">
-              <a className="text-primary hover:text-primary/80 flex items-center gap-1 transition-all duration-300 hover:translate-x-1">
+              <div className="text-primary hover:text-primary/80 flex items-center gap-1 transition-all duration-300 hover:translate-x-1 cursor-pointer">
                 View All
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                 </svg>
-              </a>
+              </div>
             </Link>
           </div>
           
