@@ -12,6 +12,9 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
+// Import CSS
+import './styles/NewArrivals.css';
+
 export const NewArrivals: React.FC<NewArrivalsProps> = ({ products, isLoading }) => {
   return (
     <section className="new-arrivals-section">
