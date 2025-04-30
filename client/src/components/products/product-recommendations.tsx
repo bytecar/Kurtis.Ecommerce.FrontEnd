@@ -43,22 +43,22 @@ export function ProductRecommendations({ productId, className }: ProductRecommen
       <h2 className="text-2xl font-serif font-bold mb-6">You May Also Like</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {recommendations.map((product) => (
-          <Card key={product.id} className="border-0 shadow-none">
+          <Card key={product.id} className="border-0 shadow-none group overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
             <Link href={`/product/${product.id}`}>
               <a className="group">
-                <div className="overflow-hidden rounded-lg grow-on-hover">
+                <div className="overflow-hidden rounded-lg">
                   <img 
                     src={Array.isArray(product.imageUrls) && product.imageUrls.length > 0
                       ? product.imageUrls[0]
                       : "https://images.unsplash.com/photo-1612722432474-b971cdcea546"}
                     alt={product.name}
-                    className="w-full aspect-[3/4] object-cover"
+                    className="w-full aspect-[3/4] object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
                   />
                 </div>
-                <CardContent className="p-3 pt-4">
-                  <h3 className="font-medium text-base truncate">{product.name}</h3>
-                  <p className="text-muted-foreground text-sm">{product.brand}</p>
-                  <p className="font-medium mt-1">
+                <CardContent className="p-3 pt-4 transition-all duration-300">
+                  <h3 className="font-medium text-base truncate transform group-hover:translate-x-1 transition-all duration-300 ease-out group-hover:text-primary">{product.name}</h3>
+                  <p className="text-muted-foreground text-sm transform group-hover:translate-x-1 transition-all duration-300 ease-out">{product.brand}</p>
+                  <p className="font-medium mt-1 transform group-hover:scale-105 transition-all duration-300 ease-out group-hover:text-primary">
                     ₹{product.discountedPrice ?? product.price}
                   </p>
                 </CardContent>
