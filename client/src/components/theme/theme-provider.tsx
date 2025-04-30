@@ -1,6 +1,15 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { ThemeProviderProps } from "next-themes/dist/types";
+
+type ThemeProviderProps = {
+  children: ReactNode;
+  defaultTheme?: string;
+  storageKey?: string;
+  attribute?: string;
+  value?: Record<string, string>;
+  enableSystem?: boolean;
+  disableTransitionOnChange?: boolean;
+};
 
 export function ThemeProvider({ 
   children, 

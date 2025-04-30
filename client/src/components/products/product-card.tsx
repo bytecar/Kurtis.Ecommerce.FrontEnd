@@ -71,7 +71,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
         )}
         
         <Link href={`/product/${product.id}`}>
-          <a className="block overflow-hidden">
+          <div className="block overflow-hidden cursor-pointer">
             <img 
               src={Array.isArray(product.imageUrls) && product.imageUrls.length > 0
                 ? product.imageUrls[0]
@@ -79,7 +79,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
               alt={product.name}
               className="h-64 md:h-72 w-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
             />
-          </a>
+          </div>
         </Link>
       </div>
       
@@ -94,9 +94,9 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
         </div>
         <h3 className="font-medium text-base mb-1 truncate transform group-hover:translate-x-1 transition-all duration-300 ease-out">
           <Link href={`/product/${product.id}`}>
-            <a className="hover:text-primary transition-all duration-300 hover:font-semibold">
+            <div className="hover:text-primary transition-all duration-300 hover:font-semibold cursor-pointer">
               {product.name}
-            </a>
+            </div>
           </Link>
         </h3>
         <p className="text-muted-foreground text-sm transform group-hover:translate-x-1 transition-all duration-300 ease-out">{product.brand}</p>
