@@ -72,22 +72,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get product by ID
-  app.get("/api/products/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const product = await storage.getProduct(id);
-      
-      if (!product) {
-        return res.status(404).json({ error: "Product not found" });
-      }
-      
-      res.json(product);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to retrieve product" });
-    }
-  });
-  
   // Get featured products
   app.get("/api/products/featured", async (req, res) => {
     try {
@@ -116,6 +100,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(newArrivals);
     } catch (error) {
       res.status(500).json({ error: "Failed to retrieve new arrivals" });
+    }
+  });
+  
+  // Get product by ID
+  app.get("/api/products/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const product = await storage.getProduct(id);
+      
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+      
+      res.json(product);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to retrieve product" });
     }
   });
   
@@ -387,6 +387,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get recent orders (Admin only)
+  app.get("/api/orders/recent", async (req, res) => {
+    try {
+      // Verify user role
+      if (!req.isAuthenticated() || req.user.role !== "admin") {
+        return res.status(403).json({ error: "Not authorized" });
+      }
+      
+      const orders = await storage.getAllOrders();
+      
+      // Sort by createdAt descending and take the first 10
+      const recentOrders = [...orders]
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 10);
+      
+      res.json(recentOrders);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to retrieve recent orders" });
+    }
+  });
+  
   // Get order by ID (authenticated users only)
   app.get("/api/orders/:id", async (req, res) => {
     try {
@@ -438,27 +459,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(orderItems);
     } catch (error) {
       res.status(500).json({ error: "Failed to retrieve order items" });
-    }
-  });
-  
-  // Get recent orders (Admin only)
-  app.get("/api/orders/recent", async (req, res) => {
-    try {
-      // Verify user role
-      if (!req.isAuthenticated() || req.user.role !== "admin") {
-        return res.status(403).json({ error: "Not authorized" });
-      }
-      
-      const orders = await storage.getAllOrders();
-      
-      // Sort by createdAt descending and take the first 10
-      const recentOrders = [...orders]
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        .slice(0, 10);
-      
-      res.json(recentOrders);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to retrieve recent orders" });
     }
   });
   

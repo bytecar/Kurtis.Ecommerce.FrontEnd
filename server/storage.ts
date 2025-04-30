@@ -393,6 +393,11 @@ export class MemStorage implements IStorage {
     return this.wishlists.delete(wishlistItem.id);
   }
   
+  // Alias for removeFromWishlist to match route usage
+  async deleteWishlistItem(userId: number, productId: number): Promise<boolean> {
+    return this.removeFromWishlist(userId, productId);
+  }
+  
   // Recently viewed methods
   async getRecentlyViewedByUser(userId: number): Promise<Product[]> {
     const recentItems = Array.from(this.recentlyViewed.values())
@@ -430,6 +435,11 @@ export class MemStorage implements IStorage {
     };
     this.recentlyViewed.set(id, newRecentlyViewed);
     return newRecentlyViewed;
+  }
+  
+  // Alias for addToRecentlyViewed to match route usage
+  async createRecentlyViewed(recentlyViewed: InsertRecentlyViewed): Promise<RecentlyViewed> {
+    return this.addToRecentlyViewed(recentlyViewed);
   }
   
   // Return management methods
