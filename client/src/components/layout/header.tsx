@@ -6,6 +6,8 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
