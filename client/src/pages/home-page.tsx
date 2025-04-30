@@ -27,25 +27,25 @@ export default function HomePage() {
   const categories = [
     { 
       name: "Kurtis", 
-      image: "https://images.unsplash.com/photo-1610189025554-708a149676b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8d29tZW4ncyBpbmRpYW4gZXRobmljIGRyZXNzZXN8fHx8fHwxNzE4NTU3Njk2&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      image: "https://images.unsplash.com/photo-1610189025554-708a149676b8?auto=format&fit=crop&q=80&w=1080",
       count: "500+",
       href: "/products/women?category=kurtis"
     },
     { 
       name: "Sarees", 
-      image: "https://images.unsplash.com/photo-1636628266722-d5448ca44f5a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8d29tZW4ncyBpbmRpYW4gZXRobmljIGRyZXNzZXN8fHx8fHwxNzE4NTU3Njk3&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      image: "https://images.unsplash.com/photo-1606902168692-BF5954ba5a5d?auto=format&fit=crop&q=80&w=1080",
       count: "300+",
       href: "/products/women?category=sarees"
     },
     { 
       name: "Men's Kurta", 
-      image: "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8bWVuJ3MgdHJhZGl0aW9uYWwgY2xvdGhpbmd8fHx8fHwxNzE4NTU3Njk4&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      image: "https://images.unsplash.com/photo-1624032786592-2ade942c727f?auto=format&fit=crop&q=80&w=1080",
       count: "250+",
       href: "/products/men?category=kurta-sets"
     },
     { 
       name: "Lehengas", 
-      image: "https://images.unsplash.com/photo-1623000963328-6eb604d3f15f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8ZmFzaGlvbiBtb2RlbHMgd2l0aCBldGhuaWMgd2Vhcnx8fHx8fDE3MTg1NTc2OTg&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      image: "https://images.unsplash.com/photo-1652384046585-15d13c0b750c?auto=format&fit=crop&q=80&w=1080",
       count: "200+",
       href: "/products/women?category=lehengas"
     }
@@ -56,19 +56,19 @@ export default function HomePage() {
     {
       name: "Festival Collection",
       description: "Celebrate in style",
-      image: "https://images.unsplash.com/photo-1578148541106-219e9b56eb28?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8d29tZW4ncyBpbmRpYW4gZXRobmljIGRyZXNzZXN8fHx8fHwxNzE4NTU3NzA0&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      image: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&q=80&w=1080",
       href: "/products/women?collection=festival"
     },
     {
       name: "Summer Essentials",
       description: "Light & breathable fabrics",
-      image: "https://images.unsplash.com/photo-1594387903898-7d1235079332?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8d29tZW4ncyBpbmRpYW4gZXRobmljIGRyZXNzZXN8fHx8fHwxNzE4NTU3NzAy&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      image: "https://images.unsplash.com/photo-1581192299347-7228a808afc4?auto=format&fit=crop&q=80&w=1080",
       href: "/products/women?collection=summer"
     },
     {
       name: "Men's Collection",
       description: "Modern & traditional styles",
-      image: "https://images.unsplash.com/photo-1625301840055-7c4d6f04b5d5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8bWVuJ3MgdHJhZGl0aW9uYWwgY2xvdGhpbmd8fHx8fHwxNzE4NTU3NzAz&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      image: "https://images.unsplash.com/photo-1626054437123-40a75e3cfa8a?auto=format&fit=crop&q=80&w=1080",
       href: "/products/men"
     }
   ];

@@ -138,7 +138,7 @@ export default function ProductListing() {
       
       <div className="mb-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-serif font-bold">{getPageHeading()}</h1>
+          <h1 className="text-3xl font-serif font-bold text-center w-full md:text-left md:w-auto">{getPageHeading()}</h1>
           
           {isMobile && (
             <ProductFilters
@@ -148,7 +148,7 @@ export default function ProductListing() {
           )}
         </div>
         {products && (
-          <p className="text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 text-center md:text-left">
             {products.length} {products.length === 1 ? 'product' : 'products'} found
           </p>
         )}
