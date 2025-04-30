@@ -2,67 +2,101 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Light mode - Ethnic-inspired color palette */
 :root {
-  --background: 0 0% 100%;
-  --foreground: 20 14.3% 4.1%;
-  --muted: 60 4.8% 95.9%;
-  --muted-foreground: 25 5.3% 44.7%;
-  --popover: 0 0% 100%;
+  /* Base colors */
+  --background: 35 25% 98%;  /* Soft ivory */
+  --foreground: 20 14.3% 4.1%; /* Rich black */
+  
+  /* Muted colors */
+  --muted: 35 35% 95%;  /* Light sandstone */
+  --muted-foreground: 25 15% 41%;  /* Earthy taupe */
+  
+  /* Interface elements */
+  --popover: 35 25% 98%;
   --popover-foreground: 20 14.3% 4.1%;
-  --card: 0 0% 100%;
+  --card: 35 20% 99%;  /* Off-white with warm undertone */
   --card-foreground: 20 14.3% 4.1%;
-  --border: 20 5.9% 90%;
-  --input: 20 5.9% 90%;
-  --primary: 270 76% 53%;
-  --primary-foreground: 211 100% 99%;
-  --secondary: 60 4.8% 95.9%;
-  --secondary-foreground: 24 9.8% 10%;
-  --accent: 60 4.8% 95.9%;
+  --border: 30 10% 90%;  /* Soft beige border */
+  --input: 30 10% 90%;
+  
+  /* Primary colors - Festive inspiration */
+  --primary: 350 75% 41%;  /* Vibrant Indian red */
+  --primary-foreground: 35 40% 98%;
+  
+  /* Secondary and accent colors - Textile inspired */
+  --secondary: 35 40% 90%;  /* Warm beige */
+  --secondary-foreground: 20 40% 10%;
+  --accent: 40 100% 94%;  /* Soft gold accent */
   --accent-foreground: 24 9.8% 10%;
+  
+  /* Destructive and utility colors */
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 60 9.1% 97.8%;
-  --ring: 20 14.3% 4.1%;
-  --sidebar: 0 0% 100%;
+  --ring: 350 75% 41%;
+  
+  /* Sidebar colors */
+  --sidebar: 30 30% 96%;  /* Warm sandstone */
   --sidebar-foreground: 20 14.3% 4.1%;
-  --sidebar-muted: 60 4.8% 95.9%;
-  --sidebar-muted-foreground: 25 5.3% 44.7%;
+  --sidebar-muted: 35 40% 92%;
+  --sidebar-muted-foreground: 25 15% 41%;
+  
+  /* Other settings */
   --radius: 0.5rem;
-  --chart-1: 270 76% 53%;
-  --chart-2: 340 65% 60%;
-  --chart-3: 26 91% 56%;
-  --chart-4: 232 51% 36%;
-  --chart-5: 162 47% 50%;
+  
+  /* Chart colors - Inspired by traditional textiles */
+  --chart-1: 350 75% 41%;  /* Indian red */
+  --chart-2: 24 90% 50%;  /* Marigold orange */
+  --chart-3: 195 65% 40%;  /* Peacock blue */
+  --chart-4: 120 40% 45%;  /* Mehendi green */
+  --chart-5: 47 100% 46%;  /* Turmeric yellow */
 }
 
+/* Dark mode - Ethnic-inspired color palette */
 .dark {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
-  --card: 240 10% 3.9%;
-  --card-foreground: 0 0% 98%;
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --primary: 270 76% 53%;
-  --primary-foreground: 211 100% 99%;
-  --secondary: 240 3.7% 15.9%;
-  --secondary-foreground: 0 0% 98%;
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
+  /* Base colors */
+  --background: 240 15% 12%;  /* Deep indigo-black */
+  --foreground: 35 25% 90%;  /* Soft ivory text */
+  
+  /* Muted colors */
+  --muted: 240 10% 22%;  /* Deep muted blue */
+  --muted-foreground: 35 15% 65%;  /* Soft beige */
+  
+  /* Interface elements */
+  --popover: 240 15% 12%;
+  --popover-foreground: 35 25% 90%;
+  --card: 240 10% 16%;  /* Deep indigo card */
+  --card-foreground: 35 25% 90%;
+  --border: 240 10% 25%;  /* Deep indigo border */
+  --input: 240 10% 25%;
+  
+  /* Primary colors - Festive inspiration (more vibrant in dark mode) */
+  --primary: 350 80% 50%;  /* Brighter Indian red */
+  --primary-foreground: 35 40% 98%;
+  
+  /* Secondary and accent colors - Textile inspired */
+  --secondary: 240 10% 25%;
+  --secondary-foreground: 35 25% 90%;
+  --accent: 35 50% 20%;  /* Rich gold accent, darker */
+  --accent-foreground: 35 25% 90%;
+  
+  /* Destructive and utility colors */
+  --destructive: 0 62.8% 40.6%;
   --destructive-foreground: 0 0% 98%;
-  --ring: 240 4.9% 83.9%;
-  --sidebar: 240 10% 3.9%;
-  --sidebar-foreground: 0 0% 98%;
-  --sidebar-muted: 240 3.7% 15.9%;
-  --sidebar-muted-foreground: 240 5% 64.9%;
-  --chart-1: 262 83% 71%;
-  --chart-2: 340 65% 60%;
-  --chart-3: 26 91% 56%;
-  --chart-4: 232 51% 36%;
-  --chart-5: 162 47% 50%;
+  --ring: 350 80% 50%;
+  
+  /* Sidebar colors */
+  --sidebar: 240 20% 14%;  /* Deep indigo sidebar */
+  --sidebar-foreground: 35 25% 90%;
+  --sidebar-muted: 240 10% 22%;
+  --sidebar-muted-foreground: 35 15% 65%;
+  
+  /* Chart colors - More vibrant in dark mode */
+  --chart-1: 350 80% 60%;  /* Brighter red */
+  --chart-2: 24 95% 60%;  /* Vibrant orange */
+  --chart-3: 195 70% 50%;  /* Brighter peacock */
+  --chart-4: 120 45% 55%;  /* Vibrant green */
+  --chart-5: 47 100% 55%;  /* Bright yellow */
 }
 
 @layer base {
@@ -71,6 +105,19 @@
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  /* Smooth transitions for theme changes */
+  *, *::before, *::after {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+  
+  /* Exceptions to avoid transition on certain elements */
+  button *, a *, svg *, input, select, textarea {
+    transition-property: transform, opacity;
   }
 }
 
