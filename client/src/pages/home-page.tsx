@@ -6,6 +6,7 @@ import { ProductGrid } from "@/components/products/product-grid";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AnimatedHeading } from "@/components/ui/animated-heading";
 
 export default function HomePage() {
   // Fetch featured products
@@ -161,7 +162,9 @@ export default function HomePage() {
       {/* Categories */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-serif font-bold text-center mb-10">Shop By Category</h2>
+          <div className="mb-10 group">
+            <AnimatedHeading center>Shop By Category</AnimatedHeading>
+          </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {categories.map((category, index) => (
@@ -189,10 +192,10 @@ export default function HomePage() {
       {/* Featured Products */}
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-serif font-bold">Featured Products</h2>
+          <div className="flex justify-between items-center mb-8 group">
+            <AnimatedHeading>Featured Products</AnimatedHeading>
             <Link href="/products/featured">
-              <a className="text-primary hover:text-primary/80 flex items-center gap-1">
+              <a className="text-primary hover:text-primary/80 flex items-center gap-1 transition-all duration-300 hover:translate-x-1">
                 View All
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
@@ -223,7 +226,9 @@ export default function HomePage() {
       {/* Collections */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-serif font-bold text-center mb-10">Shop By Collections</h2>
+          <div className="mb-10 group">
+            <AnimatedHeading center>Shop By Collections</AnimatedHeading>
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {collections.map((collection, index) => (
@@ -252,10 +257,10 @@ export default function HomePage() {
       {/* New Arrivals */}
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-serif font-bold">New Arrivals</h2>
+          <div className="flex justify-between items-center mb-8 group">
+            <AnimatedHeading>New Arrivals</AnimatedHeading>
             <Link href="/products/new">
-              <a className="text-primary hover:text-primary/80 flex items-center gap-1">
+              <a className="text-primary hover:text-primary/80 flex items-center gap-1 transition-all duration-300 hover:translate-x-1">
                 View All
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
@@ -290,22 +295,22 @@ export default function HomePage() {
                     <div className="p-1">
                       <Link href={`/product/${product.id}`}>
                         <a className="block group">
-                          <div className="relative overflow-hidden rounded-lg grow-on-hover">
+                          <div className="relative overflow-hidden rounded-lg">
                             <img 
                               src={Array.isArray(product.imageUrls) && product.imageUrls.length > 0
                                 ? product.imageUrls[0]
                                 : "https://placehold.co/400x500"}
                               alt={product.name}
-                              className="w-full aspect-[3/4] object-cover"
+                              className="w-full aspect-[3/4] object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
                             />
                             <div className="absolute top-2 left-2">
                               <span className="bg-primary text-white text-xs px-2 py-1 rounded-full">New</span>
                             </div>
                           </div>
-                          <div className="mt-3">
-                            <h3 className="font-medium">{product.name}</h3>
-                            <p className="text-gray-600 text-sm">{product.brand}</p>
-                            <div className="mt-1 flex items-center gap-2">
+                          <div className="mt-3 transition-all duration-300">
+                            <h3 className="font-medium group-hover:text-primary transition-colors duration-300 transform group-hover:translate-x-1">{product.name}</h3>
+                            <p className="text-gray-600 text-sm transform group-hover:translate-x-1 transition-all duration-300 ease-out">{product.brand}</p>
+                            <div className="mt-1 flex items-center gap-2 transform group-hover:scale-105 transition-all duration-300 ease-out group-hover:text-primary">
                               <span className="font-medium">₹{product.discountedPrice || product.price}</span>
                               {product.discountedPrice && (
                                 <span className="text-gray-500 text-sm line-through">₹{product.price}</span>
@@ -328,8 +333,8 @@ export default function HomePage() {
       {/* Testimonials */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-serif font-bold mb-3">What Our Customers Say</h2>
+          <div className="text-center mb-12 group">
+            <AnimatedHeading center className="mb-3">What Our Customers Say</AnimatedHeading>
             <p className="text-gray-600 max-w-2xl mx-auto">See why thousands of customers love shopping with us</p>
           </div>
           
@@ -396,8 +401,8 @@ export default function HomePage() {
       {/* Newsletter */}
       <section className="py-16 bg-primary text-white">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-serif font-bold mb-3">Join Our Newsletter</h2>
+          <div className="max-w-3xl mx-auto text-center group">
+            <AnimatedHeading center className="mb-3 text-white before:bg-white">Join Our Newsletter</AnimatedHeading>
             <p className="mb-6 opacity-90">Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.</p>
             <form className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
               <input 
