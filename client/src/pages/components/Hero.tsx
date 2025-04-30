@@ -3,7 +3,11 @@ import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { HeroProps } from '@/types/component.types';
 
+// Import CSS
+import './styles/Hero.css';
+
 export const Hero: React.FC<HeroProps> = ({ title, subtitle, image }) => {
+  // The HTML structure is maintained in './html/Hero.html'
   return (
     <section className="hero-section">
       <div className="container mx-auto hero-container">
