@@ -362,22 +362,57 @@ export class MemStorage implements IStorage {
       
       // Associate some products with collections
       if (id === 1) { // New Arrivals Collection
-        // Most recent products go here (1, 2, 3)
-        [1, 2, 3].forEach(productId => {
+        // Products 1-10 go into New Arrivals
+        for (let productId = 1; productId <= 10; productId++) {
           this.addProductToCollection({ productId, collectionId: id });
-        });
+        }
       } else if (id === 2) { // Summer Collection
-        [1, 3, 5].forEach(productId => {
+        // Random summer products (lightweight materials)
+        [1, 3, 5, 7, 9, 11, 13, 15, 17, 19].forEach(productId => {
           this.addProductToCollection({ productId, collectionId: id });
         });
       } else if (id === 3) { // Wedding Collection
-        [2, 6, 8].forEach(productId => {
+        // Fancier items
+        [2, 6, 8, 12, 16, 20, 24, 28, 32, 36].forEach(productId => {
           this.addProductToCollection({ productId, collectionId: id });
         });
       } else if (id === 4) { // Festival Collection
-        [4, 7, 9].forEach(productId => {
+        // Colorful festival items
+        [4, 7, 9, 14, 18, 22, 26, 30, 34, 38].forEach(productId => {
           this.addProductToCollection({ productId, collectionId: id });
         });
+      } else if (id === 5) { // Men's Ethnic
+        // Filter men's products
+        for (let productId = 1; productId <= 100; productId++) {
+          const product = this.products.get(productId);
+          if (product && product.gender === 'men') {
+            this.addProductToCollection({ productId, collectionId: id });
+          }
+        }
+      } else if (id === 6) { // Women's Ethnic
+        // Filter women's products
+        for (let productId = 1; productId <= 100; productId++) {
+          const product = this.products.get(productId);
+          if (product && product.gender === 'women') {
+            this.addProductToCollection({ productId, collectionId: id });
+          }
+        }
+      } else if (id === 7) { // Designer Collection
+        // Higher priced items go into Designer Collection
+        for (let productId = 1; productId <= 100; productId++) {
+          const product = this.products.get(productId);
+          if (product && product.price > 3000) {
+            this.addProductToCollection({ productId, collectionId: id });
+          }
+        }
+      } else if (id === 8) { // Trending Now
+        // Products with high ratings go into Trending
+        for (let productId = 1; productId <= 100; productId++) {
+          const product = this.products.get(productId);
+          if (product && product.averageRating > 4.5) {
+            this.addProductToCollection({ productId, collectionId: id });
+          }
+        }
       }
     });
   }
