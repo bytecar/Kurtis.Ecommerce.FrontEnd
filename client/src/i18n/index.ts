@@ -7,6 +7,7 @@ import Backend from 'i18next-http-backend';
 import enTranslation from './locales/en.json';
 import hiTranslation from './locales/hi.json';
 import knTranslation from './locales/kn.json';
+import teTranslation from './locales/te.json';
 
 // Define resources with the translations
 const resources = {
@@ -18,6 +19,9 @@ const resources = {
   },
   kn: {
     translation: knTranslation
+  },
+  te: {
+    translation: teTranslation
   }
 };
 
