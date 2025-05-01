@@ -74,6 +74,12 @@ export interface IStorage {
   getCollectionsByProduct(productId: number): Promise<Collection[]>;
   addProductToCollection(productCollection: InsertProductCollection): Promise<ProductCollection>;
   removeProductFromCollection(productId: number, collectionId: number): Promise<boolean>;
+  
+  // Metadata for filtering and UI
+  getAllCategories(): Promise<{id: number, name: string, label: string, gender: string}[]>;
+  getAllBrands(): Promise<{id: number, name: string, label: string}[]>;
+  getAllSizes(): Promise<{id: number, name: string, label: string}[]>;
+  getAllRatingOptions(): Promise<{id: string, label: string}[]>;
 
   // Review management
   getAllReviews(): Promise<Review[]>;
@@ -1118,84 +1124,108 @@ export class MemStorage implements IStorage {
     }
   }
 
+  // Define category data structure with IDs for normalization
+  private categoryData = [
+    // Women's ethnic wear
+    { id: 1, name: "sarees", label: "Sarees", gender: "women" },
+    { id: 2, name: "kurtis", label: "Kurtis", gender: "women" },
+    { id: 3, name: "lehengas", label: "Lehengas", gender: "women" },
+    { id: 4, name: "salwar_kameez", label: "Salwar Kameez", gender: "women" },
+    { id: 5, name: "anarkali_suits", label: "Anarkali Suits", gender: "women" },
+    { id: 6, name: "palazzo_suits", label: "Palazzo Suits", gender: "women" },
+    { id: 7, name: "gowns", label: "Gowns", gender: "women" },
+    { id: 8, name: "dupattas", label: "Dupattas", gender: "women" },
+    { id: 9, name: "blouses", label: "Blouses", gender: "women" },
+    { id: 10, name: "skirts", label: "Skirts", gender: "women" },
+    { id: 11, name: "dresses", label: "Dresses", gender: "women" },
+    // Men's ethnic wear
+    { id: 12, name: "kurtas", label: "Kurtas", gender: "men" },
+    { id: 13, name: "sherwanis", label: "Sherwanis", gender: "men" },
+    { id: 14, name: "nehru_jackets", label: "Nehru Jackets", gender: "men" },
+    { id: 15, name: "dhoti_sets", label: "Dhoti Sets", gender: "men" },
+    { id: 16, name: "indo_western", label: "Indo Western", gender: "men" },
+    // Accessories (unisex)
+    { id: 17, name: "jewelry", label: "Jewelry", gender: "unisex" },
+    { id: 18, name: "footwear", label: "Footwear", gender: "unisex" },
+    { id: 19, name: "bags", label: "Bags", gender: "unisex" },
+    { id: 20, name: "scarves", label: "Scarves", gender: "unisex" },
+  ];
+
+  // Define brand data structure with IDs for normalization
+  private brandData = [
+    { id: 1, name: "Fabindia", label: "Fabindia" },
+    { id: 2, name: "Biba", label: "Biba" },
+    { id: 3, name: "W", label: "W" },
+    { id: 4, name: "Global Desi", label: "Global Desi" },
+    { id: 5, name: "Anokhi", label: "Anokhi" },
+    { id: 6, name: "Aurelia", label: "Aurelia" },
+    { id: 7, name: "Manyavar", label: "Manyavar" },
+    { id: 8, name: "Ritu Kumar", label: "Ritu Kumar" },
+    { id: 9, name: "Soch", label: "Soch" },
+    { id: 10, name: "Khaadi", label: "Khaadi" },
+    { id: 11, name: "Jaypore", label: "Jaypore" },
+    { id: 12, name: "House of Masaba", label: "House of Masaba" },
+    { id: 13, name: "Sabyasachi", label: "Sabyasachi" },
+    { id: 14, name: "Tarun Tahiliani", label: "Tarun Tahiliani" },
+    { id: 15, name: "Anita Dongre", label: "Anita Dongre" },
+    { id: 16, name: "Raymond", label: "Raymond" },
+    { id: 17, name: "Rangriti", label: "Rangriti" },
+    { id: 18, name: "Ethnic Basket", label: "Ethnic Basket" },
+    { id: 19, name: "Libas", label: "Libas" },
+    { id: 20, name: "Neerus", label: "Neerus" },
+    { id: 21, name: "Meena Bazaar", label: "Meena Bazaar" },
+    { id: 22, name: "Chhabra 555", label: "Chhabra 555" },
+    { id: 23, name: "Tikhi Imli", label: "Tikhi Imli" },
+    { id: 24, name: "Sangria", label: "Sangria" },
+  ];
+
+  // Define size data structure with IDs for normalization
+  private sizeData = [
+    { id: 1, name: "xs", label: "XS (Extra Small)" },
+    { id: 2, name: "s", label: "S (Small)" },
+    { id: 3, name: "m", label: "M (Medium)" },
+    { id: 4, name: "l", label: "L (Large)" },
+    { id: 5, name: "xl", label: "XL (Extra Large)" },
+    { id: 6, name: "xxl", label: "XXL (Double Extra Large)" },
+  ];
+
+  // Define rating data structure for consistent filtering
+  private ratingData = [
+    { id: "4-up", label: "4★ & Above" },
+    { id: "3-up", label: "3★ & Above" },
+    { id: "2-up", label: "2★ & Above" },
+    { id: "1-up", label: "1★ & Above" },
+  ];
+
+  private fabricData = [
+    "Cotton",
+    "Silk",
+    "Linen",
+    "Chiffon",
+    "Georgette",
+    "Chanderi",
+    "Banarasi",
+    "Khadi",
+    "Rayon",
+    "Crepe",
+    "Organza",
+    "Velvet",
+    "Brocade",
+    "Kota",
+    "Tussar",
+    "Patola",
+    "Pashmina",
+    "Kanjeevaram",
+    "Maheshwari",
+    "Ikat",
+    "Pochampally",
+    "Bandhani",
+  ];
+  
   private initializeProducts() {
-    const categories = [
-      // Women's ethnic wear
-      "sarees",
-      "kurtis",
-      "lehengas",
-      "salwar_kameez",
-      "anarkali_suits",
-      "palazzo_suits",
-      "gowns",
-      "dupattas",
-      "blouses",
-      "skirts",
-      "dresses",
-      // Men's ethnic wear
-      "kurtas",
-      "sherwanis",
-      "nehru_jackets",
-      "dhoti_sets",
-      "indo_western",
-      // Accessories
-      "jewelry",
-      "footwear",
-      "bags",
-      "scarves",
-    ];
-
-    const brands = [
-      "Fabindia",
-      "Biba",
-      "W",
-      "Global Desi",
-      "Anokhi",
-      "Aurelia",
-      "Manyavar",
-      "Ritu Kumar",
-      "Soch",
-      "Khaadi",
-      "Jaypore",
-      "House of Masaba",
-      "Sabyasachi",
-      "Tarun Tahiliani",
-      "Anita Dongre",
-      "Raymond",
-      "Rangriti",
-      "Ethnic Basket",
-      "Libas",
-      "Neerus",
-      "Meena Bazaar",
-      "Chhabra 555",
-      "Tikhi Imli",
-      "Sangria",
-    ];
-
-    const fabrics = [
-      "Cotton",
-      "Silk",
-      "Linen",
-      "Chiffon",
-      "Georgette",
-      "Chanderi",
-      "Banarasi",
-      "Khadi",
-      "Rayon",
-      "Crepe",
-      "Organza",
-      "Velvet",
-      "Brocade",
-      "Kota",
-      "Tussar",
-      "Patola",
-      "Pashmina",
-      "Kanjeevaram",
-      "Maheshwari",
-      "Ikat",
-      "Pochampally",
-      "Bandhani",
-    ];
+    // Extract simple arrays for backward compatibility in product generation
+    const categories = this.categoryData.map(cat => cat.name);
+    const brands = this.brandData.map(brand => brand.name);
 
     const occasions = [
       "Casual",
