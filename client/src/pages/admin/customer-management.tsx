@@ -519,7 +519,7 @@ const CustomerManagement: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredUsers.slice(0, 10).map((user) => (
+                  {paginatedUsers.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
@@ -575,11 +575,25 @@ const CustomerManagement: React.FC = () => {
         </CardContent>
         <CardFooter className="flex justify-between">
           <div className="text-sm text-muted-foreground">
-            Showing 1 to 10 of {filteredUsers.length} results
+            Showing {filteredUsers.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, filteredUsers.length)} of {filteredUsers.length} results
           </div>
           <div className="space-x-2">
-            <Button variant="outline" size="sm" disabled>Previous</Button>
-            <Button variant="outline" size="sm">Next</Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              disabled={currentPage <= 1}
+              onClick={() => setCurrentPage(prevPage => Math.max(prevPage - 1, 1))}
+            >
+              Previous
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              disabled={currentPage >= totalPages}
+              onClick={() => setCurrentPage(prevPage => Math.min(prevPage + 1, totalPages))}
+            >
+              Next
+            </Button>
           </div>
         </CardFooter>
       </Card>
