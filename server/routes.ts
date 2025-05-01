@@ -309,7 +309,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create or update user preferences
   app.post("/api/user/preferences", authenticateJWT, async (req, res) => {
     try {
-      const userId = (req as any).user.id;
+      // Get authenticated user safely
+      const user = getUserSafely(req);
+      const userId = user.id;
       const { favoriteCategories, favoriteColors, favoriteOccasions, priceRangeMin, priceRangeMax } = req.body;
       
       // Validate input
@@ -320,9 +322,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create new preferences
       const preferences = {
         userId,
-        favoriteCategories,
-        favoriteColors,
-        favoriteOccasions,
+        // Ensure arrays are properly typed as string[]
+        favoriteCategories: Array.isArray(favoriteCategories) ? favoriteCategories : Array.from(favoriteCategories) as string[],
+        favoriteColors: Array.isArray(favoriteColors) ? favoriteColors : Array.from(favoriteColors) as string[],
+        favoriteOccasions: Array.isArray(favoriteOccasions) ? favoriteOccasions : Array.from(favoriteOccasions) as string[],
         priceRangeMin: priceRangeMin || null,
         priceRangeMax: priceRangeMax || null
       };
