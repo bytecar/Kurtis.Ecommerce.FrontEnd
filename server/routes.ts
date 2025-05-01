@@ -3,6 +3,7 @@ import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, hashPassword } from "./auth";
+import { authenticateJWT, requirePermission, requireRole } from "./jwt-auth";
 import { z } from "zod";
 import { insertProductSchema, insertInventorySchema, insertReviewSchema, insertOrderSchema, insertOrderItemSchema, insertReturnSchema, insertRecentlyViewedSchema, insertWishlistSchema } from "@shared/schema";
 import multer from "multer";
@@ -50,12 +51,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ======= Admin Routes =======
   
   // Get all users (admin only)
-  app.get("/api/admin/users", async (req, res) => {
+  app.get("/api/admin/users", authenticateJWT, requireRole("admin"), async (req, res) => {
     try {
-      // Check if user is admin
-      if (!req.isAuthenticated() || req.user.role !== "admin") {
-        return res.status(403).json({ error: "Unauthorized: Admin access required" });
-      }
       
       const users = await storage.getAllUsers();
       // Remove sensitive information
@@ -129,7 +126,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const hashedPassword = await hashPassword(result.data.password);
       const newUser = await storage.createUser({
         ...result.data,
-        password: hashedPassword
+        password: hashedPassword,
+        status: "active" // Required for JWT authentication
       });
       
       // Remove password from response
@@ -1225,13 +1223,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ======= Content Manager Routes =======
 
   // Upload product images
-  app.post('/api/upload', (req, res, next) => {
-    // Check if user is authenticated and has the right role
-    if (!req.isAuthenticated() || (req.user.role !== "contentManager" && req.user.role !== "admin")) {
-      return res.status(403).json({ error: "Not authorized" });
-    }
-    next();
-  }, upload.array('images', 10), (req, res) => {
+  app.post('/api/upload', authenticateJWT, requirePermission('product:write'), upload.array('images', 10), (req, res) => {
     try {
       const files = req.files as Express.Multer.File[];
       if (!files || files.length === 0) {
@@ -1248,12 +1240,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Bulk update products
-  app.post('/api/products/bulk-update', async (req, res) => {
+  app.post('/api/products/bulk-update', authenticateJWT, requirePermission('product:write'), async (req, res) => {
     try {
-      // Check if user is authenticated and has the right role
-      if (!req.isAuthenticated() || (req.user.role !== "contentManager" && req.user.role !== "admin")) {
-        return res.status(403).json({ error: "Not authorized" });
-      }
       
       // Validate request
       const bulkUpdateSchema = z.object({
