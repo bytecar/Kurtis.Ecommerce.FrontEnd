@@ -12,7 +12,7 @@ import {
   PinterestIcon,
   TelegramIcon,
 } from 'react-share';
-import { CopyIcon, CheckIcon, ShareIcon } from 'lucide-react';
+import { CopyIcon, CheckIcon, Share2Icon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -235,7 +235,7 @@ export const SocialShareButton: React.FC<SocialShareButtonProps> = ({
           size={buttonSize}
           className={`gap-2 ${className}`}
         >
-          <ShareIcon className="h-4 w-4" />
+          <Share2Icon className="h-4 w-4" />
           {buttonSize !== 'icon' && (t('social.share') || 'Share')}
         </Button>
       </DropdownMenuTrigger>
