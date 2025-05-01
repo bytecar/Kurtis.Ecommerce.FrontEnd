@@ -13,7 +13,7 @@ import { CheckIcon, GlobeIcon } from 'lucide-react';
 const languages = [
   { code: 'en', label: 'English' },
   { code: 'hi', label: 'हिंदी' }, // Hindi
-  { code: 'gu', label: 'ગુજરાતી' }, // Gujarati
+  { code: 'kn', label: 'ಕನ್ನಡ' }, // Kannada
 ];
 
 const LanguageSwitcher: React.FC = () => {
