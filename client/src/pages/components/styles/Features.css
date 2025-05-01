@@ -1,71 +1,33 @@
 .features-section {
-  padding: 5rem 0;
-  background-color: var(--background-alt);
+  padding: 4rem 0;
+  background-color: var(--background);
   position: relative;
-  overflow: hidden;
 }
 
 .features-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
-  margin-top: 3rem;
+  margin-top: 2rem;
 }
 
 .feature-card {
   text-align: center;
-  background-color: var(--background);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  position: relative;
-  z-index: 1;
-  overflow: hidden;
-}
-
-.feature-card::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 3px;
-  bottom: 0;
-  left: 0;
-  background: linear-gradient(to right, var(--primary), var(--secondary));
-  transform: scaleX(0);
-  transform-origin: bottom right;
-  transition: transform 0.3s ease;
-  z-index: -1;
-}
-
-.feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-}
-
-.feature-card:hover::after {
-  transform: scaleX(1);
-  transform-origin: bottom left;
+  border: 1px solid var(--border);
 }
 
 .feature-icon-container {
-  margin: 0 auto 1.5rem;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
+  margin: 0 auto 1rem;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--primary-50);
   color: var(--primary);
-  transition: all 0.3s ease;
-}
-
-.feature-card:hover .feature-icon-container {
-  background-color: var(--primary);
-  color: white;
-  transform: scale(1.1);
 }
 
 .feature-icon {
@@ -74,9 +36,9 @@
 }
 
 .feature-title {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 600;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   color: var(--foreground);
 }
 
