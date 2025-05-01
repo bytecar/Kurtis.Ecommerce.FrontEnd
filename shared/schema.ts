@@ -246,3 +246,44 @@ export const insertUserPreferencesSchema = createInsertSchema(userPreferences).p
 
 export type UserPreferences = typeof userPreferences.$inferSelect;
 export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
+
+// Collections
+export const collections = pgTable("collections", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  imageUrl: text("image_url"),
+  active: boolean("active").default(true),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertCollectionSchema = createInsertSchema(collections).pick({
+  name: true,
+  description: true,
+  imageUrl: true,
+  active: true,
+  startDate: true,
+  endDate: true,
+});
+
+// Product Collections (many-to-many relationship between products and collections)
+export const productCollections = pgTable("product_collections", {
+  id: serial("id").primaryKey(),
+  productId: integer("product_id").notNull(),
+  collectionId: integer("collection_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertProductCollectionSchema = createInsertSchema(productCollections).pick({
+  productId: true,
+  collectionId: true,
+});
+
+export type Collection = typeof collections.$inferSelect;
+export type InsertCollection = z.infer<typeof insertCollectionSchema>;
+
+export type ProductCollection = typeof productCollections.$inferSelect;
+export type InsertProductCollection = z.infer<typeof insertProductCollectionSchema>;
