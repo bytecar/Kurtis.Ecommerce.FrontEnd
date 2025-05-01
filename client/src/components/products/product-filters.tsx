@@ -194,14 +194,19 @@ export function ProductFilters({
             <div className="space-y-2">
               {categories.map((category) => (
                 <div key={category.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`category-${category.id}`}
-                    checked={selectedCategories.includes(category.id)}
-                    onCheckedChange={() => handleCategoryChange(category.id)}
-                  />
+                  <div 
+                    className="cursor-pointer"
+                    onClick={() => handleCategoryChange(category.id)}
+                  >
+                    <Checkbox
+                      id={`category-${category.id}`}
+                      checked={selectedCategories.includes(category.id)}
+                    />
+                  </div>
                   <Label
                     htmlFor={`category-${category.id}`}
                     className="text-sm cursor-pointer"
+                    onClick={() => handleCategoryChange(category.id)}
                   >
                     {category.label}
                   </Label>
@@ -222,14 +227,19 @@ export function ProductFilters({
             <div className="space-y-2">
               {brands.map((brand) => (
                 <div key={brand.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`brand-${brand.id}`}
-                    checked={selectedBrands.includes(brand.id)}
-                    onCheckedChange={() => handleBrandChange(brand.id)}
-                  />
+                  <div 
+                    className="cursor-pointer"
+                    onClick={() => handleBrandChange(brand.id)}
+                  >
+                    <Checkbox
+                      id={`brand-${brand.id}`}
+                      checked={selectedBrands.includes(brand.id)}
+                    />
+                  </div>
                   <Label
                     htmlFor={`brand-${brand.id}`}
                     className="text-sm cursor-pointer"
+                    onClick={() => handleBrandChange(brand.id)}
                   >
                     {brand.label}
                   </Label>
@@ -250,14 +260,19 @@ export function ProductFilters({
             <div className="space-y-2">
               {sizes.map((size) => (
                 <div key={size.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`size-${size.id}`}
-                    checked={selectedSizes.includes(size.id)}
-                    onCheckedChange={() => handleSizeChange(size.id)}
-                  />
+                  <div 
+                    className="cursor-pointer"
+                    onClick={() => handleSizeChange(size.id)}
+                  >
+                    <Checkbox
+                      id={`size-${size.id}`}
+                      checked={selectedSizes.includes(size.id)}
+                    />
+                  </div>
                   <Label
                     htmlFor={`size-${size.id}`}
                     className="text-sm cursor-pointer"
+                    onClick={() => handleSizeChange(size.id)}
                   >
                     {size.label}
                   </Label>
@@ -278,14 +293,19 @@ export function ProductFilters({
             <div className="space-y-2">
               {ratings.map((rating) => (
                 <div key={rating.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`rating-${rating.id}`}
-                    checked={selectedRating === rating.id}
-                    onCheckedChange={() => handleRatingChange(rating.id)}
-                  />
+                  <div 
+                    className="cursor-pointer"
+                    onClick={() => handleRatingChange(rating.id)}
+                  >
+                    <Checkbox
+                      id={`rating-${rating.id}`}
+                      checked={selectedRating === rating.id}
+                    />
+                  </div>
                   <Label
                     htmlFor={`rating-${rating.id}`}
                     className="text-sm cursor-pointer"
+                    onClick={() => handleRatingChange(rating.id)}
                   >
                     {rating.label}
                   </Label>
