@@ -110,6 +110,7 @@
     "rememberMe": "Remember Me",
     "dontHaveAccount": "Don't have an account?",
     "alreadyHaveAccount": "Already have an account?",
+    "accountAccessInfo": "To access account and manage orders",
     "passwordsMustMatch": "Passwords must match",
     "enterPassword": "Enter your password",
     "enterEmail": "Enter your email",
