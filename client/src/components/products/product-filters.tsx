@@ -18,20 +18,25 @@ const categories = [
   { id: "kurtis", label: "Kurtis" },
   { id: "sarees", label: "Sarees" },
   { id: "lehengas", label: "Lehengas" },
-  { id: "kurta_sets", label: "Kurta Sets" },
+  { id: "salwar_kameez", label: "Salwar Kameez" },
+  { id: "anarkali_suits", label: "Anarkali Suits" },
+  { id: "palazzo_suits", label: "Palazzo Suits" },
   { id: "gowns", label: "Gowns" },
-  { id: "pants", label: "Pants" },
-  { id: "tops", label: "Tops" },
+  { id: "kurtas", label: "Kurtas" },
+  { id: "nehru_jackets", label: "Nehru Jackets" },
+  { id: "jewelry", label: "Jewelry" },
+  { id: "footwear", label: "Footwear" },
 ];
 
 const brands = [
-  { id: "Ethnic Bloom", label: "Ethnic Bloom" },
-  { id: "Royal Ethnix", label: "Royal Ethnix" },
-  { id: "Manyavar", label: "Manyavar" },
-  { id: "Saree House", label: "Saree House" },
-  { id: "Fabindia", label: "FabIndia" },
+  { id: "Fabindia", label: "Fabindia" },
   { id: "Biba", label: "Biba" },
-  { id: "Kalyan", label: "Kalyan" },
+  { id: "W", label: "W" },
+  { id: "Global Desi", label: "Global Desi" },
+  { id: "Manyavar", label: "Manyavar" },
+  { id: "Ritu Kumar", label: "Ritu Kumar" },
+  { id: "House of Masaba", label: "House of Masaba" },
+  { id: "Anita Dongre", label: "Anita Dongre" },
 ];
 
 const sizes = [
@@ -79,7 +84,7 @@ export function ProductFilters({
   });
 
   // Toggle accordion state
-  const toggleAccordion = (accordionId: string) => {
+  const toggleAccordion = (accordionId: keyof typeof openAccordions) => {
     setOpenAccordions((prev) => ({
       ...prev,
       [accordionId]: !prev[accordionId],
@@ -106,21 +111,17 @@ export function ProductFilters({
 
   // Handle size selection
   const handleSizeChange = (sizeId: string) => {
-    console.log("Size selection changed:", sizeId);
     setSelectedSizes((prev) => {
       const newSizes = prev.includes(sizeId)
         ? prev.filter((id) => id !== sizeId)
         : [...prev, sizeId];
-      console.log("Updated selected sizes:", newSizes);
       return newSizes;
     });
   };
 
   // Handle rating selection
   const handleRatingChange = (ratingId: string) => {
-    console.log("Rating selection changed:", ratingId);
     const newRating = selectedRating === ratingId ? null : ratingId;
-    console.log("Updated selected rating:", newRating);
     setSelectedRating(newRating);
   };
 
@@ -167,7 +168,6 @@ export function ProductFilters({
         rating: selectedRating,
         price: priceRange,
       };
-      console.log("Sending filter data:", filterData);
       onFilterChange(filterData);
     }
   }, [
@@ -197,16 +197,17 @@ export function ProductFilters({
             <div 
               key={category.id} 
               className="flex items-center space-x-2 cursor-pointer"
-              onClick={() => handleCategoryChange(category.id)}
             >
               <Checkbox
                 id={`category-${category.id}`}
                 checked={selectedCategories.includes(category.id)}
+                onCheckedChange={() => handleCategoryChange(category.id)}
                 className="cursor-pointer"
               />
               <Label
                 htmlFor={`category-${category.id}`}
                 className="text-sm cursor-pointer w-full"
+                onClick={() => handleCategoryChange(category.id)}
               >
                 {category.label}
               </Label>
@@ -234,16 +235,17 @@ export function ProductFilters({
             <div 
               key={brand.id} 
               className="flex items-center space-x-2 cursor-pointer"
-              onClick={() => handleBrandChange(brand.id)}
             >
               <Checkbox
                 id={`brand-${brand.id}`}
                 checked={selectedBrands.includes(brand.id)}
+                onCheckedChange={() => handleBrandChange(brand.id)}
                 className="cursor-pointer"
               />
               <Label
                 htmlFor={`brand-${brand.id}`}
                 className="text-sm cursor-pointer w-full"
+                onClick={() => handleBrandChange(brand.id)}
               >
                 {brand.label}
               </Label>
@@ -271,16 +273,17 @@ export function ProductFilters({
             <div 
               key={size.id} 
               className="flex items-center space-x-2 cursor-pointer"
-              onClick={() => handleSizeChange(size.id)}
             >
               <Checkbox
                 id={`size-${size.id}`}
                 checked={selectedSizes.includes(size.id)}
+                onCheckedChange={() => handleSizeChange(size.id)}
                 className="cursor-pointer"
               />
               <Label
                 htmlFor={`size-${size.id}`}
                 className="text-sm cursor-pointer w-full"
+                onClick={() => handleSizeChange(size.id)}
               >
                 {size.label}
               </Label>
@@ -308,16 +311,17 @@ export function ProductFilters({
             <div 
               key={rating.id} 
               className="flex items-center space-x-2 cursor-pointer"
-              onClick={() => handleRatingChange(rating.id)}
             >
               <Checkbox
                 id={`rating-${rating.id}`}
                 checked={selectedRating === rating.id}
+                onCheckedChange={() => handleRatingChange(rating.id)}
                 className="cursor-pointer"
               />
               <Label
                 htmlFor={`rating-${rating.id}`}
                 className="text-sm cursor-pointer w-full"
+                onClick={() => handleRatingChange(rating.id)}
               >
                 {rating.label}
               </Label>
