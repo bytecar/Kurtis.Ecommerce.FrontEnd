@@ -307,6 +307,8 @@ const ReturnsManagement: React.FC = () => {
   const [refundAmount, setRefundAmount] = useState<string>('');
   const [returnMethod, setReturnMethod] = useState<string>('pickup');
   const [returnTrackingId, setReturnTrackingId] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(10);
   
   // Format currency in Indian Rupees
   const formatCurrency = (amount: number): string => {
