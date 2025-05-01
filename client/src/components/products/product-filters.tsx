@@ -90,16 +90,22 @@ export function ProductFilters({
 
   // Handle size selection
   const handleSizeChange = (sizeId: string) => {
-    setSelectedSizes((prev) =>
-      prev.includes(sizeId)
+    console.log("Size selection changed:", sizeId);
+    setSelectedSizes((prev) => {
+      const newSizes = prev.includes(sizeId)
         ? prev.filter((id) => id !== sizeId)
-        : [...prev, sizeId]
-    );
+        : [...prev, sizeId];
+      console.log("Updated selected sizes:", newSizes);
+      return newSizes;
+    });
   };
 
   // Handle rating selection
   const handleRatingChange = (ratingId: string) => {
-    setSelectedRating(selectedRating === ratingId ? null : ratingId);
+    console.log("Rating selection changed:", ratingId);
+    const newRating = selectedRating === ratingId ? null : ratingId;
+    console.log("Updated selected rating:", newRating);
+    setSelectedRating(newRating);
   };
 
   // Apply filters
