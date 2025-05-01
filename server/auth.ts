@@ -1,19 +1,26 @@
-import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
-import { Express } from "express";
-import session from "express-session";
+import { Express, Request, Response, NextFunction } from "express";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
+import cookieParser from "cookie-parser";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
-
-declare global {
-  namespace Express {
-    interface User extends SelectUser {}
-  }
-}
+import { 
+  generateToken, 
+  authenticateJWT, 
+  requirePermission, 
+  requireRole 
+} from "./jwt-auth";
 
 const scryptAsync = promisify(scrypt);
+
+// JWT Cookie options for better security and lower network overhead
+const JWT_COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict' as const,
+  maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  path: '/'
+};
 
 export async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
@@ -29,49 +36,10 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-  // Use memory store for sessions in development
-  const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET || "kurtisnmore-secret-key",
-    resave: false,
-    saveUninitialized: false,
-    store: storage.sessionStore,
-    cookie: {
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      httpOnly: true,
-      sameSite: "lax",
-    }
-  };
-
-  app.set("trust proxy", 1);
-  app.use(session(sessionSettings));
-  app.use(passport.initialize());
-  app.use(passport.session());
-
-  passport.use(
-    new LocalStrategy(async (username, password, done) => {
-      try {
-        const user = await storage.getUserByUsername(username);
-        if (!user || !(await comparePasswords(password, user.password))) {
-          return done(null, false);
-        } else {
-          return done(null, user);
-        }
-      } catch (error) {
-        return done(error);
-      }
-    }),
-  );
-
-  passport.serializeUser((user, done) => done(null, user.id));
-  passport.deserializeUser(async (id: number, done) => {
-    try {
-      const user = await storage.getUser(id);
-      done(null, user);
-    } catch (error) {
-      done(error);
-    }
-  });
-
+  // Middleware to parse cookies
+  app.use(cookieParser());
+  
+  // Register routes
   app.post("/api/register", async (req, res, next) => {
     try {
       const existingUser = await storage.getUserByUsername(req.body.username);
@@ -84,45 +52,101 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "Email already in use" });
       }
 
-      const user = await storage.createUser({
+      // Default role to customer for new registrations
+      const userData = {
         ...req.body,
+        role: req.body.role || "customer",
+        status: "active", // Important for JWT auth
         password: await hashPassword(req.body.password),
-      });
+      };
 
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(201).json(user);
+      const user = await storage.createUser(userData);
+
+      // Generate JWT token
+      const token = generateToken(user);
+      
+      // Set JWT in cookie for secure storage
+      res.cookie('jwt', token, JWT_COOKIE_OPTIONS);
+      
+      // Remove password before sending user data
+      const { password, ...userResponse } = user;
+      
+      res.status(201).json({
+        user: userResponse,
+        token // Also send token in response for mobile clients
       });
     } catch (error) {
       next(error);
     }
   });
 
-  app.post("/api/login", passport.authenticate("local"), (req, res) => {
-    res.status(200).json(req.user);
-  });
-
-  app.post("/api/logout", (req, res, next) => {
-    req.logout((err) => {
-      if (err) return next(err);
-      res.sendStatus(200);
-    });
-  });
-
-  app.get("/api/user", (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
-    res.json(req.user);
-  });
-
-  // Change password endpoint
-  app.post("/api/users/:id/change-password", async (req, res, next) => {
+  // Login route
+  app.post("/api/login", async (req, res, next) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ message: "Authentication required" });
+      const { username, password } = req.body;
+      
+      // Validate input
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
       }
+      
+      // Authenticate user
+      const user = await storage.getUserByUsername(username);
+      if (!user || !(await comparePasswords(password, user.password))) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      
+      // Check if user is active
+      if (user.status !== "active") {
+        return res.status(403).json({ message: "Account is not active" });
+      }
+      
+      // Generate JWT token
+      const token = generateToken(user);
+      
+      // Set JWT in cookie for secure storage
+      res.cookie('jwt', token, JWT_COOKIE_OPTIONS);
+      
+      // Remove password before sending user data
+      const { password: _, ...userResponse } = user;
+      
+      res.status(200).json({
+        user: userResponse,
+        token // Also send token in response for mobile clients
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
 
+  // Logout route
+  app.post("/api/logout", (req, res) => {
+    // Clear the JWT cookie
+    res.clearCookie('jwt', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/'
+    });
+    
+    res.status(200).json({ message: "Logged out successfully" });
+  });
+
+  // Get current user route (protected)
+  app.get("/api/user", authenticateJWT, (req, res) => {
+    // Remove password before sending user data
+    const { password, ...userResponse } = (req as any).user;
+    res.json(userResponse);
+  });
+
+  // Change password endpoint (protected)
+  app.post("/api/users/:id/change-password", authenticateJWT, async (req, res, next) => {
+    try {
       const userId = parseInt(req.params.id);
-      if (req.user.id !== userId) {
+      const currentUser = (req as any).user;
+      
+      // Only allow users to change their own password unless they're an admin
+      if (currentUser.id !== userId && currentUser.role !== "admin") {
         return res.status(403).json({ message: "Not authorized to change another user's password" });
       }
 
@@ -146,28 +170,36 @@ export function setupAuth(app: Express) {
       const hashedNewPassword = await hashPassword(newPassword);
       await storage.updateUserPassword(userId, hashedNewPassword);
 
+      // Generate new token with updated data
+      if (currentUser.id === userId) {
+        const updatedUser = await storage.getUser(userId);
+        if (updatedUser) {
+          const newToken = generateToken(updatedUser);
+          res.cookie('jwt', newToken, JWT_COOKIE_OPTIONS);
+        }
+      }
+
       res.status(200).json({ message: "Password updated successfully" });
     } catch (error) {
       next(error);
     }
   });
 
-  // Update user profile
-  app.patch("/api/users/:id", async (req, res, next) => {
+  // Update user profile (protected)
+  app.patch("/api/users/:id", authenticateJWT, async (req, res, next) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ message: "Authentication required" });
-      }
-
       const userId = parseInt(req.params.id);
-      if (req.user.id !== userId && req.user.role !== "admin") {
+      const currentUser = (req as any).user;
+      
+      // Only allow users to update their own profile unless they're an admin
+      if (currentUser.id !== userId && currentUser.role !== "admin") {
         return res.status(403).json({ message: "Not authorized to update another user's profile" });
       }
 
       const { fullName, email } = req.body;
       
       // Check if email already exists (if changing email)
-      if (email && email !== req.user.email) {
+      if (email && email !== currentUser.email) {
         const existingEmail = await storage.getUserByEmail(email);
         if (existingEmail && existingEmail.id !== userId) {
           return res.status(400).json({ message: "Email already in use" });
@@ -180,9 +212,26 @@ export function setupAuth(app: Express) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      res.status(200).json(updatedUser);
+      // Generate new token with updated data if user is updating their own profile
+      if (currentUser.id === userId) {
+        const newToken = generateToken(updatedUser);
+        res.cookie('jwt', newToken, JWT_COOKIE_OPTIONS);
+      }
+
+      // Remove password before sending response
+      const { password, ...userResponse } = updatedUser;
+      res.status(200).json(userResponse);
     } catch (error) {
       next(error);
     }
+  });
+  
+  // Validate token endpoint (useful for frontend to check token validity)
+  app.get("/api/auth/validate", authenticateJWT, (req, res) => {
+    const { password, ...userResponse } = (req as any).user;
+    res.status(200).json({
+      valid: true,
+      user: userResponse
+    });
   });
 }
