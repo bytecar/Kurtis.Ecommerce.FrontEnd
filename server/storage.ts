@@ -156,9 +156,10 @@ export class MemStorage implements IStorage {
       checkPeriod: 86400000, // prune expired entries every 24h
     });
 
-    // Initialize with products and preferences (non-async)
+    // Initialize with products, preferences, and reviews (non-async)
     this.initializeProducts();
     this.initializeUserPreferences();
+    this.initializeReviews();
     
     // Start async initialization for users
     this.initializeUsersAsync();
@@ -609,6 +610,55 @@ export class MemStorage implements IStorage {
       console.log("User initialization complete with test credentials");
     } catch (error) {
       console.error("Failed to initialize users:", error);
+    }
+  }
+  
+  // Initialize with sample reviews
+  private initializeReviews() {
+    // Sample reviews for different products
+    const reviewComments = [
+      "Love this product! The quality is amazing and the fit is perfect.",
+      "Beautiful design and comfortable to wear. Will definitely buy more colors.",
+      "The color is exactly as shown in the pictures. Very happy with my purchase.",
+      "Received many compliments when I wore this. Highly recommended!",
+      "Good product but the size runs a bit large. Consider ordering a size down.",
+      "The material is so soft and the embroidery detail is exquisite.",
+      "Perfect for festive occasions. The embellishments are beautifully done.",
+      "Shipping was fast and the product looks even better in person.",
+      "Great value for money. The quality exceeds what I expected at this price.",
+      "The design is unique and stands out. Love the traditional elements."
+    ];
+    
+    // Add some sample reviews for the first 5 products
+    for (let productId = 1; productId <= 5; productId++) {
+      // Add 3-5 reviews per product
+      const reviewCount = 3 + Math.floor(Math.random() * 3);
+      
+      for (let j = 0; j < reviewCount; j++) {
+        // Randomize which user left the review (from user1 to user5)
+        const userId = Math.floor(Math.random() * 5) + 1;
+        
+        // Randomize rating (weighted towards positive ratings)
+        const ratings = [3, 4, 4, 5, 5, 5];
+        const rating = ratings[Math.floor(Math.random() * ratings.length)];
+        
+        // Pick a random comment
+        const comment = reviewComments[Math.floor(Math.random() * reviewComments.length)];
+        
+        const reviewId = this.currentReviewId++;
+        const createdAt = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000); // Random date within last 30 days
+        
+        const review: Review = {
+          id: reviewId,
+          userId,
+          productId,
+          rating,
+          comment,
+          createdAt
+        };
+        
+        this.reviews.set(reviewId, review);
+      }
     }
   }
 
