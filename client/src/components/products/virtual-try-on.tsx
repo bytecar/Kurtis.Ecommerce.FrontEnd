@@ -62,26 +62,53 @@ export function VirtualTryOn({ product, selectedSize }: VirtualTryOnProps) {
     
     setIsGenerating(true);
     
-    // In a real application, this would call an AI model API to generate the try-on image
-    // For this demo, we'll simulate API call with a delay and use placeholder images
-    setTimeout(() => {
-      // For demonstration purposes, use placeholder images
-      const placeholderImages = {
-        default: 'https://images.unsplash.com/photo-1624043209005-152535822cbb?auto=format&fit=crop&q=80&w=500',
-        model1: 'https://images.unsplash.com/photo-1614069565320-3cb05f7a6462?auto=format&fit=crop&q=80&w=500',
-        model2: 'https://images.unsplash.com/photo-1621784563286-3dc8ae63e3b1?auto=format&fit=crop&q=80&w=500',
-        model3: 'https://images.unsplash.com/photo-1566689476264-847d0bfcbf89?auto=format&fit=crop&q=80&w=500',
-        upload: userImage || DEFAULT_MODEL_IMAGE,
-      };
-
-      // Use the appropriate image based on selected model or uploaded image
-      const baseImage = activeTab === 'model' 
-        ? placeholderImages[selectedModel as keyof typeof placeholderImages] || placeholderImages.default
-        : placeholderImages.upload;
+    try {
+      // In a real application, this would call an AI model API to generate the try-on image
+      // For this demo, we'll simulate API call with a delay and use placeholder images
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      setVirtualTryOnImage(baseImage);
+      console.log("Generating try-on with model:", selectedModel, "tab:", activeTab);
+      
+      // Create a map of model IDs to display images
+      // These would normally be AI-generated images of the selected product on different models
+      const tryOnImagesWomen = {
+        default: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=500',
+        model1: 'https://images.unsplash.com/photo-1583395149979-f3037723c640?auto=format&fit=crop&q=80&w=500',
+        model2: 'https://images.unsplash.com/photo-1614886145232-246605739502?auto=format&fit=crop&q=80&w=500',
+        model3: 'https://images.unsplash.com/photo-1614886145019-3ed81d51d114?auto=format&fit=crop&q=80&w=500',
+      };
+      
+      const tryOnImagesMen = {
+        default: 'https://images.unsplash.com/photo-1558310356-c1e1c6b1e472?auto=format&fit=crop&q=80&w=500',
+        model1: 'https://images.unsplash.com/photo-1594549181132-9045fed330ce?auto=format&fit=crop&q=80&w=500',
+        model2: 'https://images.unsplash.com/photo-1574791600523-de05d8686881?auto=format&fit=crop&q=80&w=500',
+        model3: 'https://images.unsplash.com/photo-1603915402597-5dd3ea5f676b?auto=format&fit=crop&q=80&w=500',
+      };
+      
+      // Choose the appropriate image set based on product gender
+      const tryOnImages = product.gender === 'women' ? tryOnImagesWomen : tryOnImagesMen;
+
+      // Handle user uploaded image case - simulate placing the product on user's image
+      if (activeTab === 'upload' && userImage) {
+        // In a real application, we'd call an AI service to overlay the product on the user image
+        // For now, just use the uploaded image to simulate this process
+        console.log("Using uploaded image for try-on");
+        setVirtualTryOnImage(userImage);
+      } else {
+        // Use the appropriate pre-generated image based on selected model
+        console.log("Using model image:", selectedModel);
+        const modelKey = selectedModel as keyof typeof tryOnImages;
+        const modelImage = tryOnImages[modelKey] || tryOnImages.default;
+        console.log("Selected image URL:", modelImage);
+        setVirtualTryOnImage(modelImage);
+      }
+    } catch (error) {
+      console.error('Error generating virtual try-on:', error);
+      // Show error message in the preview
+      setVirtualTryOnImage(null);
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   const ModelButton = ({ id, src, label }: { id: string, src: string, label: string }) => (
@@ -129,26 +156,53 @@ export function VirtualTryOn({ product, selectedSize }: VirtualTryOnProps) {
             
             <TabsContent value="model" className="mt-4">
               <div className="grid grid-cols-4 gap-2">
-                <ModelButton 
-                  id="default" 
-                  src="https://images.unsplash.com/photo-1600167651261-8c0da6ff2c09?auto=format&fit=crop&q=80&w=300" 
-                  label="Default"
-                />
-                <ModelButton 
-                  id="model1" 
-                  src="https://images.unsplash.com/photo-1582015907937-ac7dfa31a3b5?auto=format&fit=crop&q=80&w=300" 
-                  label="Model 1"
-                />
-                <ModelButton 
-                  id="model2" 
-                  src="https://images.unsplash.com/photo-1624043209005-152535822cbb?auto=format&fit=crop&q=80&w=300" 
-                  label="Model 2"
-                />
-                <ModelButton 
-                  id="model3" 
-                  src="https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=300" 
-                  label="Model 3"
-                />
+                {product.gender === 'women' ? (
+                  <>
+                    <ModelButton 
+                      id="default" 
+                      src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=300" 
+                      label="Default"
+                    />
+                    <ModelButton 
+                      id="model1" 
+                      src="https://images.unsplash.com/photo-1583395149979-f3037723c640?auto=format&fit=crop&q=80&w=300" 
+                      label="Model 1"
+                    />
+                    <ModelButton 
+                      id="model2" 
+                      src="https://images.unsplash.com/photo-1614886145232-246605739502?auto=format&fit=crop&q=80&w=300" 
+                      label="Model 2"
+                    />
+                    <ModelButton 
+                      id="model3" 
+                      src="https://images.unsplash.com/photo-1614886145019-3ed81d51d114?auto=format&fit=crop&q=80&w=300" 
+                      label="Model 3"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <ModelButton 
+                      id="default" 
+                      src="https://images.unsplash.com/photo-1558310356-c1e1c6b1e472?auto=format&fit=crop&q=80&w=300" 
+                      label="Default"
+                    />
+                    <ModelButton 
+                      id="model1" 
+                      src="https://images.unsplash.com/photo-1594549181132-9045fed330ce?auto=format&fit=crop&q=80&w=300" 
+                      label="Model 1"
+                    />
+                    <ModelButton 
+                      id="model2" 
+                      src="https://images.unsplash.com/photo-1574791600523-de05d8686881?auto=format&fit=crop&q=80&w=300" 
+                      label="Model 2"
+                    />
+                    <ModelButton 
+                      id="model3" 
+                      src="https://images.unsplash.com/photo-1603915402597-5dd3ea5f676b?auto=format&fit=crop&q=80&w=300" 
+                      label="Model 3"
+                    />
+                  </>
+                )}
               </div>
             </TabsContent>
             
