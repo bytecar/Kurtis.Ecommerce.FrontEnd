@@ -189,7 +189,10 @@ export function ProductFilters({
                   <Checkbox
                     id={`category-${category.id}`}
                     checked={selectedCategories.includes(category.id)}
-                    onCheckedChange={() => handleCategoryChange(category.id)}
+                    onCheckedChange={(checked) => {
+                      if (checked) handleCategoryChange(category.id);
+                      else handleCategoryChange(category.id);
+                    }}
                   />
                   <Label
                     htmlFor={`category-${category.id}`}
