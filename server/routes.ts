@@ -1065,12 +1065,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Add product to recently viewed (authenticated users only)
-  app.post("/api/recently-viewed", async (req, res) => {
+  app.post("/api/recently-viewed", authenticateJWT, async (req, res) => {
     try {
-      // Verify authentication
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
+      // Get authenticated user
+      const user = getUserSafely(req);
       
       const { productId } = req.body;
       
@@ -1087,7 +1085,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Add to recently viewed
       const recentlyViewedItem = await storage.createRecentlyViewed({
-        userId: req.user.id,
+        userId: user.id,
         productId,
       });
       
@@ -1100,10 +1098,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ======= Dashboard Stats =======
   
   // Get dashboard statistics (Admin only)
-  app.get("/api/stats", async (req, res) => {
+  app.get("/api/stats", authenticateJWT, async (req, res) => {
     try {
-      // Verify user role
-      if (!req.isAuthenticated() || req.user.role !== "admin") {
+      // Get authenticated user and verify admin role
+      const user = getUserSafely(req);
+      if (user.role !== "admin") {
         return res.status(403).json({ error: "Not authorized" });
       }
       
