@@ -18,7 +18,7 @@ import { RecentlyViewed } from "@/components/products/recently-viewed";
 import { ProductReviews } from "@/components/products/product-reviews";
 import { SizeSelector, SizeOption } from "@/components/products/size-selector";
 import { SizeRecommendationWizard } from "@/components/products/size-recommendation-wizard";
-import VirtualTryOn from "@/components/products/DirectVirtualTryOn";
+// Virtual try-on feature removed
 import { SocialShareButton } from "@/components/social";
 import { useState } from "react";
 import { logger, LogCategory } from "@/lib/logging";
@@ -294,12 +294,7 @@ export default function ProductDetail() {
                       onSizeSelect={handleSizeSelect}
                     />
                   )}
-                  {product && selectedSize && (
-                    <VirtualTryOn 
-                      product={product}
-                      selectedSize={selectedSize}
-                    />
-                  )}
+                  {/* Size recommendation wizard is sufficient */}
                 </div>
               </div>
               <SizeSelector
