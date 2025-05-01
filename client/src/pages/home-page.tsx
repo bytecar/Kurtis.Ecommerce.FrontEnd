@@ -28,6 +28,7 @@ interface Feature {
 }
 
 export default function HomePage() {
+  const { t } = useTranslation();
   // Fetch featured products
   const { 
     data: featuredProducts = [],
@@ -49,20 +50,20 @@ export default function HomePage() {
   // Collection data - static for now
   const collections = [
     {
-      name: "Women's Ethnic",
-      description: "Traditional & contemporary styles",
+      name: t('collections.womensEthnic'),
+      description: t('collections.womensEthnicDesc'),
       image: "https://images.unsplash.com/photo-1610030469668-3a0bd5e08696?auto=format&fit=crop&q=80&w=1000",
       href: "/products/women"
     },
     {
-      name: "Men's Ethnic",
-      description: "Classic & modern designs",
+      name: t('collections.mensEthnic'),
+      description: t('collections.mensEthnicDesc'),
       image: "https://images.unsplash.com/photo-1558310356-c1e1c6b1e472?auto=format&fit=crop&q=80&w=1000",
       href: "/products/men"
     },
     {
-      name: "Festive Collection",
-      description: "Celebrate in style",
+      name: t('collections.festive'),
+      description: t('collections.festiveDesc'),
       image: "https://images.unsplash.com/photo-1591213954196-2d0ccb3f8d4c?auto=format&fit=crop&q=80&w=1000",
       href: "/products/festive"
     }
@@ -93,23 +94,23 @@ export default function HomePage() {
   // Features data - static for now
   const features = [
     {
-      title: "Free Shipping",
-      description: "Free shipping on all orders above ₹999",
+      title: t('features.freeShipping'),
+      description: t('features.freeShippingDesc'),
       icon: "truck"
     },
     {
-      title: "Easy Returns",
-      description: "30-day easy return policy",
+      title: t('features.easyReturns'),
+      description: t('features.easyReturnsDesc'),
       icon: "arrow-go-back"
     },
     {
-      title: "Secure Payments",
-      description: "Multiple secure payment options",
+      title: t('features.securePayments'),
+      description: t('features.securePaymentsDesc'),
       icon: "secure-payment"
     },
     {
-      title: "24/7 Support",
-      description: "Dedicated customer support",
+      title: t('features.support'),
+      description: t('features.supportDesc'),
       icon: "customer-service-2"
     }
   ];
@@ -117,8 +118,8 @@ export default function HomePage() {
   return (
     <div>
       <Hero 
-        title="Embrace Tradition with Modern Elegance" 
-        subtitle="Discover our exquisite collection of ethnic wear that blends traditional craftsmanship with contemporary designs."
+        title={t('home.heroTitle')} 
+        subtitle={t('home.heroSubtitle')}
         image="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=1000"
       />
       
