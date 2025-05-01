@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
   Table,
   TableBody,
@@ -53,8 +55,10 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, MoreHorizontal, PlusCircle, Search, Trash2, UserCog, UserPlus } from "lucide-react";
+import { AlertCircle, Loader2, MoreHorizontal, PlusCircle, Search, Trash2, UserCog, UserPlus } from "lucide-react";
 import { format } from 'date-fns';
+import { AdminLayout } from '@/components/layout/admin-layout';
+import { apiRequest } from '@/lib/queryClient';
 
 // Define user type
 type User = {
@@ -184,13 +188,10 @@ const generateMockUsers = (count: number): User[] => {
   return users;
 };
 
-// Mock data
-const mockUsers = generateMockUsers(50);
-
 const CustomerManagement: React.FC = () => {
+  const { t } = useTranslation();
   const { toast } = useToast();
-  const [users, setUsers] = useState<User[]>(mockUsers);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [roleFilter, setRoleFilter] = useState<string>('all');
@@ -198,7 +199,169 @@ const CustomerManagement: React.FC = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(10);
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    fullName: '',
+    password: '',
+    role: 'customer',
+    status: 'active',
+    gender: '',
+    address: '',
+    phoneNumber: '',
+  });
 
+  // Fetch all users
+  const { data: users = [], isLoading, error } = useQuery<User[]>({
+    queryKey: ['/api/admin/users'],
+    refetchOnWindowFocus: false,
+  });
+
+  // Create user mutation
+  const createUserMutation = useMutation({
+    mutationFn: async (userData: Partial<User> & { password: string }) => {
+      const res = await apiRequest('POST', '/api/admin/users', userData);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      toast({
+        title: t('admin.userCreated'),
+        description: t('admin.userCreatedDescription'),
+      });
+      setIsCreateDialogOpen(false);
+      resetForm();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: t('common.error'),
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Update user mutation
+  const updateUserMutation = useMutation({
+    mutationFn: async (userData: Partial<User>) => {
+      if (!selectedUser) return null;
+      const res = await apiRequest('PATCH', `/api/admin/users/${selectedUser.id}`, userData);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      toast({
+        title: t('admin.userUpdated'),
+        description: t('admin.userUpdatedDescription'),
+      });
+      setIsEditDialogOpen(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: t('common.error'),
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Delete user mutation
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: number) => {
+      const res = await apiRequest('DELETE', `/api/admin/users/${userId}`);
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      toast({
+        title: t('admin.userDeleted'),
+        description: t('admin.userDeletedDescription'),
+      });
+      setIsDeleteDialogOpen(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: t('common.error'),
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const resetForm = () => {
+    setFormData({
+      username: '',
+      email: '',
+      fullName: '',
+      password: '',
+      role: 'customer',
+      status: 'active',
+      gender: '',
+      address: '',
+      phoneNumber: '',
+    });
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCreateUser = () => {
+    if (!formData.username || !formData.email || !formData.password || !formData.fullName) {
+      toast({
+        title: t('common.validationError'),
+        description: t('admin.fillRequiredFields'),
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    createUserMutation.mutate(formData);
+  };
+
+  const handleUpdateUser = () => {
+    if (!selectedUser) return;
+    
+    // Omit password if it's empty (means no change)
+    const userData = { ...formData };
+    if (!userData.password) {
+      delete userData.password;
+    }
+    
+    updateUserMutation.mutate(userData);
+  };
+
+  const handleDeleteUser = () => {
+    if (selectedUser) {
+      deleteUserMutation.mutate(selectedUser.id);
+    }
+  };
+
+  const handleUserAction = (action: 'edit' | 'delete', user: User) => {
+    setSelectedUser(user);
+    
+    if (action === 'edit') {
+      setFormData({
+        username: user.username,
+        email: user.email,
+        fullName: user.fullName,
+        password: '', // Don't populate password for security
+        role: user.role,
+        status: user.status,
+        gender: user.gender || '',
+        address: user.address || '',
+        phoneNumber: user.phoneNumber || '',
+      });
+      setIsEditDialogOpen(true);
+    } else if (action === 'delete') {
+      setIsDeleteDialogOpen(true);
+    }
+  };
+
+  // Filter users based on search and filters
   const filteredUsers = users.filter(user => {
     try {
       // Search term
@@ -219,45 +382,6 @@ const CustomerManagement: React.FC = () => {
       return false;
     }
   });
-
-  const handleUserAction = (action: 'edit' | 'delete', user: User) => {
-    setSelectedUser(user);
-    if (action === 'edit') {
-      setIsEditDialogOpen(true);
-    } else if (action === 'delete') {
-      setIsDeleteDialogOpen(true);
-    }
-  };
-
-  const handleCreateUser = () => {
-    // Here you would connect to your API to create a user
-    toast({
-      title: "User created",
-      description: "The user has been created successfully.",
-    });
-    setIsCreateDialogOpen(false);
-  };
-
-  const handleUpdateUser = () => {
-    // Here you would connect to your API to update a user
-    toast({
-      title: "User updated",
-      description: "The user has been updated successfully.",
-    });
-    setIsEditDialogOpen(false);
-  };
-
-  const handleDeleteUser = () => {
-    if (selectedUser) {
-      // Here you would connect to your API to delete a user
-      setUsers(users.filter(user => user.id !== selectedUser.id));
-      toast({
-        title: "User deleted",
-        description: "The user has been deleted successfully.",
-      });
-      setIsDeleteDialogOpen(false);
-    }
-  };
 
   const getStatusColor = (status: string): string => {
     switch (status) {
@@ -283,15 +407,44 @@ const CustomerManagement: React.FC = () => {
     }
   };
 
+  // Format dates for display
+  const formatDate = (date: Date | null | undefined) => {
+    if (!date) return 'Never';
+    return format(new Date(date), 'MMM d, yyyy');
+  };
+
+  // Calculate pagination
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+
+  // Show error state if there was an error loading users
+  if (error) {
+    return (
+      <AdminLayout title={t('adminDashboard.customers')}>
+        <div className="flex flex-col items-center justify-center h-[400px] gap-4">
+          <AlertCircle className="h-16 w-16 text-destructive" />
+          <h2 className="text-2xl font-bold">{t('common.errorOccurred')}</h2>
+          <p className="text-muted-foreground">{(error as Error).message}</p>
+          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] })}>
+            {t('common.tryAgain')}
+          </Button>
+        </div>
+      </AdminLayout>
+    );
+  }
+
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Customer Management</h1>
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
-          <UserPlus className="mr-2 h-4 w-4" />
-          Add New User
-        </Button>
-      </div>
+    <AdminLayout title={t('adminDashboard.customers')}>
+      <div className="container space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold">{t('adminDashboard.customerManagement')}</h1>
+          <Button onClick={() => setIsCreateDialogOpen(true)}>
+            <UserPlus className="mr-2 h-4 w-4" />
+            {t('admin.addNewUser')}
+          </Button>
+        </div>
 
       <Card>
         <CardHeader>
@@ -665,7 +818,8 @@ const CustomerManagement: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </AdminLayout>
   );
 };
 
