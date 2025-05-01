@@ -325,10 +325,53 @@ const CustomerManagement: React.FC = () => {
   const handleUpdateUser = () => {
     if (!selectedUser) return;
     
+    // Collect form data from input elements
+    const fullName = (document.getElementById('fullName') as HTMLInputElement)?.value || selectedUser.fullName;
+    const username = (document.getElementById('username') as HTMLInputElement)?.value || selectedUser.username;
+    const email = (document.getElementById('email') as HTMLInputElement)?.value || selectedUser.email;
+    const phoneNumber = (document.getElementById('phoneNumber') as HTMLInputElement)?.value || selectedUser.phoneNumber;
+    const address = (document.getElementById('address') as HTMLInputElement)?.value || selectedUser.address;
+    const password = (document.getElementById('resetPassword') as HTMLInputElement)?.value;
+    const profilePicture = (document.getElementById('profilePicture') as HTMLInputElement)?.value || selectedUser.profilePicture;
+    
+    // Get dropdown values (need to be handled differently from form.value)
+    const statusElement = document.querySelector('[id*="radix-"][data-state="checked"][data-value]') as HTMLElement;
+    const roleElement = document.querySelector('[id*="radix-"][data-state="checked"][data-value]') as HTMLElement;
+    const genderElement = document.querySelector('[id*="radix-"][data-state="checked"][data-value]') as HTMLElement;
+    
+    const status = statusElement?.getAttribute('data-value') || selectedUser.status;
+    const role = roleElement?.getAttribute('data-value') || selectedUser.role;
+    const gender = genderElement?.getAttribute('data-value') || selectedUser.gender;
+    
+    // Handle birthdate - ensure it's properly processed
+    const birthdateEl = document.getElementById('birthdate') as HTMLInputElement;
+    let birthdate = selectedUser.birthdate;
+    if (birthdateEl && birthdateEl.value) {
+      try {
+        birthdate = new Date(birthdateEl.value);
+      } catch (err) {
+        console.error("Failed to parse birthdate", err);
+      }
+    }
+    
+    const userData: Partial<User> & { password?: string } = {
+      fullName,
+      username,
+      email,
+      profilePicture,
+      status: status as 'active' | 'inactive' | 'suspended',
+      role: role as 'admin' | 'customer' | 'contentManager',
+      phoneNumber,
+      address,
+      gender,
+      birthdate
+    };
+    
     // Omit password if it's empty (means no change)
-    const userData = { ...formData };
-    if (!userData.password) {
+    if (!password) {
       delete userData.password;
+    } else {
+      userData.password = password;
     }
     
     updateUserMutation.mutate(userData);
@@ -434,7 +477,7 @@ const CustomerManagement: React.FC = () => {
   }
 
   return (
-    <div className="container space-y-6">
+    <div className="container mx-auto max-w-6xl space-y-6 px-4 md:px-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">{t('adminDashboard.customerManagement')}</h1>
         <Button onClick={() => setIsCreateDialogOpen(true)}>
@@ -703,7 +746,9 @@ const CustomerManagement: React.FC = () => {
                   <Input 
                     id="birthdate" 
                     type="date" 
-                    defaultValue={selectedUser.birthdate ? format(selectedUser.birthdate, 'yyyy-MM-dd') : ''} 
+                    defaultValue={selectedUser?.birthdate && selectedUser.birthdate instanceof Date && !isNaN(selectedUser.birthdate.getTime()) 
+                      ? format(selectedUser.birthdate, 'yyyy-MM-dd') 
+                      : ''} 
                   />
                 </div>
               </TabsContent>
