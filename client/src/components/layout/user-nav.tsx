@@ -45,17 +45,17 @@ export function UserNav() {
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
                   <Link href="/profile">
-                    <div className="w-full cursor-pointer">My Profile</div>
+                    <div className="w-full cursor-pointer">{t('profile.title')}</div>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/orders">
-                    <div className="w-full cursor-pointer">My Orders</div>
+                    <div className="w-full cursor-pointer">{t('orders.title')}</div>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/wishlist">
-                    <div className="w-full cursor-pointer">My Wishlist</div>
+                    <div className="w-full cursor-pointer">{t('wishlist.title')}</div>
                   </Link>
                 </DropdownMenuItem>
                 
@@ -65,12 +65,12 @@ export function UserNav() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link href="/admin/dashboard">
-                        <div className="w-full cursor-pointer">Admin Dashboard</div>
+                        <div className="w-full cursor-pointer">{t('adminDashboard.dashboard')}</div>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/admin/reviews">
-                        <div className="w-full cursor-pointer">Review Management</div>
+                        <div className="w-full cursor-pointer">{t('adminDashboard.reviews')}</div>
                       </Link>
                     </DropdownMenuItem>
                   </>
@@ -82,7 +82,7 @@ export function UserNav() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link href="/admin/inventory">
-                        <div className="w-full cursor-pointer">Inventory Management</div>
+                        <div className="w-full cursor-pointer">{t('adminDashboard.inventory')}</div>
                       </Link>
                     </DropdownMenuItem>
                   </>
@@ -90,26 +90,26 @@ export function UserNav() {
                 
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-                  Logout
+                  {t('common.logout')}
                 </DropdownMenuItem>
               </DropdownMenuGroup>
             </>
           ) : (
             <>
               <div className="px-2 py-2">
-                <p className="font-medium mb-1">Welcome</p>
+                <p className="font-medium mb-1">{t('common.welcome')}</p>
                 <p className="text-xs text-muted-foreground mb-3">
-                  To access account and manage orders
+                  {t('auth.accountAccessInfo', 'To access account and manage orders')}
                 </p>
                 <div className="flex gap-2">
                   <Link href="/auth">
                     <Button variant="default" className="w-full" size="sm">
-                      Login
+                      {t('common.login')}
                     </Button>
                   </Link>
                   <Link href="/auth?tab=register">
                     <Button variant="outline" className="w-full" size="sm">
-                      Register
+                      {t('common.register')}
                     </Button>
                   </Link>
                 </div>
@@ -133,7 +133,7 @@ export function UserNav() {
       <Link href="/cart">
         <Button variant="ghost" className="flex flex-col items-center p-0 relative">
           <ShoppingBag className="h-5 w-5" />
-          <span className="text-xs hidden md:block mt-1">Cart</span>
+          <span className="text-xs hidden md:block mt-1">{t('common.cart')}</span>
           {totalItems > 0 && (
             <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center">
               {totalItems}
