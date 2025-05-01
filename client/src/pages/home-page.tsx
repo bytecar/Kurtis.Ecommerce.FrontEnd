@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getQueryFn } from '@/lib/queryClient';
 import { Product } from '@shared/schema';
+import { useTranslation } from 'react-i18next';
 
 // Import page components
 import { Hero } from './components/Hero';
