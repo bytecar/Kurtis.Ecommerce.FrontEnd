@@ -110,6 +110,7 @@
     "rememberMe": "मुझे याद रखें",
     "dontHaveAccount": "अकाउंट नहीं है?",
     "alreadyHaveAccount": "पहले से ही अकाउंट है?",
+    "accountAccessInfo": "अकाउंट एक्सेस करने और ऑर्डर प्रबंधित करने के लिए",
     "passwordsMustMatch": "पासवर्ड मेल खाने चाहिए",
     "enterPassword": "अपना पासवर्ड दर्ज करें",
     "enterEmail": "अपना ईमेल दर्ज करें",
