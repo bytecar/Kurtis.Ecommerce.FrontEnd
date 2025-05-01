@@ -1,9 +1,47 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, hashPassword } from "./auth";
 import { z } from "zod";
 import { insertProductSchema, insertInventorySchema, insertReviewSchema, insertOrderSchema, insertOrderItemSchema, insertReturnSchema, insertRecentlyViewedSchema, insertWishlistSchema } from "@shared/schema";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+
+// Set up multer for file uploads
+const upload_storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(process.cwd(), 'uploads');
+    if (!fs.existsSync(uploadDir)){
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: upload_storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB max size
+  },
+  fileFilter: (req, file, cb) => {
+    // Accept only images
+    const filetypes = /jpeg|jpg|png|gif|webp/;
+    const mimetype = filetypes.test(file.mimetype);
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    
+    if (mimetype && extname) {
+      return cb(null, true);
+    }
+    
+    cb(new Error("Only image files are allowed!"));
+  }
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
@@ -1178,6 +1216,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(stats);
     } catch (error) {
       res.status(500).json({ error: "Failed to retrieve dashboard statistics" });
+    }
+  });
+
+  // Serve uploads directory with Express
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
+  // ======= Content Manager Routes =======
+
+  // Upload product images
+  app.post('/api/upload', (req, res, next) => {
+    // Check if user is authenticated and has the right role
+    if (!req.isAuthenticated() || (req.user.role !== "contentManager" && req.user.role !== "admin")) {
+      return res.status(403).json({ error: "Not authorized" });
+    }
+    next();
+  }, upload.array('images', 10), (req, res) => {
+    try {
+      const files = req.files as Express.Multer.File[];
+      if (!files || files.length === 0) {
+        return res.status(400).json({ error: "No files uploaded" });
+      }
+      
+      // Create URLs for the uploaded files
+      const fileUrls = files.map(file => `/uploads/${file.filename}`);
+      res.status(200).json({ urls: fileUrls });
+    } catch (error) {
+      console.error("Error uploading files:", error);
+      res.status(500).json({ error: "Failed to upload files" });
+    }
+  });
+
+  // Bulk update products
+  app.post('/api/products/bulk-update', async (req, res) => {
+    try {
+      // Check if user is authenticated and has the right role
+      if (!req.isAuthenticated() || (req.user.role !== "contentManager" && req.user.role !== "admin")) {
+        return res.status(403).json({ error: "Not authorized" });
+      }
+      
+      // Validate request
+      const bulkUpdateSchema = z.object({
+        selectedIds: z.array(z.number()),
+        action: z.enum(["discount", "category", "stock"]),
+        discount: z.number().optional(),
+        newCategory: z.string().optional(),
+        stockChange: z.number().optional(),
+        sizeToUpdate: z.string().optional()
+      });
+      
+      const result = bulkUpdateSchema.safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ error: "Invalid input data", details: result.error });
+      }
+      
+      const { selectedIds, action, discount, newCategory, stockChange, sizeToUpdate } = result.data;
+      
+      // Ensure we have required fields based on action
+      if (action === "discount" && (discount === undefined || discount < 0 || discount > 100)) {
+        return res.status(400).json({ error: "Valid discount percentage is required" });
+      }
+      
+      if (action === "category" && !newCategory) {
+        return res.status(400).json({ error: "New category is required" });
+      }
+      
+      if (action === "stock" && (stockChange === undefined || !sizeToUpdate)) {
+        return res.status(400).json({ error: "Size and stock change are required" });
+      }
+      
+      // Process bulk update based on action type
+      let updatedCount = 0;
+      
+      if (action === "discount") {
+        // Apply discount to all selected products
+        for (const id of selectedIds) {
+          const product = await storage.getProduct(id);
+          if (product) {
+            const discountedPrice = product.price - (product.price * (discount / 100));
+            await storage.updateProduct(id, { discountedPrice });
+            updatedCount++;
+          }
+        }
+      } else if (action === "category") {
+        // Change category for all selected products
+        for (const id of selectedIds) {
+          const product = await storage.getProduct(id);
+          if (product) {
+            await storage.updateProduct(id, { category: newCategory });
+            updatedCount++;
+          }
+        }
+      } else if (action === "stock") {
+        // Update inventory for all selected products
+        for (const id of selectedIds) {
+          const inventoryItems = await storage.getInventoryByProduct(id);
+          const sizeItem = inventoryItems.find(item => item.size === sizeToUpdate);
+          
+          if (sizeItem) {
+            // Update existing inventory
+            const newQuantity = Math.max(0, sizeItem.quantity + stockChange);
+            await storage.updateInventory(sizeItem.id, { quantity: newQuantity });
+            updatedCount++;
+          } else {
+            // Create new inventory if size doesn't exist (only if adding stock)
+            if (stockChange > 0) {
+              await storage.createInventory({
+                productId: id,
+                size: sizeToUpdate,
+                quantity: stockChange
+              });
+              updatedCount++;
+            }
+          }
+        }
+      }
+      
+      res.json({ success: true, updatedCount });
+    } catch (error) {
+      console.error("Error performing bulk update:", error);
+      res.status(500).json({ error: "Failed to perform bulk update" });
     }
   });
 
