@@ -78,8 +78,11 @@ export function ProductFilters({
     ratings: true
   });
 
+  // Define valid accordion IDs type
+  type AccordionId = 'categories' | 'brands' | 'sizes' | 'ratings';
+  
   // Toggle accordion state
-  const toggleAccordion = (accordionId: string) => {
+  const toggleAccordion = (accordionId: AccordionId) => {
     setOpenAccordions((prev) => ({
       ...prev,
       [accordionId]: !prev[accordionId],
@@ -196,17 +199,32 @@ export function ProductFilters({
           {categories.map((category) => (
             <div 
               key={category.id} 
-              className="flex items-center space-x-2 cursor-pointer"
-              onClick={() => handleCategoryChange(category.id)}
+              className="flex items-center space-x-2 cursor-pointer py-1"
             >
-              <Checkbox
-                id={`category-${category.id}`}
-                checked={selectedCategories.includes(category.id)}
+              <div 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleCategoryChange(category.id);
+                }}
                 className="cursor-pointer"
-              />
+              >
+                <Checkbox
+                  id={`category-${category.id}`}
+                  checked={selectedCategories.includes(category.id)}
+                  className="cursor-pointer"
+                  onClick={(e) => e.stopPropagation()}
+                  onCheckedChange={() => handleCategoryChange(category.id)}
+                />
+              </div>
               <Label
                 htmlFor={`category-${category.id}`}
                 className="text-sm cursor-pointer w-full"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleCategoryChange(category.id);
+                }}
               >
                 {category.label}
               </Label>
@@ -233,17 +251,32 @@ export function ProductFilters({
           {brands.map((brand) => (
             <div 
               key={brand.id} 
-              className="flex items-center space-x-2 cursor-pointer"
-              onClick={() => handleBrandChange(brand.id)}
+              className="flex items-center space-x-2 cursor-pointer py-1"
             >
-              <Checkbox
-                id={`brand-${brand.id}`}
-                checked={selectedBrands.includes(brand.id)}
+              <div 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleBrandChange(brand.id);
+                }}
                 className="cursor-pointer"
-              />
+              >
+                <Checkbox
+                  id={`brand-${brand.id}`}
+                  checked={selectedBrands.includes(brand.id)}
+                  className="cursor-pointer"
+                  onClick={(e) => e.stopPropagation()}
+                  onCheckedChange={() => handleBrandChange(brand.id)}
+                />
+              </div>
               <Label
                 htmlFor={`brand-${brand.id}`}
                 className="text-sm cursor-pointer w-full"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleBrandChange(brand.id);
+                }}
               >
                 {brand.label}
               </Label>
@@ -270,17 +303,32 @@ export function ProductFilters({
           {sizes.map((size) => (
             <div 
               key={size.id} 
-              className="flex items-center space-x-2 cursor-pointer"
-              onClick={() => handleSizeChange(size.id)}
+              className="flex items-center space-x-2 cursor-pointer py-1"
             >
-              <Checkbox
-                id={`size-${size.id}`}
-                checked={selectedSizes.includes(size.id)}
+              <div 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSizeChange(size.id);
+                }}
                 className="cursor-pointer"
-              />
+              >
+                <Checkbox
+                  id={`size-${size.id}`}
+                  checked={selectedSizes.includes(size.id)}
+                  className="cursor-pointer"
+                  onClick={(e) => e.stopPropagation()}
+                  onCheckedChange={() => handleSizeChange(size.id)}
+                />
+              </div>
               <Label
                 htmlFor={`size-${size.id}`}
                 className="text-sm cursor-pointer w-full"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSizeChange(size.id);
+                }}
               >
                 {size.label}
               </Label>
@@ -307,17 +355,32 @@ export function ProductFilters({
           {ratings.map((rating) => (
             <div 
               key={rating.id} 
-              className="flex items-center space-x-2 cursor-pointer"
-              onClick={() => handleRatingChange(rating.id)}
+              className="flex items-center space-x-2 cursor-pointer py-1"
             >
-              <Checkbox
-                id={`rating-${rating.id}`}
-                checked={selectedRating === rating.id}
+              <div 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleRatingChange(rating.id);
+                }}
                 className="cursor-pointer"
-              />
+              >
+                <Checkbox
+                  id={`rating-${rating.id}`}
+                  checked={selectedRating === rating.id}
+                  className="cursor-pointer"
+                  onClick={(e) => e.stopPropagation()}
+                  onCheckedChange={() => handleRatingChange(rating.id)}
+                />
+              </div>
               <Label
                 htmlFor={`rating-${rating.id}`}
                 className="text-sm cursor-pointer w-full"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleRatingChange(rating.id);
+                }}
               >
                 {rating.label}
               </Label>
