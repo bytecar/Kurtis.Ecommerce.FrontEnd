@@ -301,25 +301,49 @@ export class MemStorage implements IStorage {
       {
         name: "New Arrivals",
         description: "Recently added products to our collection",
-        imageUrl: "https://example.com/new-arrivals.jpg",
+        imageUrl: "https://images.unsplash.com/photo-1590077428593-a33c3fb61d63?q=80&w=2080",
         active: true
       },
       {
         name: "Summer Collection",
         description: "Light and colorful ethnic wear for summer",
-        imageUrl: "https://example.com/summer.jpg",
+        imageUrl: "https://images.unsplash.com/photo-1607006344380-b6775a0824ce?q=80&w=2080",
         active: true
       },
       {
         name: "Wedding Collection",
         description: "Elegant and traditional wear for wedding ceremonies",
-        imageUrl: "https://example.com/wedding.jpg",
+        imageUrl: "https://images.unsplash.com/photo-1630271358016-61a86089853a?q=80&w=2080",
         active: true
       },
       {
         name: "Festival Collection",
         description: "Vibrant and celebratory ethnic wear for festivals",
-        imageUrl: "https://example.com/festival.jpg",
+        imageUrl: "https://images.unsplash.com/photo-1604422759792-36b2c104ac18?q=80&w=2080",
+        active: true
+      },
+      {
+        name: "Men's Ethnic",
+        description: "Traditional and contemporary ethnic wear for men",
+        imageUrl: "https://images.unsplash.com/photo-1614886137091-45232bd9c70e?q=80&w=2080",
+        active: true
+      },
+      {
+        name: "Women's Ethnic",
+        description: "Elegant ethnic wear for women of all ages",
+        imageUrl: "https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?q=80&w=2080",
+        active: true
+      },
+      {
+        name: "Designer Collection",
+        description: "Premium designer ethnic wear for special occasions",
+        imageUrl: "https://images.unsplash.com/photo-1638364826277-dbb2c1fed33c?q=80&w=2080",
+        active: true
+      },
+      {
+        name: "Trending Now",
+        description: "Most popular ethnic wear items this season",
+        imageUrl: "https://images.unsplash.com/photo-1623244727304-b46c0e20c83b?q=80&w=2080",
         active: true
       }
     ];
@@ -1237,6 +1261,22 @@ export class MemStorage implements IStorage {
           ? Math.floor((price * (100 - discountRate)) / 100)
           : null;
 
+      // Random sizes for each product
+      const availableSizes = ["xs", "s", "m", "l", "xl", "xxl"];
+      const productSizes = [];
+      const numSizes = Math.floor(Math.random() * 5) + 1; // 1-5 sizes per product
+      for (let j = 0; j < numSizes; j++) {
+        productSizes.push(availableSizes[Math.floor(Math.random() * availableSizes.length)]);
+      }
+      
+      // Generate random ratings
+      const ratingCount = Math.floor(Math.random() * 100);
+      const averageRating = ratingCount > 0 ? (Math.random() * 4 + 1).toFixed(1) : 0; // 1.0-5.0 rating
+      
+      // Randomly mark some products as featured or new
+      const featured = Math.random() < 0.2; // 20% chance to be featured
+      const isNew = Math.random() < 0.3; // 30% chance to be new
+      
       const product: InsertProduct = {
         name: `${brands[i % brands.length]} ${categories[i % categories.length].slice(0, -1)}`,
         description: `Beautiful ethnic ${categories[i % categories.length].slice(0, -1)} from ${brands[i % brands.length]}. Perfect for festive occasions.`,
@@ -1245,6 +1285,11 @@ export class MemStorage implements IStorage {
         brand: brands[i % brands.length],
         category: categories[i % categories.length],
         gender: genders[i % 2],
+        sizes: [...new Set(productSizes)], // Remove duplicates
+        averageRating: parseFloat(averageRating),
+        ratingCount,
+        featured,
+        isNew,
         imageUrls: [imageUrls[i % imageUrls.length]],
       };
 

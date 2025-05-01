@@ -1,4 +1,13 @@
-import { pgTable, text, serial, integer, boolean, timestamp, json, doublePrecision } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  serial,
+  integer,
+  boolean,
+  timestamp,
+  json,
+  doublePrecision,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -21,31 +30,33 @@ export const users = pgTable("users", {
   birthdate: timestamp("birthdate"),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-  email: true,
-  fullName: true,
-  role: true,
-  gender: true,
-  status: true,
-  profilePicture: true,
-  lastLogin: true,
-  phoneNumber: true,
-  address: true,
-  birthdate: true,
-}).extend({
-  // Make email and fullName optional for flexibility in admin user creation
-  email: z.string().email().optional(), 
-  fullName: z.string().optional(),
-  gender: z.string().optional(),
-  status: z.string().default("active"),
-  profilePicture: z.string().optional(),
-  lastLogin: z.date().optional(),
-  phoneNumber: z.string().optional(),
-  address: z.string().optional(),
-  birthdate: z.date().optional(),
-});
+export const insertUserSchema = createInsertSchema(users)
+  .pick({
+    username: true,
+    password: true,
+    email: true,
+    fullName: true,
+    role: true,
+    gender: true,
+    status: true,
+    profilePicture: true,
+    lastLogin: true,
+    phoneNumber: true,
+    address: true,
+    birthdate: true,
+  })
+  .extend({
+    // Make email and fullName optional for flexibility in admin user creation
+    email: z.string().email().optional(),
+    fullName: z.string().optional(),
+    gender: z.string().optional(),
+    status: z.string().default("active"),
+    profilePicture: z.string().optional(),
+    lastLogin: z.date().optional(),
+    phoneNumber: z.string().optional(),
+    address: z.string().optional(),
+    birthdate: z.date().optional(),
+  });
 
 // Products
 export const products = pgTable("products", {
@@ -57,7 +68,12 @@ export const products = pgTable("products", {
   brand: text("brand").notNull(),
   category: text("category").notNull(),
   gender: text("gender").notNull(),
+  sizes: json("sizes").$type<string[]>(),
+  averageRating: doublePrecision("average_rating").default(0),
+  ratingCount: integer("rating_count").default(0),
   imageUrls: json("image_urls").notNull().$type<string[]>(),
+  featured: boolean("featured").default(false),
+  isNew: boolean("is_new").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -70,7 +86,12 @@ export const insertProductSchema = createInsertSchema(products).pick({
   brand: true,
   category: true,
   gender: true,
+  sizes: true,
+  averageRating: true,
+  ratingCount: true,
   imageUrls: true,
+  featured: true,
+  isNew: true,
 });
 
 // Inventory
@@ -190,7 +211,9 @@ export const recentlyViewed = pgTable("recently_viewed", {
   viewedAt: timestamp("viewed_at").defaultNow(),
 });
 
-export const insertRecentlyViewedSchema = createInsertSchema(recentlyViewed).pick({
+export const insertRecentlyViewedSchema = createInsertSchema(
+  recentlyViewed,
+).pick({
   userId: true,
   productId: true,
 });
@@ -235,13 +258,15 @@ export const userPreferences = pgTable("user_preferences", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertUserPreferencesSchema = createInsertSchema(userPreferences).pick({
+export const insertUserPreferencesSchema = createInsertSchema(
+  userPreferences,
+).pick({
   userId: true,
   favoriteCategories: true,
   favoriteColors: true,
   favoriteOccasions: true,
   priceRangeMin: true,
-  priceRangeMax: true
+  priceRangeMax: true,
 });
 
 export type UserPreferences = typeof userPreferences.$inferSelect;
@@ -277,7 +302,9 @@ export const productCollections = pgTable("product_collections", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertProductCollectionSchema = createInsertSchema(productCollections).pick({
+export const insertProductCollectionSchema = createInsertSchema(
+  productCollections,
+).pick({
   productId: true,
   collectionId: true,
 });
@@ -286,4 +313,6 @@ export type Collection = typeof collections.$inferSelect;
 export type InsertCollection = z.infer<typeof insertCollectionSchema>;
 
 export type ProductCollection = typeof productCollections.$inferSelect;
-export type InsertProductCollection = z.infer<typeof insertProductCollectionSchema>;
+export type InsertProductCollection = z.infer<
+  typeof insertProductCollectionSchema
+>;
