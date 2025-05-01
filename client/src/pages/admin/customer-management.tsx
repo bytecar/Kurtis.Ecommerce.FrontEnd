@@ -200,19 +200,24 @@ const CustomerManagement: React.FC = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
 
   const filteredUsers = users.filter(user => {
-    // Search term
-    const matchesSearch = 
-      user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.username.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // Status filter
-    const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
-    
-    // Role filter
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-    
-    return matchesSearch && matchesStatus && matchesRole;
+    try {
+      // Search term
+      const matchesSearch = searchTerm === '' || 
+        user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.username.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // Status filter
+      const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
+      
+      // Role filter
+      const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+      
+      return matchesSearch && matchesStatus && matchesRole;
+    } catch (error) {
+      console.error('Error filtering user:', error, user);
+      return false;
+    }
   });
 
   const handleUserAction = (action: 'edit' | 'delete', user: User) => {

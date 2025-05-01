@@ -213,19 +213,24 @@ const RatingManagement: React.FC = () => {
 
   // Filter ratings based on search term and filters
   const filteredRatings = ratings.filter(rating => {
-    // Search term
-    const matchesSearch = 
-      rating.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      rating.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      rating.comment.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // Status filter
-    const matchesStatus = statusFilter === 'all' || rating.status === statusFilter;
-    
-    // Rating filter
-    const matchesRating = ratingFilter === 'all' || rating.rating.toString() === ratingFilter;
-    
-    return matchesSearch && matchesStatus && matchesRating;
+    try {
+      // Search term
+      const matchesSearch = searchTerm === '' || 
+        rating.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        rating.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        rating.comment.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // Status filter
+      const matchesStatus = statusFilter === 'all' || rating.status === statusFilter;
+      
+      // Rating filter
+      const matchesRating = ratingFilter === 'all' || rating.rating.toString() === ratingFilter;
+      
+      return matchesSearch && matchesStatus && matchesRating;
+    } catch (error) {
+      console.error('Error filtering rating:', error, rating);
+      return false;
+    }
   });
 
   const handleRatingAction = (action: 'view' | 'delete', rating: Rating) => {

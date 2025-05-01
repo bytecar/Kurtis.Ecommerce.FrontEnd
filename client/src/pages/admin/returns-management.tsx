@@ -319,18 +319,23 @@ const ReturnsManagement: React.FC = () => {
 
   // Filter returns based on search and status filter
   const filteredReturns = returns.filter(returnItem => {
-    // Search term
-    const matchesSearch = 
-      returnItem.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      returnItem.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      returnItem.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      returnItem.orderId.toString().includes(searchTerm) ||
-      (returnItem.additionalInfo && returnItem.additionalInfo.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    // Status filter
-    const matchesStatus = statusFilter === 'all' || returnItem.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
+    try {
+      // Search term
+      const matchesSearch = searchTerm === '' || 
+        returnItem.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        returnItem.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        returnItem.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        returnItem.orderId.toString().includes(searchTerm) ||
+        (returnItem.additionalInfo && returnItem.additionalInfo.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      // Status filter
+      const matchesStatus = statusFilter === 'all' || returnItem.status === statusFilter;
+      
+      return matchesSearch && matchesStatus;
+    } catch (error) {
+      console.error('Error filtering return:', error, returnItem);
+      return false;
+    }
   });
 
   const handleReturnAction = (action: 'view' | 'delete', returnItem: Return) => {
