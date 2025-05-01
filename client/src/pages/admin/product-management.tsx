@@ -301,36 +301,57 @@ export default function ProductManagement() {
     }
   });
 
-  // Upload images
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Upload images to server
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     const newUploads = Array.from(files);
     setIsUploading(true);
 
-    // Simulate image upload with base64 conversion for demo
-    // In production, you would upload to a server or cloud storage
-    Promise.all(
-      newUploads.map(file => {
-        return new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            resolve(reader.result as string);
-          };
-          reader.readAsDataURL(file);
-        });
-      })
-    ).then(urls => {
-      setImagePreviewUrls(prev => [...prev, ...urls]);
+    try {
+      // Create a FormData instance to send to the server
+      const formData = new FormData();
+      newUploads.forEach(file => {
+        formData.append('images', file);
+      });
+
+      // Use fetch directly to send FormData
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include' // Necessary for sending auth cookies
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed: ' + response.statusText);
+      }
+
+      const result = await response.json();
+      
+      // Set image previews with the server-returned URLs
+      setImagePreviewUrls(prev => [...prev, ...result.urls]);
       setImageUploads(prev => [...prev, ...newUploads]);
       
+      // Update the form with the new image URLs
       const currentUrls = productForm.getValues("imageUrls");
-      productForm.setValue("imageUrls", [...currentUrls, ...urls]);
+      productForm.setValue("imageUrls", [...currentUrls, ...result.urls]);
       productForm.trigger("imageUrls");
       
+      toast({
+        title: "Images Uploaded",
+        description: `Successfully uploaded ${result.urls.length} images.`,
+      });
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      toast({
+        title: "Upload Failed",
+        description: error instanceof Error ? error.message : "Failed to upload images",
+        variant: "destructive",
+      });
+    } finally {
       setIsUploading(false);
-    });
+    }
   };
 
   // Remove an uploaded image
@@ -349,9 +370,9 @@ export default function ProductManagement() {
 
   // Handle product form submission
   const onProductSubmit = (values: ProductFormValues) => {
-    // In a real app, you would upload images to a server here
-    // and then use the returned URLs
-
+    // Image URLs are already uploaded to the server via handleImageUpload
+    // and stored in the form values
+    
     if (editingProduct) {
       updateProductMutation.mutate({
         ...values,
