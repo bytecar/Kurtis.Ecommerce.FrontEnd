@@ -44,7 +44,9 @@ export const Newsletter: React.FC = () => {
     <section className="newsletter-section">
       <div className="newsletter-container">
         <div className="newsletter-content">
-          <MailCheck className="newsletter-icon" />
+          <div className="newsletter-icon-container">
+            <MailCheck className="newsletter-icon" />
+          </div>
           <h2 className="newsletter-title">{t('newsletter.title')}</h2>
           <p className="newsletter-subtitle">{t('newsletter.subtitle')}</p>
           
