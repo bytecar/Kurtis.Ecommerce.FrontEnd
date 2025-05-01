@@ -18,7 +18,7 @@ import { RecentlyViewed } from "@/components/products/recently-viewed";
 import { ProductReviews } from "@/components/products/product-reviews";
 import { SizeSelector, SizeOption } from "@/components/products/size-selector";
 import { SizeRecommendationWizard } from "@/components/products/size-recommendation-wizard";
-import { VirtualTryOn } from "@/components/products/virtual-try-on";
+import VirtualTryOn from "@/components/products/virtual-try-on-fixed";
 import { SocialShareButton } from "@/components/social";
 import { useState } from "react";
 import { logger, LogCategory } from "@/lib/logging";
