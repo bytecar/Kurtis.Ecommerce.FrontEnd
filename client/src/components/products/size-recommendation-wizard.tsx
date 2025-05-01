@@ -18,6 +18,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { useTranslation } from 'react-i18next';
 import {
   Select,
   SelectContent,
@@ -36,7 +37,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SizeOption } from './size-selector';
 
-// Define schema for the wizard form
+// Define schema for the wizard form with translation function
 const sizeFormSchema = z.object({
   height: z.string().min(1, { message: 'Please enter your height' }),
   weight: z.string().min(1, { message: 'Please enter your weight' }),
@@ -75,6 +76,7 @@ export function SizeRecommendationWizard({
   availableSizes,
   onSizeSelect,
 }: SizeRecommendationWizardProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [calculatingSize, setCalculatingSize] = useState(false);
@@ -332,7 +334,7 @@ export function SizeRecommendationWizard({
         name="height"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Height*</FormLabel>
+            <FormLabel>{t('product.sizeRecommender.heightLabel')}</FormLabel>
             <FormControl>
               <div className="flex gap-2">
                 <Input 
@@ -341,7 +343,7 @@ export function SizeRecommendationWizard({
                   type="number"
                 />
                 <span className="flex items-center text-muted-foreground min-w-16">
-                  {getUnitLabel()}
+                  {watchUseInches ? t('product.sizeRecommender.measurementInches') : t('product.sizeRecommender.measurementCm')}
                 </span>
               </div>
             </FormControl>
@@ -355,7 +357,7 @@ export function SizeRecommendationWizard({
         name="weight"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Weight*</FormLabel>
+            <FormLabel>{t('product.sizeRecommender.weightLabel')}</FormLabel>
             <FormControl>
               <div className="flex gap-2">
                 <Input 
@@ -378,7 +380,7 @@ export function SizeRecommendationWizard({
         name="age"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Age*</FormLabel>
+            <FormLabel>{t('product.sizeRecommender.ageLabel')}</FormLabel>
             <FormControl>
               <Input placeholder="e.g. 30" {...field} type="number" />
             </FormControl>
@@ -392,20 +394,20 @@ export function SizeRecommendationWizard({
         name="bodyType"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Body Type*</FormLabel>
+            <FormLabel>{t('product.sizeRecommender.bodyTypeLabel')}</FormLabel>
             <Select
               onValueChange={field.onChange}
               defaultValue={field.value}
             >
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select your body type" />
+                  <SelectValue placeholder={t('product.sizeRecommender.selectBodyType')} />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
                 {bodyTypeOptions.map(option => (
                   <SelectItem key={option.value} value={option.value}>
-                    {option.label}
+                    {t(`product.sizeRecommender.bodyTypes.${option.value}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -427,9 +429,9 @@ export function SizeRecommendationWizard({
               />
             </FormControl>
             <div className="space-y-1 leading-none">
-              <FormLabel>Use imperial measurements (inches/pounds)</FormLabel>
+              <FormLabel>{t('product.sizeRecommender.useImperialLabel')}</FormLabel>
               <FormDescription>
-                Switch between metric and imperial units
+                {t('product.sizeRecommender.unitSwitchDescription')}
               </FormDescription>
             </div>
           </FormItem>
@@ -441,17 +443,16 @@ export function SizeRecommendationWizard({
   const renderStepTwo = () => (
     <div className="space-y-4 py-4">
       <div className="mb-4">
-        <h3 className="text-lg font-medium">Advanced Measurements</h3>
+        <h3 className="text-lg font-medium">{t('product.sizeRecommender.advancedMeasurementsTitle')}</h3>
         <p className="text-muted-foreground text-sm">
-          For a more accurate size recommendation, please provide the following measurements.
-          These are optional but will improve our recommendation.
+          {t('product.sizeRecommender.advancedMeasurementsDescription')}
         </p>
       </div>
 
       <Tabs defaultValue="measure" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="measure">Enter Measurements</TabsTrigger>
-          <TabsTrigger value="guide">Measurement Guide</TabsTrigger>
+          <TabsTrigger value="measure">{t('product.sizeRecommender.enterMeasurementsTab')}</TabsTrigger>
+          <TabsTrigger value="guide">{t('product.sizeRecommender.measurementGuideTab')}</TabsTrigger>
         </TabsList>
         <TabsContent value="measure" className="space-y-4 pt-4">
           <FormField
@@ -459,7 +460,7 @@ export function SizeRecommendationWizard({
             name="measureChest"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Chest/Bust</FormLabel>
+                <FormLabel>{t('product.sizeRecommender.chestBustLabel')}</FormLabel>
                 <FormControl>
                   <div className="flex gap-2">
                     <Input 
@@ -468,7 +469,7 @@ export function SizeRecommendationWizard({
                       type="number"
                     />
                     <span className="flex items-center text-muted-foreground min-w-16">
-                      {getUnitLabel()}
+                      {watchUseInches ? t('product.sizeRecommender.measurementInches') : t('product.sizeRecommender.measurementCm')}
                     </span>
                   </div>
                 </FormControl>
@@ -482,7 +483,7 @@ export function SizeRecommendationWizard({
             name="measureWaist"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Waist</FormLabel>
+                <FormLabel>{t('product.sizeRecommender.waistLabel')}</FormLabel>
                 <FormControl>
                   <div className="flex gap-2">
                     <Input 
@@ -491,7 +492,7 @@ export function SizeRecommendationWizard({
                       type="number"
                     />
                     <span className="flex items-center text-muted-foreground min-w-16">
-                      {getUnitLabel()}
+                      {watchUseInches ? t('product.sizeRecommender.measurementInches') : t('product.sizeRecommender.measurementCm')}
                     </span>
                   </div>
                 </FormControl>
@@ -505,7 +506,7 @@ export function SizeRecommendationWizard({
             name="measureHips"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Hips</FormLabel>
+                <FormLabel>{t('product.sizeRecommender.hipsLabel')}</FormLabel>
                 <FormControl>
                   <div className="flex gap-2">
                     <Input 
@@ -514,7 +515,7 @@ export function SizeRecommendationWizard({
                       type="number"
                     />
                     <span className="flex items-center text-muted-foreground min-w-16">
-                      {getUnitLabel()}
+                      {watchUseInches ? t('product.sizeRecommender.measurementInches') : t('product.sizeRecommender.measurementCm')}
                     </span>
                   </div>
                 </FormControl>
@@ -684,14 +685,14 @@ export function SizeRecommendationWizard({
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
           <RulerIcon className="h-4 w-4" />
-          <span>Find Your Size</span>
+          <span>{t('product.sizeRecommender.findYourSize')}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] md:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Size Recommendation Wizard</DialogTitle>
+          <DialogTitle>{t('product.sizeRecommender.title')}</DialogTitle>
           <DialogDescription>
-            Answer a few questions to find your perfect size for this {productType}.
+            {t('product.sizeRecommender.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -713,7 +714,7 @@ export function SizeRecommendationWizard({
                       variant="outline"
                       onClick={() => setOpen(false)}
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </Button>
                     <Button 
                       type="button" 
@@ -723,7 +724,7 @@ export function SizeRecommendationWizard({
                         !form.getValues().weight || 
                         !form.getValues().age}
                     >
-                      Next
+                      {t('product.sizeRecommender.nextButton')}
                     </Button>
                   </div>
                 </>
@@ -734,9 +735,9 @@ export function SizeRecommendationWizard({
                     variant="outline"
                     onClick={prevStep}
                   >
-                    Back
+                    {t('product.sizeRecommender.backButton')}
                   </Button>
-                  <Button type="submit">Calculate My Size</Button>
+                  <Button type="submit">{t('product.sizeRecommender.calculateButton')}</Button>
                 </>
               ) : (
                 <>
@@ -745,14 +746,14 @@ export function SizeRecommendationWizard({
                     variant="outline"
                     onClick={resetWizard}
                   >
-                    Start Over
+                    {t('product.sizeRecommender.tryAgain')}
                   </Button>
                   <Button
                     type="button"
                     onClick={handleSelectRecommendedSize}
                     disabled={!recommendedSize}
                   >
-                    Select This Size
+                    {t('product.sizeRecommender.selectSizeButton')}
                   </Button>
                 </>
               )}
