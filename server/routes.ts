@@ -33,6 +33,164 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get a specific user (admin only)
+  app.get("/api/admin/users/:id", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (!req.isAuthenticated() || req.user.role !== "admin") {
+        return res.status(403).json({ error: "Unauthorized: Admin access required" });
+      }
+      
+      const id = parseInt(req.params.id);
+      const user = await storage.getUser(id);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Remove sensitive information
+      const { password, ...safeUser } = user;
+      
+      res.json(safeUser);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ error: "Failed to fetch user" });
+    }
+  });
+  
+  // Create a new user (admin only)
+  app.post("/api/admin/users", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (!req.isAuthenticated() || req.user.role !== "admin") {
+        return res.status(403).json({ error: "Unauthorized: Admin access required" });
+      }
+      
+      // Validate request data
+      const schema = z.object({
+        username: z.string().min(3),
+        email: z.string().email().optional(),
+        fullName: z.string().optional(),
+        role: z.enum(["admin", "customer", "contentManager"]).default("customer"),
+        password: z.string().min(6)
+      });
+      
+      const result = schema.safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ error: "Invalid input data", details: result.error });
+      }
+      
+      // Check if username is already taken
+      const existingUser = await storage.getUserByUsername(result.data.username);
+      if (existingUser) {
+        return res.status(409).json({ error: "Username already exists" });
+      }
+      
+      // Create the user
+      const hashedPassword = await hashPassword(result.data.password);
+      const newUser = await storage.createUser({
+        ...result.data,
+        password: hashedPassword
+      });
+      
+      // Remove password from response
+      const { password, ...safeUser } = newUser;
+      
+      res.status(201).json(safeUser);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ error: "Failed to create user" });
+    }
+  });
+  
+  // Update a user (admin only)
+  app.patch("/api/admin/users/:id", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (!req.isAuthenticated() || req.user.role !== "admin") {
+        return res.status(403).json({ error: "Unauthorized: Admin access required" });
+      }
+      
+      const id = parseInt(req.params.id);
+      
+      // Validate request data
+      const schema = z.object({
+        username: z.string().min(3).optional(),
+        email: z.string().email().optional(),
+        fullName: z.string().optional(),
+        role: z.enum(["admin", "customer", "contentManager"]).optional(),
+        password: z.string().min(6).optional()
+      });
+      
+      const result = schema.safeParse(req.body);
+      
+      if (!result.success) {
+        return res.status(400).json({ error: "Invalid input data", details: result.error });
+      }
+      
+      // Check if username is already taken if it's being updated
+      if (result.data.username) {
+        const existingUser = await storage.getUserByUsername(result.data.username);
+        if (existingUser && existingUser.id !== id) {
+          return res.status(409).json({ error: "Username already exists" });
+        }
+      }
+      
+      // Update user data
+      let updateData = { ...result.data };
+      
+      // If password is provided, hash it
+      if (result.data.password) {
+        const hashedPassword = await hashPassword(result.data.password);
+        updateData.password = hashedPassword;
+      }
+      
+      // Update the user
+      const updatedUser = await storage.updateUser(id, updateData);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Remove password from response
+      const { password, ...safeUser } = updatedUser;
+      
+      res.json(safeUser);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ error: "Failed to update user" });
+    }
+  });
+  
+  // Delete a user (admin only)
+  app.delete("/api/admin/users/:id", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (!req.isAuthenticated() || req.user.role !== "admin") {
+        return res.status(403).json({ error: "Unauthorized: Admin access required" });
+      }
+      
+      const id = parseInt(req.params.id);
+      
+      // Don't allow deleting the requesting user
+      if (id === req.user.id) {
+        return res.status(400).json({ error: "Cannot delete your own user account" });
+      }
+      
+      const deleted = await storage.deleteUser(id);
+      
+      if (!deleted) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ error: "Failed to delete user" });
+    }
+  });
+  
   // Public endpoint to get basic user information by ID
   app.get("/api/users/:id", async (req, res) => {
     try {
