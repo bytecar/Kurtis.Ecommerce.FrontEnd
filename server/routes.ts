@@ -713,7 +713,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Sort by createdAt descending and take the first 10
       const recentOrders = [...orders]
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .sort((a, b) => safeDate(b.createdAt).getTime() - safeDate(a.createdAt).getTime())
         .slice(0, 10);
       
       res.json(recentOrders);
@@ -733,8 +733,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Order not found" });
       }
       
+      // Get authenticated user
+      const user = getUserSafely(req);
+      
       // Ensure the order belongs to the user or user is admin
-      if (order.userId !== req.user.id && req.user.role !== "admin") {
+      if (order.userId !== user.id && user.role !== "admin") {
         return res.status(403).json({ error: "Not authorized to view this order" });
       }
       
@@ -755,8 +758,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Order not found" });
       }
       
+      // Get authenticated user
+      const user = getUserSafely(req);
+      
       // Ensure the order belongs to the user or user is admin
-      if (order.userId !== req.user.id && req.user.role !== "admin") {
+      if (order.userId !== user.id && user.role !== "admin") {
         return res.status(403).json({ error: "Not authorized to view this order" });
       }
       
@@ -774,8 +780,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate request body
       const validatedData = insertOrderSchema.parse(req.body);
       
+      // Get authenticated user
+      const user = getUserSafely(req);
+      
       // Set userId from JWT
-      validatedData.userId = req.user.id;
+      validatedData.userId = user.id;
       
       // Create order
       const order = await storage.createOrder(validatedData);
@@ -848,7 +857,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Order not found" });
       }
       
-      if (order.userId !== req.user.id && req.user.role !== "admin") {
+      // Get authenticated user
+      const user = getUserSafely(req);
+      
+      if (order.userId !== user.id && user.role !== "admin") {
         return res.status(403).json({ error: "Not authorized to create return for this order" });
       }
       
@@ -869,8 +881,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user wishlist (authenticated users only)
   app.get("/api/wishlist", authenticateJWT, async (req, res) => {
     try {
+      // Get authenticated user
+      const user = getUserSafely(req);
       
-      const wishlistItems = await storage.getWishlistByUser(req.user.id);
+      const wishlistItems = await storage.getWishlistByUser(user.id);
       
       // Fetch full product details for each wishlist item
       const products = [];
@@ -890,6 +904,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add product to wishlist (authenticated users only)
   app.post("/api/wishlist", authenticateJWT, async (req, res) => {
     try {
+      // Get authenticated user
+      const user = getUserSafely(req);
       
       const { productId } = req.body;
       
@@ -906,7 +922,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Add to wishlist
       const wishlistItem = await storage.createWishlist({
-        userId: req.user.id,
+        userId: user.id,
         productId,
       });
       
@@ -917,17 +933,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Remove product from wishlist (authenticated users only)
-  app.delete("/api/wishlist/:productId", async (req, res) => {
+  app.delete("/api/wishlist/:productId", authenticateJWT, async (req, res) => {
     try {
-      // Verify authentication
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
+      // Get authenticated user
+      const user = getUserSafely(req);
       
       const productId = parseInt(req.params.productId);
       
       // Remove from wishlist
-      const success = await storage.deleteWishlistItem(req.user.id, productId);
+      const success = await storage.deleteWishlistItem(user.id, productId);
       
       if (!success) {
         return res.status(404).json({ error: "Wishlist item not found" });
@@ -948,9 +962,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let collections;
       
       // Check if user is authenticated to get personalized collections
-      if (req.isAuthenticated()) {
+      const isAuthenticated = req.isAuthenticated && req.isAuthenticated();
+      if (isAuthenticated) {
         try {
-          const userPreferences = await storage.getUserPreferences(req.user.id);
+          // Get authenticated user (safe now since we checked authentication)
+          const user = req.user!;
+
+          const userPreferences = await storage.getUserPreferences(user.id);
           
           // If user has preferences, try to get personalized collections using AI
           if (userPreferences) {
@@ -962,7 +980,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const preferenceData = {
                 favoriteCategories: userPreferences.favoriteCategories,
                 favoriteColors: userPreferences.favoriteColors,
-                gender: req.user.gender,
+                gender: user.gender,
                 priceRange: userPreferences.priceRangeMin && userPreferences.priceRangeMax ? 
                   { min: userPreferences.priceRangeMin, max: userPreferences.priceRangeMax } : undefined
               };
@@ -1024,14 +1042,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ======= Recently Viewed Routes =======
   
   // Get recently viewed products (authenticated users only)
-  app.get("/api/recently-viewed", async (req, res) => {
+  app.get("/api/recently-viewed", authenticateJWT, async (req, res) => {
     try {
-      // Verify authentication
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
+      // Get authenticated user
+      const user = getUserSafely(req);
       
-      const recentlyViewedItems = await storage.getRecentlyViewedByUser(req.user.id);
+      const recentlyViewedItems = await storage.getRecentlyViewedByUser(user.id);
       
       // Fetch full product details for each recently viewed item
       const products = [];
