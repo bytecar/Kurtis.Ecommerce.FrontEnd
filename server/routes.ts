@@ -349,10 +349,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const gender = req.query.gender as string;
       const category = req.query.category ? Array.isArray(req.query.category) ? req.query.category as string[] : [req.query.category as string] : [];
       const brand = req.query.brand ? Array.isArray(req.query.brand) ? req.query.brand as string[] : [req.query.brand as string] : [];
+      const size = req.query.size ? Array.isArray(req.query.size) ? req.query.size as string[] : [req.query.size as string] : [];
+      const rating = req.query.rating as string;
       const minPrice = req.query.minPrice ? parseInt(req.query.minPrice as string) : 0;
       const maxPrice = req.query.maxPrice ? parseInt(req.query.maxPrice as string) : Number.MAX_SAFE_INTEGER;
       const query = req.query.q as string;
       const collection = req.query.collection as string;
+      
+      console.log("Filter parameters:", { gender, category, brand, size, rating, minPrice, maxPrice, query, collection });
       
       let products = await storage.getAllProducts();
       
@@ -367,6 +371,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (brand.length > 0) {
         products = products.filter(product => brand.includes(product.brand));
+      }
+      
+      // Size filter - Get inventory for each product and check if any item has the requested size
+      if (size.length > 0) {
+        const filteredProducts = [];
+        
+        for (const product of products) {
+          const inventory = await storage.getInventoryByProduct(product.id);
+          const hasSizes = inventory.some(item => size.includes(item.size) && item.quantity > 0);
+          
+          if (hasSizes) {
+            filteredProducts.push(product);
+          }
+        }
+        
+        products = filteredProducts;
+      }
+      
+      // Rating filter - Check product reviews for average rating
+      if (rating) {
+        const filteredProducts = [];
+        const ratingValue = rating.split('-')[0]; // Extracts "4" from "4-up"
+        const minimumRating = parseInt(ratingValue);
+        
+        if (!isNaN(minimumRating)) {
+          for (const product of products) {
+            const reviews = await storage.getReviewsByProduct(product.id);
+            
+            if (reviews.length > 0) {
+              const avgRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+              
+              if (avgRating >= minimumRating) {
+                filteredProducts.push(product);
+              }
+            }
+          }
+          
+          products = filteredProducts;
+        }
       }
       
       // Price filter
@@ -388,12 +431,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Collection filter
       if (collection) {
-        // This is a mock implementation since we don't have a collections field
-        // In a real app, you would have a proper collection relationship
-        if (collection === "festival") {
-          products = products.filter(product => product.category === "lehengas" || product.category === "sarees");
-        } else if (collection === "summer") {
-          products = products.filter(product => product.category === "kurtis" || product.category === "tops");
+        try {
+          // First try to find the collection by ID
+          const collectionId = parseInt(collection);
+          if (!isNaN(collectionId)) {
+            products = await storage.getProductsByCollection(collectionId);
+          } else {
+            // Otherwise, use the legacy approach for predefined collections
+            if (collection === "festival") {
+              products = products.filter(product => product.category === "lehengas" || product.category === "sarees");
+            } else if (collection === "summer") {
+              products = products.filter(product => product.category === "kurtis" || product.category === "tops");
+            }
+          }
+        } catch (err) {
+          console.error("Error filtering by collection:", err);
         }
       }
       

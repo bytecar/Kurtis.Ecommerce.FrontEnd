@@ -138,13 +138,15 @@ export function ProductFilters({
 
   useEffect(() => {
     if (!isMobile && onFilterChange) {
-      onFilterChange({
+      const filterData = {
         categories: selectedCategories,
         brands: selectedBrands,
         sizes: selectedSizes,
         rating: selectedRating,
         price: priceRange,
-      });
+      };
+      console.log("Sending filter data:", filterData);
+      onFilterChange(filterData);
     }
   }, [
     selectedCategories,

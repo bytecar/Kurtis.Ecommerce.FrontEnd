@@ -84,6 +84,7 @@ export default function ProductListing() {
       params.append("collection", collection);
     }
     
+    console.log("Built query string:", params.toString());
     return params.toString();
   };
 
