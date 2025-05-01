@@ -1116,8 +1116,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const totalSales = orders.reduce((sum, order) => sum + order.total, 0);
       
       // Calculate sales by category
-      const salesByCategory = [];
-      const categorySales = {};
+      const salesByCategory: { category: string; sales: number }[] = [];
+      const categorySales: Record<string, number> = {};
       
       for (const order of orders) {
         const orderItems = await storage.getOrderItemsByOrder(order.id);

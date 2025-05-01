@@ -71,18 +71,30 @@ export function generateToken(user: User): string {
   };
   
   // Cast JWT_SECRET as jwt.Secret type to fix typings
-  return jwt.sign(payload, JWT_SECRET, { 
-    expiresIn: JWT_EXPIRES_IN 
-  });
+  return jwt.sign(
+    payload, 
+    JWT_SECRET as jwt.Secret, 
+    { expiresIn: JWT_EXPIRES_IN }
+  );
 }
 
 // Verify JWT token
 export function verifyToken(token: string): JwtPayload | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET as jwt.Secret);
     // Ensure the decoded token has the required JwtPayload structure
     if (decoded && typeof decoded === 'object' && 'sub' in decoded) {
-      return decoded as JwtPayload;
+      // Convert the decoded JWT payload to our specific JwtPayload type
+      const payload: JwtPayload = {
+        sub: decoded.sub as number,
+        username: decoded.username as string,
+        email: decoded.email as string | null,
+        role: decoded.role as string,
+        permissions: decoded.permissions as string[],
+        iat: decoded.iat,
+        exp: decoded.exp
+      };
+      return payload;
     }
     return null;
   } catch (error) {
