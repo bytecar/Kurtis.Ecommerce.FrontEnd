@@ -649,6 +649,142 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ======= Collection Routes =======
+  
+  // Get all collections
+  app.get("/api/collections", async (req, res) => {
+    try {
+      const collections = await storage.getAllCollections();
+      res.json(collections);
+    } catch (error) {
+      console.error("Error fetching collections:", error);
+      res.status(500).json({ error: "Failed to fetch collections" });
+    }
+  });
+
+  // Get collection by ID
+  app.get("/api/collections/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const collection = await storage.getCollection(id);
+      
+      if (!collection) {
+        return res.status(404).json({ error: "Collection not found" });
+      }
+      
+      res.json(collection);
+    } catch (error) {
+      console.error(`Error fetching collection ${req.params.id}:`, error);
+      res.status(500).json({ error: "Failed to fetch collection" });
+    }
+  });
+  
+  // Create collection (ContentManager or Admin only)
+  app.post("/api/collections", authenticateJWT, requireRole(["contentManager", "admin"]), async (req, res) => {
+    try {
+      const collection = await storage.createCollection(req.body);
+      res.status(201).json(collection);
+    } catch (error) {
+      console.error("Error creating collection:", error);
+      res.status(500).json({ error: "Failed to create collection" });
+    }
+  });
+  
+  // Update collection (ContentManager or Admin only)
+  app.patch("/api/collections/:id", authenticateJWT, requireRole(["contentManager", "admin"]), async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const collection = await storage.updateCollection(id, req.body);
+      
+      if (!collection) {
+        return res.status(404).json({ error: "Collection not found" });
+      }
+      
+      res.json(collection);
+    } catch (error) {
+      console.error(`Error updating collection ${req.params.id}:`, error);
+      res.status(500).json({ error: "Failed to update collection" });
+    }
+  });
+  
+  // Delete collection (ContentManager or Admin only)
+  app.delete("/api/collections/:id", authenticateJWT, requireRole(["contentManager", "admin"]), async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deleteCollection(id);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Collection not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error(`Error deleting collection ${req.params.id}:`, error);
+      res.status(500).json({ error: "Failed to delete collection" });
+    }
+  });
+  
+  // Get products in a collection
+  app.get("/api/collections/:id/products", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const products = await storage.getProductsByCollection(id);
+      res.json(products);
+    } catch (error) {
+      console.error(`Error fetching products for collection ${req.params.id}:`, error);
+      res.status(500).json({ error: "Failed to fetch products for collection" });
+    }
+  });
+  
+  // Get collections for a product
+  app.get("/api/products/:id/collections", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const collections = await storage.getCollectionsByProduct(id);
+      res.json(collections);
+    } catch (error) {
+      console.error(`Error fetching collections for product ${req.params.id}:`, error);
+      res.status(500).json({ error: "Failed to fetch collections for product" });
+    }
+  });
+  
+  // Add product to collection (ContentManager or Admin only)
+  app.post("/api/products/:productId/collections/:collectionId", authenticateJWT, requireRole(["contentManager", "admin"]), async (req, res) => {
+    try {
+      const productId = parseInt(req.params.productId);
+      const collectionId = parseInt(req.params.collectionId);
+      
+      const productCollection = await storage.addProductToCollection({
+        productId,
+        collectionId
+      });
+      
+      res.status(201).json(productCollection);
+    } catch (error) {
+      console.error(`Error adding product ${req.params.productId} to collection ${req.params.collectionId}:`, error);
+      res.status(500).json({ error: "Failed to add product to collection" });
+    }
+  });
+  
+  // Remove product from collection (ContentManager or Admin only)
+  app.delete("/api/products/:productId/collections/:collectionId", authenticateJWT, requireRole(["contentManager", "admin"]), async (req, res) => {
+    try {
+      const productId = parseInt(req.params.productId);
+      const collectionId = parseInt(req.params.collectionId);
+      
+      const success = await storage.removeProductFromCollection(productId, collectionId);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Product-collection association not found" });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error(`Error removing product ${req.params.productId} from collection ${req.params.collectionId}:`, error);
+      res.status(500).json({ error: "Failed to remove product from collection" });
+    }
+  });
+  
   // ======= Inventory Routes =======
   
   // Get inventory for product

@@ -22,6 +22,10 @@ import {
   InsertRecentlyViewed,
   UserPreferences,
   InsertUserPreferences,
+  Collection,
+  InsertCollection,
+  ProductCollection,
+  InsertProductCollection,
 } from "@shared/schema";
 
 const MemoryStore = createMemoryStore(session);
@@ -54,6 +58,22 @@ export interface IStorage {
     id: number,
     inventoryData: Partial<Inventory>,
   ): Promise<Inventory | undefined>;
+  
+  // Collections management
+  getAllCollections(): Promise<Collection[]>;
+  getCollection(id: number): Promise<Collection | undefined>;
+  createCollection(collection: InsertCollection): Promise<Collection>;
+  updateCollection(
+    id: number,
+    collectionData: Partial<Collection>,
+  ): Promise<Collection | undefined>;
+  deleteCollection(id: number): Promise<boolean>;
+  
+  // Product Collections (many-to-many relationship)
+  getProductsByCollection(collectionId: number): Promise<Product[]>;
+  getCollectionsByProduct(productId: number): Promise<Collection[]>;
+  addProductToCollection(productCollection: InsertProductCollection): Promise<ProductCollection>;
+  removeProductFromCollection(productId: number, collectionId: number): Promise<boolean>;
 
   // Review management
   getAllReviews(): Promise<Review[]>;
@@ -114,6 +134,8 @@ export class MemStorage implements IStorage {
   private recentlyViewed: Map<number, RecentlyViewed>;
   private returns: Map<number, Return>;
   private userPreferences: Map<number, UserPreferences>;
+  private collections: Map<number, Collection>;
+  private productCollections: Map<number, ProductCollection>;
 
   sessionStore: session.Store;
 
@@ -128,6 +150,8 @@ export class MemStorage implements IStorage {
   currentRecentlyViewedId: number;
   currentReturnId: number;
   currentUserPreferencesId: number;
+  currentCollectionId: number;
+  currentProductCollectionId: number;
 
   constructor() {
     this.users = new Map();
@@ -140,6 +164,8 @@ export class MemStorage implements IStorage {
     this.recentlyViewed = new Map();
     this.returns = new Map();
     this.userPreferences = new Map();
+    this.collections = new Map();
+    this.productCollections = new Map();
 
     this.currentUserId = 1;
     this.currentProductId = 1;
@@ -151,6 +177,8 @@ export class MemStorage implements IStorage {
     this.currentRecentlyViewedId = 1;
     this.currentReturnId = 1;
     this.currentUserPreferencesId = 1;
+    this.currentCollectionId = 1;
+    this.currentProductCollectionId = 1;
 
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000, // prune expired entries every 24h
@@ -160,9 +188,163 @@ export class MemStorage implements IStorage {
     this.initializeProducts();
     this.initializeUserPreferences();
     this.initializeReviews();
+    this.initializeCollections();
     
     // Start async initialization for users
     this.initializeUsersAsync();
+  }
+  
+  // Collections management methods
+  async getAllCollections(): Promise<Collection[]> {
+    return Array.from(this.collections.values());
+  }
+
+  async getCollection(id: number): Promise<Collection | undefined> {
+    return this.collections.get(id);
+  }
+
+  async createCollection(collection: InsertCollection): Promise<Collection> {
+    const id = this.currentCollectionId++;
+    const now = new Date();
+    const newCollection: Collection = {
+      ...collection,
+      id,
+      createdAt: now,
+      updatedAt: now,
+      active: collection.active !== undefined ? collection.active : true,
+    };
+    this.collections.set(id, newCollection);
+    return newCollection;
+  }
+
+  async updateCollection(
+    id: number,
+    collectionData: Partial<Collection>,
+  ): Promise<Collection | undefined> {
+    const collection = this.collections.get(id);
+    if (!collection) return undefined;
+
+    const updatedCollection = {
+      ...collection,
+      ...collectionData,
+      updatedAt: new Date(),
+    };
+    this.collections.set(id, updatedCollection);
+    return updatedCollection;
+  }
+
+  async deleteCollection(id: number): Promise<boolean> {
+    // First remove all product-collection associations for this collection
+    const productCollections = Array.from(this.productCollections.values())
+      .filter(pc => pc.collectionId === id);
+    
+    for (const pc of productCollections) {
+      this.productCollections.delete(pc.id);
+    }
+    
+    return this.collections.delete(id);
+  }
+
+  // Product Collections methods
+  async getProductsByCollection(collectionId: number): Promise<Product[]> {
+    const productIds = Array.from(this.productCollections.values())
+      .filter(pc => pc.collectionId === collectionId)
+      .map(pc => pc.productId);
+    
+    return Array.from(this.products.values())
+      .filter(product => productIds.includes(product.id));
+  }
+
+  async getCollectionsByProduct(productId: number): Promise<Collection[]> {
+    const collectionIds = Array.from(this.productCollections.values())
+      .filter(pc => pc.productId === productId)
+      .map(pc => pc.collectionId);
+    
+    return Array.from(this.collections.values())
+      .filter(collection => collectionIds.includes(collection.id));
+  }
+
+  async addProductToCollection(productCollection: InsertProductCollection): Promise<ProductCollection> {
+    // Check if the association already exists
+    const existing = Array.from(this.productCollections.values()).find(
+      pc => pc.productId === productCollection.productId && 
+            pc.collectionId === productCollection.collectionId
+    );
+    
+    if (existing) {
+      return existing;
+    }
+    
+    const id = this.currentProductCollectionId++;
+    const now = new Date();
+    const newProductCollection: ProductCollection = {
+      ...productCollection,
+      id,
+      createdAt: now,
+    };
+    this.productCollections.set(id, newProductCollection);
+    return newProductCollection;
+  }
+
+  async removeProductFromCollection(productId: number, collectionId: number): Promise<boolean> {
+    const productCollection = Array.from(this.productCollections.values()).find(
+      pc => pc.productId === productId && pc.collectionId === collectionId
+    );
+    
+    if (!productCollection) return false;
+    return this.productCollections.delete(productCollection.id);
+  }
+  
+  // Sample data initialization
+  private initializeCollections() {
+    const collections = [
+      {
+        name: "Summer Collection",
+        description: "Light and colorful ethnic wear for summer",
+        imageUrl: "https://example.com/summer.jpg",
+        active: true
+      },
+      {
+        name: "Wedding Collection",
+        description: "Elegant and traditional wear for wedding ceremonies",
+        imageUrl: "https://example.com/wedding.jpg",
+        active: true
+      },
+      {
+        name: "Festival Collection",
+        description: "Vibrant and celebratory ethnic wear for festivals",
+        imageUrl: "https://example.com/festival.jpg",
+        active: true
+      }
+    ];
+    
+    collections.forEach(collection => {
+      const id = this.currentCollectionId++;
+      const now = new Date();
+      this.collections.set(id, {
+        ...collection,
+        id,
+        createdAt: now,
+        updatedAt: now,
+        startDate: null,
+        endDate: null
+      });
+      
+      // Associate some products with collections
+      if (id === 1) { // Summer Collection
+        [1, 3, 5].forEach(productId => {
+          this.addProductToCollection({ productId, collectionId: id });
+        });
+      } else if (id === 2) { // Wedding Collection
+        [2, 6, 8].forEach(productId => {
+          this.addProductToCollection({ productId, collectionId: id });
+        });
+      } else if (id === 3) { // Festival Collection
+        [4, 7, 9].forEach(productId => {
+          this.addProductToCollection({ productId, collectionId: id });
+        });
+      }
+    });
   }
 
   // User management methods
