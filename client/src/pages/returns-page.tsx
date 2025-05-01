@@ -51,9 +51,22 @@ import {
 } from "lucide-react";
 
 // Return form schema
+// Define return reasons
+const returnReasons = [
+  "Damaged on arrival",
+  "Wrong size ordered",
+  "Item does not match description",
+  "Color different from what was shown",
+  "Quality not as expected",
+  "Received incorrect item",
+  "Found better price elsewhere",
+  "Changed my mind"
+];
+
 const returnFormSchema = z.object({
   orderId: z.number(),
   orderItemId: z.number(),
+  returnReason: z.string().min(1, "Please select a reason for return"),
   reason: z.string().min(10, "Please provide more details about the return reason"),
 });
 
