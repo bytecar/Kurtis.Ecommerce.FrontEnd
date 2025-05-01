@@ -10,7 +10,8 @@ import {
   OrderItem, InsertOrderItem, 
   Wishlist, InsertWishlist, 
   Return, InsertReturn, 
-  RecentlyViewed, InsertRecentlyViewed 
+  RecentlyViewed, InsertRecentlyViewed,
+  UserPreferences, InsertUserPreferences
 } from "@shared/schema";
 
 const MemoryStore = createMemoryStore(session);
