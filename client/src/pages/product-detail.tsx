@@ -12,12 +12,14 @@ import { useCart } from "@/hooks/use-cart";
 import { useWishlist } from "@/hooks/use-wishlist";
 import { useRecentlyViewed } from "@/hooks/use-recently-viewed";
 import { useAuth } from "@/hooks/use-auth";
-import { Heart, Loader2, Share2 } from "lucide-react";
+import { Heart, Loader2 } from "lucide-react";
 import { ProductRecommendations } from "@/components/products/product-recommendations";
 import { RecentlyViewed } from "@/components/products/recently-viewed";
 import { ProductReviews } from "@/components/products/product-reviews";
 import { SizeSelector, SizeOption } from "@/components/products/size-selector";
+import { SocialShareButton } from "@/components/social";
 import { useState } from "react";
+import { logger, LogCategory } from "@/lib/logging";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -53,15 +55,23 @@ export default function ProductDetail() {
 
   // Add product to recently viewed on mount
   useEffect(() => {
+    // Only add to recently viewed if product ID is valid
     if (productId && !isNaN(productId)) {
-      addToRecentlyViewed(productId);
+      // Using setTimeout to ensure this happens after the component has fully mounted
+      const timer = setTimeout(() => {
+        addToRecentlyViewed(productId);
+      }, 300);
+      
+      return () => clearTimeout(timer);
     }
-    
-    // Set page title
+  }, [productId, addToRecentlyViewed]);
+  
+  // Update page title when product data is available
+  useEffect(() => {
     if (product) {
       document.title = `${product.name} | Kurtis & More`;
     }
-  }, [productId, product, addToRecentlyViewed]);
+  }, [product]);
 
   // Prepare size options from inventory
   const getSizeOptions = (): SizeOption[] => {
@@ -95,31 +105,7 @@ export default function ProductDetail() {
     }, 500);
   };
 
-  // Handle sharing product
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: product?.name || "Kurtis & More Product",
-        text: product?.description || "Check out this product!",
-        url: window.location.href,
-      })
-      .catch(() => {
-        // Fallback if sharing fails
-        copyToClipboard();
-      });
-    } else {
-      copyToClipboard();
-    }
-  };
-
-  // Fallback for sharing - copy URL to clipboard
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast({
-      title: "Link copied!",
-      description: "Product link copied to clipboard",
-    });
-  };
+  // Sharing is now handled by the SocialShareButton component
 
   // Calculate discount percentage
   const discountPercentage = product?.discountedPrice && product.price
@@ -313,12 +299,17 @@ export default function ProductDetail() {
                   <Heart className={`${isInWishlist(product.id) ? "fill-current" : ""}`} />
                 </Button>
               )}
-              <Button
-                variant="outline"
-                onClick={handleShare}
-              >
-                <Share2 className="h-4 w-4" />
-              </Button>
+              <SocialShareButton
+                url={window.location.href}
+                title={product.name}
+                description={product.description}
+                imageUrl={Array.isArray(product.imageUrls) && product.imageUrls.length > 0 ? product.imageUrls[0] : undefined}
+                category={product.category}
+                // Example occasion and region - these could be properties of the product in a real setup
+                occasion={product.category.includes('wedding') ? 'wedding' : product.category.includes('festival') ? 'festival' : 'casual'}
+                region="north-india"
+                buttonSize="icon"
+              />
             </div>
             
             {/* Product Details Tabs */}
