@@ -13,10 +13,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Heart, ShoppingBag, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 
 export function UserNav() {
   const { user, logoutMutation } = useAuth();
   const { totalItems } = useCart();
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     logoutMutation.mutate();
@@ -29,7 +31,7 @@ export function UserNav() {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="flex flex-col items-center p-0">
             <User className="h-5 w-5" />
-            <span className="text-xs hidden md:block mt-1">Account</span>
+            <span className="text-xs hidden md:block mt-1">{t('common.profile')}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end">
@@ -122,7 +124,7 @@ export function UserNav() {
         <Link href="/wishlist">
           <Button variant="ghost" className="flex flex-col items-center p-0">
             <Heart className="h-5 w-5" />
-            <span className="text-xs hidden md:block mt-1">Wishlist</span>
+            <span className="text-xs hidden md:block mt-1">{t('common.wishlist')}</span>
           </Button>
         </Link>
       )}

@@ -1,22 +1,24 @@
 import { Link, useLocation } from "wouter";
-
-const navItems = [
-  { name: "Home", href: "/" },
-  { name: "Women", href: "/products/women" },
-  { name: "Men", href: "/products/men" },
-  { name: "New Arrivals", href: "/products/new" },
-  { name: "Sale", href: "/products/sale" },
-];
+import { useTranslation } from "react-i18next";
 
 export function MainNav() {
   const [location] = useLocation();
+  const { t } = useTranslation();
+
+  const navItems = [
+    { id: "home", name: t("common.home"), href: "/" },
+    { id: "women", name: t("categories.womenswear"), href: "/products/women" },
+    { id: "men", name: t("categories.menswear"), href: "/products/men" },
+    { id: "newArrivals", name: t("home.newArrivals"), href: "/products/new" },
+    { id: "sale", name: t("product.sale"), href: "/products/sale" },
+  ];
 
   return (
     <nav className="bg-background border-t border-border">
       <div className="container mx-auto px-4">
         <ul className="flex items-center gap-6 overflow-x-auto py-3 text-sm font-medium scrollbar-hide">
           {navItems.map((item) => (
-            <li key={item.name}>
+            <li key={item.id}>
               <Link href={item.href}>
                 <div 
                   className={`pb-3 cursor-pointer ${
