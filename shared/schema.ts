@@ -11,6 +11,8 @@ export const users = pgTable("users", {
   fullName: text("full_name").notNull(),
   role: text("role").notNull().default("user"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at"),
+  gender: text("gender"),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -19,6 +21,10 @@ export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   fullName: true,
   role: true,
+}).extend({
+  // Make email and fullName optional for flexibility in admin user creation
+  email: z.string().email().optional(), 
+  fullName: z.string().optional(),
 });
 
 // Products
