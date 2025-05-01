@@ -638,12 +638,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Delete review (Admin only)
-  app.delete("/api/reviews/:id", async (req, res) => {
+  app.delete("/api/reviews/:id", authenticateJWT, requireRole("admin"), async (req, res) => {
     try {
-      // Verify user role
-      if (!req.isAuthenticated() || req.user.role !== "admin") {
-        return res.status(403).json({ error: "Not authorized" });
-      }
       
       const id = parseInt(req.params.id);
       
@@ -663,12 +659,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ======= Order Routes =======
   
   // Get user orders (authenticated users only)
-  app.get("/api/orders/user", async (req, res) => {
+  app.get("/api/orders/user", authenticateJWT, async (req, res) => {
     try {
-      // Verify authentication
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
       
       const orders = await storage.getOrdersByUser(req.user.id);
       
@@ -679,12 +671,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get recent orders (Admin only)
-  app.get("/api/orders/recent", async (req, res) => {
+  app.get("/api/orders/recent", authenticateJWT, requireRole("admin"), async (req, res) => {
     try {
-      // Verify user role
-      if (!req.isAuthenticated() || req.user.role !== "admin") {
-        return res.status(403).json({ error: "Not authorized" });
-      }
       
       const orders = await storage.getAllOrders();
       
@@ -700,12 +688,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get order by ID (authenticated users only)
-  app.get("/api/orders/:id", async (req, res) => {
+  app.get("/api/orders/:id", authenticateJWT, async (req, res) => {
     try {
-      // Verify authentication
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
       
       const id = parseInt(req.params.id);
       const order = await storage.getOrder(id);
@@ -726,12 +710,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get order items for order
-  app.get("/api/orders/:id/items", async (req, res) => {
+  app.get("/api/orders/:id/items", authenticateJWT, async (req, res) => {
     try {
-      // Verify authentication
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
       
       const id = parseInt(req.params.id);
       const order = await storage.getOrder(id);
@@ -754,15 +734,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create order
-  app.post("/api/orders", async (req, res) => {
+  app.post("/api/orders", authenticateJWT, async (req, res) => {
     try {
       // Validate request body
       const validatedData = insertOrderSchema.parse(req.body);
       
-      // If authenticated, set userId
-      if (req.isAuthenticated()) {
-        validatedData.userId = req.user.id;
-      }
+      // Set userId from JWT
+      validatedData.userId = req.user.id;
       
       // Create order
       const order = await storage.createOrder(validatedData);
@@ -795,12 +773,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update order status (Admin only)
-  app.patch("/api/orders/:id/status", async (req, res) => {
+  app.patch("/api/orders/:id/status", authenticateJWT, requireRole("admin"), async (req, res) => {
     try {
-      // Verify user role
-      if (!req.isAuthenticated() || req.user.role !== "admin") {
-        return res.status(403).json({ error: "Not authorized" });
-      }
       
       const id = parseInt(req.params.id);
       const { status } = req.body;
@@ -826,12 +800,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ======= Return Routes =======
   
   // Create return (authenticated users only)
-  app.post("/api/returns", async (req, res) => {
+  app.post("/api/returns", authenticateJWT, async (req, res) => {
     try {
-      // Verify authentication
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
       
       // Validate request body
       const validatedData = insertReturnSchema.parse(req.body);
@@ -862,12 +832,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ======= Wishlist Routes =======
   
   // Get user wishlist (authenticated users only)
-  app.get("/api/wishlist", async (req, res) => {
+  app.get("/api/wishlist", authenticateJWT, async (req, res) => {
     try {
-      // Verify authentication
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
       
       const wishlistItems = await storage.getWishlistByUser(req.user.id);
       
@@ -887,12 +853,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Add product to wishlist (authenticated users only)
-  app.post("/api/wishlist", async (req, res) => {
+  app.post("/api/wishlist", authenticateJWT, async (req, res) => {
     try {
-      // Verify authentication
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
       
       const { productId } = req.body;
       
