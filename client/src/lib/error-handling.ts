@@ -1,20 +1,13 @@
 /**
- * Comprehensive error handling and logging system for the application
- * This module provides utilities for consistent error handling, logging,
- * and user feedback across the application.
+ * Comprehensive error handling system for the application.
+ * Provides utilities for handling, logging, and classifying errors.
  */
-
 import { toast } from '@/hooks/use-toast';
+import { logger, LogCategory, LogLevel } from './logging';
 
-// Error severity levels
-export enum ErrorSeverity {
-  INFO = 'info',
-  WARNING = 'warning',
-  ERROR = 'error',
-  CRITICAL = 'critical',
-}
-
-// Error categories for better organization and filtering
+/**
+ * Categories of errors for better organization
+ */
 export enum ErrorCategory {
   API = 'api',
   VALIDATION = 'validation',
@@ -26,209 +19,134 @@ export enum ErrorCategory {
   UNKNOWN = 'unknown',
 }
 
-// Structured error type for better tracking and handling
-export interface AppError {
-  message: string;
+/**
+ * Severity levels for errors
+ */
+export enum ErrorSeverity {
+  INFO = 'info',
+  WARNING = 'warning',
+  ERROR = 'error',
+  CRITICAL = 'critical',
+}
+
+/**
+ * Error context containing additional information about the error
+ */
+export interface ErrorContext {
   severity: ErrorSeverity;
   category: ErrorCategory;
-  timestamp: Date;
-  code?: string;
-  userId?: number;
   componentName?: string;
   context?: Record<string, any>;
-  originalError?: Error;
 }
 
-// Global error log storage for debugging
-const errorLogs: AppError[] = [];
-
-// Maximum number of errors to keep in memory
-const MAX_ERROR_LOGS = 100;
-
-/**
- * Creates a structured error object
- */
-export function createError(
-  message: string,
-  severity: ErrorSeverity = ErrorSeverity.ERROR,
-  category: ErrorCategory = ErrorCategory.UNKNOWN,
-  options: Partial<AppError> = {}
-): AppError {
-  const error: AppError = {
-    message,
-    severity,
-    category,
-    timestamp: new Date(),
-    ...options,
-  };
-  
-  return error;
-}
+// In-memory error log for development and debugging
+const errorLogs: Array<{
+  message: string;
+  timestamp: number;
+  severity: ErrorSeverity;
+  category: ErrorCategory;
+  componentName?: string;
+  stack?: string;
+  context?: Record<string, any>;
+}> = [];
 
 /**
- * Logs an error to the console and error log storage
- */
-export function logError(error: AppError): void {
-  // Add to in-memory logs
-  errorLogs.unshift(error);
-  
-  // Trim log to maximum size
-  if (errorLogs.length > MAX_ERROR_LOGS) {
-    errorLogs.splice(MAX_ERROR_LOGS);
-  }
-  
-  // Log to console based on severity
-  const consoleStyles = {
-    [ErrorSeverity.INFO]: 'color: #3b82f6; font-weight: bold;',
-    [ErrorSeverity.WARNING]: 'color: #f59e0b; font-weight: bold;',
-    [ErrorSeverity.ERROR]: 'color: #ef4444; font-weight: bold;',
-    [ErrorSeverity.CRITICAL]: 'color: #7f1d1d; background: #fecaca; font-weight: bold; padding: 2px 5px;',
-  };
-  
-  // Create a formatted log message
-  const logPrefix = `[${error.severity.toUpperCase()}][${error.category}]`;
-  
-  // Log to console with appropriate styling
-  console.group(`${logPrefix} ${error.message}`);
-  console.log('%cTimestamp:', 'font-weight: bold;', error.timestamp.toISOString());
-  
-  if (error.code) {
-    console.log('%cCode:', 'font-weight: bold;', error.code);
-  }
-  
-  if (error.userId) {
-    console.log('%cUser ID:', 'font-weight: bold;', error.userId);
-  }
-  
-  if (error.componentName) {
-    console.log('%cComponent:', 'font-weight: bold;', error.componentName);
-  }
-  
-  if (error.context) {
-    console.log('%cContext:', 'font-weight: bold;', error.context);
-  }
-  
-  if (error.originalError) {
-    console.log('%cOriginal Error:', 'font-weight: bold;', error.originalError);
-    console.error(error.originalError);
-  }
-  
-  console.groupEnd();
-  
-  // For critical errors, you might want to send to a server
-  if (error.severity === ErrorSeverity.CRITICAL) {
-    // In a production app, you would send this to your error tracking service
-    // Example: sendToErrorTrackingService(error);
-  }
-}
-
-/**
- * Handles an error by logging it and optionally displaying a toast notification
+ * Main error handling function - all errors should go through this
  */
 export function handleError(
-  error: AppError | Error,
-  showToast: boolean = true,
-  options: Partial<AppError> = {}
+  error: Error | string,
+  showToast = true,
+  context?: Partial<ErrorContext>
 ): void {
-  // Convert standard Error to AppError if needed
-  const appError: AppError = 
-    error instanceof Error && !(error as any).severity ? 
-    createError(
-      error.message, 
-      ErrorSeverity.ERROR, 
-      ErrorCategory.UNKNOWN, 
-      { originalError: error, ...options }
-    ) : error as AppError;
+  const errorMessage = typeof error === 'string' ? error : error.message;
+  const errorStack = typeof error === 'string' ? undefined : error.stack;
   
-  // Log the error
-  logError(appError);
+  // Default values
+  const severity = context?.severity || ErrorSeverity.ERROR;
+  const category = context?.category || ErrorCategory.UNKNOWN;
+  const componentName = context?.componentName;
+  const additionalContext = context?.context || {};
+  
+  // Log the error to the console with our logging system
+  const logLevel = severity === ErrorSeverity.INFO 
+    ? LogLevel.INFO 
+    : severity === ErrorSeverity.WARNING 
+      ? LogLevel.WARNING 
+      : LogLevel.ERROR;
+  
+  // Map error category to log category
+  const logCategory: LogCategory = mapErrorToLogCategory(category);
+  
+  // Add to error logs
+  errorLogs.unshift({
+    message: errorMessage,
+    timestamp: Date.now(),
+    severity,
+    category,
+    componentName,
+    stack: errorStack,
+    context: additionalContext,
+  });
+  
+  // Trim logs to a reasonable size
+  if (errorLogs.length > 100) {
+    errorLogs.pop();
+  }
+  
+  // Log to our logger
+  logger.log(
+    logLevel,
+    errorMessage,
+    logCategory,
+    {
+      ...additionalContext,
+      componentName,
+      stack: errorStack,
+    }
+  );
   
   // Show toast notification if requested
   if (showToast) {
-    const toastVariant = 
-      appError.severity === ErrorSeverity.INFO ? undefined :
-      appError.severity === ErrorSeverity.WARNING ? 'warning' : 
-      'destructive';
+    const toastVariant = severity === ErrorSeverity.ERROR || severity === ErrorSeverity.CRITICAL 
+      ? 'destructive' 
+      : undefined;
     
     toast({
-      title: getErrorTitle(appError),
-      description: appError.message,
+      title: getCategoryTitle(category),
+      description: errorMessage,
       variant: toastVariant,
     });
   }
 }
 
 /**
- * Retrieves the recent error logs
+ * Map error category to log category
  */
-export function getErrorLogs(limit: number = MAX_ERROR_LOGS): AppError[] {
-  return errorLogs.slice(0, limit);
-}
-
-/**
- * Clears all error logs
- */
-export function clearErrorLogs(): void {
-  errorLogs.length = 0;
-}
-
-/**
- * Handles an API error response
- */
-export async function handleApiError(
-  response: Response, 
-  componentName?: string,
-  context?: Record<string, any>
-): Promise<AppError> {
-  let errorMessage = 'An unexpected error occurred';
-  let errorCategory = ErrorCategory.API;
-  
-  try {
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('application/json')) {
-      const data = await response.json();
-      errorMessage = data.message || errorMessage;
-    } else {
-      errorMessage = await response.text() || errorMessage;
-    }
-    
-    if (response.status === 401 || response.status === 403) {
-      errorCategory = ErrorCategory.AUTHENTICATION;
-    } else if (response.status === 400 || response.status === 422) {
-      errorCategory = ErrorCategory.VALIDATION;
-    } else if (response.status >= 500) {
-      errorCategory = ErrorCategory.NETWORK;
-    }
-  } catch (e) {
-    // If parsing fails, use the status text
-    errorMessage = response.statusText || errorMessage;
+function mapErrorToLogCategory(errorCategory: ErrorCategory): LogCategory {
+  switch (errorCategory) {
+    case ErrorCategory.API:
+      return LogCategory.API;
+    case ErrorCategory.VALIDATION:
+      return LogCategory.VALIDATION;
+    case ErrorCategory.AUTHENTICATION:
+    case ErrorCategory.AUTHORIZATION:
+      return LogCategory.AUTH;
+    case ErrorCategory.DATA:
+      return LogCategory.DATA;
+    case ErrorCategory.UI:
+      return LogCategory.UI;
+    case ErrorCategory.NETWORK:
+      return LogCategory.NETWORK;
+    default:
+      return LogCategory.APP;
   }
-  
-  const error = createError(
-    errorMessage,
-    response.status >= 500 ? ErrorSeverity.ERROR : ErrorSeverity.WARNING,
-    errorCategory,
-    {
-      code: `HTTP_${response.status}`,
-      componentName,
-      context: {
-        ...context,
-        url: response.url,
-        method: context?.method || 'GET',
-        status: response.status,
-      },
-    }
-  );
-  
-  handleError(error, true);
-  return error;
 }
 
 /**
- * Returns a user-friendly error title based on the error category
+ * Get a friendly title for error categories
  */
-function getErrorTitle(error: AppError): string {
-  switch (error.category) {
+function getCategoryTitle(category: ErrorCategory): string {
+  switch (category) {
     case ErrorCategory.API:
       return 'API Error';
     case ErrorCategory.VALIDATION:
@@ -248,5 +166,113 @@ function getErrorTitle(error: AppError): string {
   }
 }
 
-// Note: React components related to error handling 
-// have been moved to components/common/ErrorBoundary.tsx
+/**
+ * Get error logs for display
+ */
+export function getErrorLogs(limit?: number): typeof errorLogs {
+  if (limit && limit > 0) {
+    return errorLogs.slice(0, limit);
+  }
+  return [...errorLogs];
+}
+
+/**
+ * Clear error logs (useful for testing)
+ */
+export function clearErrorLogs(): void {
+  errorLogs.length = 0;
+}
+
+/**
+ * Utility function to detect network errors
+ */
+export function isNetworkError(error: any): boolean {
+  return (
+    error.message?.includes('Failed to fetch') ||
+    error.message?.includes('Network request failed') ||
+    error.message?.includes('Network error') ||
+    error.message?.includes('ECONNREFUSED') ||
+    error.name === 'TypeError' && error.message?.includes('network')
+  );
+}
+
+/**
+ * Format an error message from an unknown error
+ */
+export function formatErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  
+  if (typeof error === 'string') {
+    return error;
+  }
+  
+  if (typeof error === 'object' && error !== null) {
+    if ('message' in error) {
+      return String(error.message);
+    }
+    
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return 'Unknown error object';
+    }
+  }
+  
+  return 'Unknown error';
+}
+
+/**
+ * Create an enhanced error object
+ */
+export interface EnhancedError extends Error {
+  severity: ErrorSeverity;
+  category: ErrorCategory;
+  context?: Record<string, any>;
+  code?: string;
+  componentName?: string;
+  originalError?: Error;
+}
+
+/**
+ * Create an error with additional metadata
+ */
+export function createError(
+  message: string,
+  severity: ErrorSeverity = ErrorSeverity.ERROR,
+  category: ErrorCategory = ErrorCategory.UNKNOWN,
+  metadata: {
+    code?: string;
+    componentName?: string;
+    context?: Record<string, any>;
+    originalError?: Error;
+  } = {}
+): EnhancedError {
+  const error = new Error(message) as EnhancedError;
+  error.severity = severity;
+  error.category = category;
+  
+  if (metadata.code) {
+    error.code = metadata.code;
+  }
+  
+  if (metadata.componentName) {
+    error.componentName = metadata.componentName;
+  }
+  
+  if (metadata.context) {
+    error.context = metadata.context;
+  }
+  
+  if (metadata.originalError) {
+    error.originalError = metadata.originalError;
+    
+    // Copy the stack trace if available
+    if (metadata.originalError.stack) {
+      error.stack = metadata.originalError.stack;
+    }
+  }
+  
+  return error;
+}

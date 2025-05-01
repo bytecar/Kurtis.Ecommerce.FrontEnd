@@ -1,6 +1,6 @@
 import { toast } from '@/hooks/use-toast';
 import { createError, handleError, ErrorCategory, ErrorSeverity } from './error-handling';
-import { error as logError } from './logging';
+import { logger, LogCategory } from './logging';
 
 /**
  * Standard error responses from the API
@@ -80,7 +80,7 @@ export function handleApiError(
     }
   } catch (parsingError) {
     // If error handling itself throws an error, log it
-    logError('Error while handling API error', 'api', {
+    logger.error('Error while handling API error', LogCategory.API, {
       originalError: err,
       parsingError
     });
@@ -159,7 +159,7 @@ async function handleFetchResponseError(
   } catch (parsingError) {
     // If parsing fails, use the status text
     errorMessage = response.statusText || errorMessage;
-    logError('Error parsing API error response', 'api', {
+    logger.error('Error parsing API error response', LogCategory.API, {
       url: response.url,
       status: response.status,
       parsingError
@@ -210,9 +210,9 @@ export function handleValidationErrors(
       });
       
       // Log all validation errors
-      logError(
+      logger.error(
         'Validation errors', 
-        'validation', 
+        LogCategory.VALIDATION, 
         { validationErrors }
       );
       

@@ -1,330 +1,236 @@
 /**
- * Comprehensive logging system for the application
- * This module provides utilities for consistent logging across the application.
+ * A comprehensive logging system that can be used throughout the application.
+ * It supports different log levels, categories, and context information.
  */
 
+// Log levels according to severity
 export enum LogLevel {
   DEBUG = 'debug',
   INFO = 'info',
-  WARN = 'warn',
+  WARNING = 'warning',
   ERROR = 'error',
 }
 
+// Log categories for better organization
 export enum LogCategory {
+  APP = 'app',
   API = 'api',
   AUTH = 'auth',
-  UI = 'ui',
   DATA = 'data',
-  PERFORMANCE = 'performance',
-  USER_ACTION = 'user_action',
-  NAVIGATION = 'navigation',
-  SYSTEM = 'system',
+  UI = 'ui',
+  NETWORK = 'network',
+  VALIDATION = 'validation',
 }
 
+// Interface for the logger configuration
+interface LoggerConfig {
+  minLevel: LogLevel;
+  enableConsole: boolean;
+  enableStorage: boolean;
+  maxLogsStored: number;
+}
+
+// Interface for a log entry
 export interface LogEntry {
+  timestamp: number;
   level: LogLevel;
-  category: LogCategory;
   message: string;
-  timestamp: Date;
+  category?: LogCategory;
   context?: Record<string, any>;
-  componentName?: string;
-  userId?: number;
 }
 
-// In-memory log storage
-const logs: LogEntry[] = [];
-const MAX_LOGS = 1000;
-
-// Current log level (can be changed at runtime)
-let currentLogLevel: LogLevel = LogLevel.INFO;
-
-// Override browser's console methods to add structured logging
-const originalConsole = {
-  debug: console.debug,
-  log: console.log,
-  info: console.info,
-  warn: console.warn,
-  error: console.error,
+// Default configuration
+const defaultConfig: LoggerConfig = {
+  minLevel: process.env.NODE_ENV === 'production' ? LogLevel.WARNING : LogLevel.DEBUG,
+  enableConsole: true,
+  enableStorage: true,
+  maxLogsStored: 1000,
 };
 
-/**
- * Sets the current log level
- */
-export function setLogLevel(level: LogLevel): void {
-  currentLogLevel = level;
-}
+// In-memory storage for logs
+const logStorage: LogEntry[] = [];
 
 /**
- * Determines if a log at the given level should be processed
+ * The main logger class that handles all logging operations
  */
-function shouldLog(level: LogLevel): boolean {
-  const levels = Object.values(LogLevel);
-  const currentLevelIndex = levels.indexOf(currentLogLevel);
-  const logLevelIndex = levels.indexOf(level);
-  
-  return logLevelIndex >= currentLevelIndex;
-}
+class Logger {
+  private config: LoggerConfig;
 
-/**
- * Creates a structured log entry
- */
-export function createLogEntry(
-  message: string,
-  level: LogLevel = LogLevel.INFO,
-  category: LogCategory = LogCategory.SYSTEM,
-  options: Partial<LogEntry> = {}
-): LogEntry {
-  return {
-    message,
-    level,
-    category,
-    timestamp: new Date(),
-    ...options,
-  };
-}
-
-/**
- * Logs a message with the specified level and category
- */
-export function log(
-  message: string,
-  level: LogLevel = LogLevel.INFO,
-  category: LogCategory = LogCategory.SYSTEM,
-  context?: Record<string, any>,
-  componentName?: string
-): void {
-  if (!shouldLog(level)) {
-    return;
+  constructor(config: Partial<LoggerConfig> = {}) {
+    this.config = { ...defaultConfig, ...config };
   }
-  
-  const entry = createLogEntry(message, level, category, {
-    context,
-    componentName,
-  });
-  
-  // Add to in-memory logs
-  logs.unshift(entry);
-  
-  // Trim log to maximum size
-  if (logs.length > MAX_LOGS) {
-    logs.splice(MAX_LOGS);
+
+  /**
+   * Configure the logger
+   */
+  configure(config: Partial<LoggerConfig>): void {
+    this.config = { ...this.config, ...config };
   }
-  
-  // Format for console
-  const timestamp = entry.timestamp.toISOString();
-  const prefix = `[${level.toUpperCase()}][${category}]`;
-  const meta: Record<string, any> = {};
-  
-  if (entry.componentName) {
-    meta.component = entry.componentName;
-  }
-  
-  if (entry.context) {
-    meta.context = entry.context;
-  }
-  
-  // Log to console with appropriate level
-  switch (level) {
-    case LogLevel.DEBUG:
-      originalConsole.debug(`${prefix} ${message}`, meta);
-      break;
-    case LogLevel.INFO:
-      originalConsole.info(`${prefix} ${message}`, meta);
-      break;
-    case LogLevel.WARN:
-      originalConsole.warn(`${prefix} ${message}`, meta);
-      break;
-    case LogLevel.ERROR:
-      originalConsole.error(`${prefix} ${message}`, meta);
-      break;
-  }
-}
 
-/**
- * Debug level logging
- */
-export function debug(
-  message: string,
-  category: LogCategory = LogCategory.SYSTEM,
-  context?: Record<string, any>,
-  componentName?: string
-): void {
-  log(message, LogLevel.DEBUG, category, context, componentName);
-}
-
-/**
- * Info level logging
- */
-export function info(
-  message: string,
-  category: LogCategory = LogCategory.SYSTEM,
-  context?: Record<string, any>,
-  componentName?: string
-): void {
-  log(message, LogLevel.INFO, category, context, componentName);
-}
-
-/**
- * Warning level logging
- */
-export function warn(
-  message: string,
-  category: LogCategory = LogCategory.SYSTEM,
-  context?: Record<string, any>,
-  componentName?: string
-): void {
-  log(message, LogLevel.WARN, category, context, componentName);
-}
-
-/**
- * Error level logging
- */
-export function error(
-  message: string,
-  category: LogCategory = LogCategory.SYSTEM,
-  context?: Record<string, any>,
-  componentName?: string
-): void {
-  log(message, LogLevel.ERROR, category, context, componentName);
-}
-
-/**
- * Get all logs
- */
-export function getLogs(limit: number = MAX_LOGS): LogEntry[] {
-  return logs.slice(0, limit);
-}
-
-/**
- * Clear all logs
- */
-export function clearLogs(): void {
-  logs.length = 0;
-}
-
-/**
- * Log performance metrics
- */
-export function logPerformance(
-  operation: string,
-  durationMs: number,
-  context?: Record<string, any>,
-  componentName?: string
-): void {
-  // Define thresholds for different performance levels
-  const thresholds = {
-    fast: 100, // Under 100ms is fast
-    acceptable: 500, // Under 500ms is acceptable
-    slow: 1000, // Under 1s is slow but tolerable
-    // Over 1s is very slow
-  };
-  
-  let level = LogLevel.INFO;
-  
-  if (durationMs > thresholds.slow) {
-    level = LogLevel.WARN;
-  } else if (durationMs > thresholds.acceptable) {
-    level = LogLevel.INFO;
-  }
-  
-  const message = `${operation} took ${durationMs.toFixed(2)}ms`;
-  log(message, level, LogCategory.PERFORMANCE, {
-    ...context,
-    durationMs,
-    thresholds: {
-      fast: durationMs <= thresholds.fast,
-      acceptable: durationMs <= thresholds.acceptable,
-      slow: durationMs <= thresholds.slow,
-    },
-  }, componentName);
-}
-
-/**
- * Performance measurement utility
- */
-export function measure<T>(
-  operation: string,
-  fn: () => T,
-  componentName?: string,
-  context?: Record<string, any>
-): T {
-  const start = performance.now();
-  const result = fn();
-  const end = performance.now();
-  const duration = end - start;
-  
-  logPerformance(operation, duration, context, componentName);
-  
-  return result;
-}
-
-/**
- * Async performance measurement utility
- */
-export async function measureAsync<T>(
-  operation: string,
-  fn: () => Promise<T>,
-  componentName?: string,
-  context?: Record<string, any>
-): Promise<T> {
-  const start = performance.now();
-  const result = await fn();
-  const end = performance.now();
-  const duration = end - start;
-  
-  logPerformance(operation, duration, context, componentName);
-  
-  return result;
-}
-
-/**
- * Log user actions
- */
-export function logUserAction(
-  action: string,
-  userId?: number,
-  details?: Record<string, any>,
-  componentName?: string
-): void {
+  /**
+   * Main logging method
+   */
   log(
-    action,
-    LogLevel.INFO,
-    LogCategory.USER_ACTION,
-    {
-      ...details,
-      userId,
-    },
-    componentName
-  );
+    level: LogLevel,
+    message: string,
+    category?: LogCategory,
+    context?: Record<string, any>
+  ): void {
+    // Skip if below minimum level
+    if (!this.shouldLog(level)) return;
+
+    const entry: LogEntry = {
+      timestamp: Date.now(),
+      level,
+      message,
+      category,
+      context,
+    };
+
+    // Log to console if enabled
+    if (this.config.enableConsole) {
+      this.logToConsole(entry);
+    }
+
+    // Store log if enabled
+    if (this.config.enableStorage) {
+      this.storeLog(entry);
+    }
+  }
+
+  /**
+   * Debug level log
+   */
+  debug(message: string, category?: LogCategory, context?: Record<string, any>): void {
+    this.log(LogLevel.DEBUG, message, category, context);
+  }
+
+  /**
+   * Info level log
+   */
+  info(message: string, category?: LogCategory, context?: Record<string, any>): void {
+    this.log(LogLevel.INFO, message, category, context);
+  }
+
+  /**
+   * Warning level log
+   */
+  warn(message: string, category?: LogCategory, context?: Record<string, any>): void {
+    this.log(LogLevel.WARNING, message, category, context);
+  }
+
+  /**
+   * Error level log
+   */
+  error(message: string, category?: LogCategory, context?: Record<string, any>): void {
+    this.log(LogLevel.ERROR, message, category, context);
+  }
+
+  /**
+   * Retrieve logs
+   */
+  getLogs(limit?: number, level?: LogLevel, category?: LogCategory): LogEntry[] {
+    let filteredLogs = [...logStorage];
+
+    // Filter by level
+    if (level) {
+      filteredLogs = filteredLogs.filter((log) => log.level === level);
+    }
+
+    // Filter by category
+    if (category) {
+      filteredLogs = filteredLogs.filter((log) => log.category === category);
+    }
+
+    // Apply limit
+    if (limit && limit > 0) {
+      filteredLogs = filteredLogs.slice(0, limit);
+    }
+
+    return filteredLogs;
+  }
+
+  /**
+   * Clear all logs
+   */
+  clearLogs(): void {
+    logStorage.length = 0;
+  }
+
+  /**
+   * Check if a log level should be processed
+   */
+  private shouldLog(level: LogLevel): boolean {
+    const levelOrder = {
+      [LogLevel.DEBUG]: 0,
+      [LogLevel.INFO]: 1,
+      [LogLevel.WARNING]: 2,
+      [LogLevel.ERROR]: 3,
+    };
+
+    return levelOrder[level] >= levelOrder[this.config.minLevel];
+  }
+
+  /**
+   * Log entry to console with appropriate styling
+   */
+  private logToConsole(entry: LogEntry): void {
+    const timestamp = new Date(entry.timestamp).toISOString();
+    const category = entry.category ? `[${entry.category}]` : '';
+    
+    // Format the log message
+    const logMessage = `[${entry.level.toUpperCase()}]${category} ${entry.message}`;
+    
+    // Log with appropriate console method and styling
+    const consoleMethod = this.getConsoleMethod(entry.level);
+    const hasContext = entry.context && Object.keys(entry.context).length > 0;
+    
+    if (hasContext) {
+      console.groupCollapsed(`${logMessage}`);
+      console[consoleMethod](logMessage);
+      console.log('Context:', entry.context);
+      console.groupEnd();
+    } else {
+      console[consoleMethod](logMessage);
+    }
+  }
+
+  /**
+   * Store log entry in memory
+   */
+  private storeLog(entry: LogEntry): void {
+    // Add to front for most recent first
+    logStorage.unshift(entry);
+    
+    // Trim if exceeds max size
+    if (logStorage.length > this.config.maxLogsStored) {
+      logStorage.pop();
+    }
+  }
+
+  /**
+   * Get the appropriate console method for a log level
+   */
+  private getConsoleMethod(level: LogLevel): 'debug' | 'info' | 'warn' | 'error' {
+    switch (level) {
+      case LogLevel.DEBUG:
+        return 'debug';
+      case LogLevel.INFO:
+        return 'info';
+      case LogLevel.WARNING:
+        return 'warn';
+      case LogLevel.ERROR:
+        return 'error';
+      default:
+        return 'log';
+    }
+  }
 }
 
-/**
- * Create a logger for a specific component
- */
-export function createComponentLogger(componentName: string) {
-  return {
-    debug: (message: string, category: LogCategory = LogCategory.UI, context?: Record<string, any>) => 
-      debug(message, category, context, componentName),
-    
-    info: (message: string, category: LogCategory = LogCategory.UI, context?: Record<string, any>) => 
-      info(message, category, context, componentName),
-    
-    warn: (message: string, category: LogCategory = LogCategory.UI, context?: Record<string, any>) => 
-      warn(message, category, context, componentName),
-    
-    error: (message: string, category: LogCategory = LogCategory.UI, context?: Record<string, any>) => 
-      error(message, category, context, componentName),
-    
-    performance: (operation: string, durationMs: number, context?: Record<string, any>) => 
-      logPerformance(operation, durationMs, context, componentName),
-    
-    measure: <T>(operation: string, fn: () => T, context?: Record<string, any>) => 
-      measure(operation, fn, componentName, context),
-    
-    measureAsync: <T>(operation: string, fn: () => Promise<T>, context?: Record<string, any>) => 
-      measureAsync(operation, fn, componentName, context),
-    
-    userAction: (action: string, userId?: number, details?: Record<string, any>) => 
-      logUserAction(action, userId, details, componentName),
-  };
+// Create and export a singleton logger instance
+export const logger = new Logger();
+
+// Export a function to create custom logger instances
+export function createLogger(config: Partial<LoggerConfig> = {}): Logger {
+  return new Logger(config);
 }
