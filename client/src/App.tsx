@@ -22,6 +22,7 @@ import ReviewPage from "@/pages/admin/review-page";
 import CustomerManagement from "@/pages/admin/customer-management";
 import RatingManagement from "@/pages/admin/rating-management";
 import ReturnsManagement from "@/pages/admin/returns-management";
+import ErrorDemoPage from "@/pages/error-demo-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { CartProvider } from "@/hooks/use-cart";
 import { WishlistProvider } from "@/hooks/use-wishlist";
@@ -63,6 +64,9 @@ function Router() {
           
           {/* Content Manager routes */}
           <ContentManagerRoute path="/admin/inventory" component={InventoryPage} />
+          
+          {/* Error demonstration page */}
+          <Route path="/error-demo" component={ErrorDemoPage} />
           
           {/* Fallback 404 */}
           <Route component={NotFound} />
