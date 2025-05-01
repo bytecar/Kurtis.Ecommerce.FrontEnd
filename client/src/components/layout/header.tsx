@@ -2,17 +2,25 @@ import { useState } from "react";
 import { Logo } from "./logo";
 import { MainNav } from "./main-nav";
 import { UserNav } from "./user-nav";
+import { AdminMobileNav } from "./admin-mobile-nav";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import { useLocation } from "wouter";
+import { Search, ArrowLeft } from "lucide-react";
+import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 
 export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const [mobileSearchVisible, setMobileSearchVisible] = useState(false);
+  const { user } = useAuth();
+  const { t } = useTranslation();
+  
+  // Check if current path is an admin path
+  const isAdminPath = location.startsWith('/admin');
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,9 +28,46 @@ export function Header() {
       navigate(`/products/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
-
-  const { t } = useTranslation();
   
+  // If we're on an admin page, show a simplified header with back button
+  if (isAdminPath) {
+    return (
+      <header className="sticky top-0 z-50 bg-background shadow-sm">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <AdminMobileNav />
+            
+            <Link href="/">
+              <Button variant="ghost" size="sm" className="hidden md:flex items-center gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                <span>{t('common.backToSite')}</span>
+              </Button>
+            </Link>
+            
+            <h1 className="text-xl font-bold">
+              {location.includes('dashboard') && t('adminDashboard.dashboard')}
+              {location.includes('reviews') && t('adminDashboard.reviews')}
+              {location.includes('customers') && t('adminDashboard.customers')}
+              {location.includes('inventory') && t('adminDashboard.inventory')}
+              {location.includes('ratings') && t('adminDashboard.ratings')}
+              {location.includes('returns') && t('adminDashboard.returns')}
+            </h1>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            {user && (
+              <span className="text-sm text-muted-foreground hidden md:inline-block">
+                {t('common.loggedInAs')}: {user.fullName}
+              </span>
+            )}
+          </div>
+        </div>
+      </header>
+    );
+  }
+  
+  // Regular header for normal site pages
   return (
     <header className="sticky top-0 z-50 bg-background shadow-sm">
       {/* Top announcement bar */}
