@@ -601,18 +601,18 @@ export function SizeRecommendationWizard({
       ) : recommendedSize ? (
         <div className="space-y-6">
           <div className="text-center">
-            <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-3">
-              <Shirt className="h-6 w-6" />
+            <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary/10 text-primary mb-4">
+              <Shirt className="h-8 w-8" />
             </div>
-            <h3 className="text-xl font-medium">{t('product.sizeRecommender.recommendedSize')}</h3>
-            <div className="mt-2 text-4xl font-bold text-primary">{recommendedSize}</div>
+            <h3 className="text-2xl font-medium">{t('product.sizeRecommender.recommendedSize')}</h3>
+            <div className="mt-3 text-5xl font-bold text-primary">{recommendedSize}</div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
             <Card>
-              <CardContent className="pt-6">
-                <h4 className="font-medium mb-2">{t('product.sizeRecommender.sizeDetailsTitle')}</h4>
-                <ul className="space-y-2 text-sm">
+              <CardContent className="pt-8 px-6">
+                <h4 className="font-medium mb-4 text-lg">{t('product.sizeRecommender.sizeDetailsTitle')}</h4>
+                <ul className="space-y-3 text-base">
                   <li className="flex justify-between">
                     <span className="text-muted-foreground">{t('product.category')}:</span>
                     <span className="font-medium">{productType}</span>
@@ -630,8 +630,8 @@ export function SizeRecommendationWizard({
             </Card>
 
             <Card>
-              <CardContent className="pt-6">
-                <h4 className="font-medium mb-2">{t('product.sizeRecommender.tryOnLabel')}</h4>
+              <CardContent className="pt-8 px-6">
+                <h4 className="font-medium mb-4 text-lg">{t('product.sizeRecommender.tryOnLabel')}</h4>
                 {virtualTryOnUrl ? (
                   <div className="relative rounded-md overflow-hidden aspect-[3/4]">
                     <img 
@@ -656,9 +656,9 @@ export function SizeRecommendationWizard({
             </Card>
           </div>
 
-          <div className="bg-muted p-4 rounded-md">
-            <h4 className="font-medium mb-2">{t('product.sizeRecommender.fitAnalysisTitle')}</h4>
-            <p className="text-sm text-muted-foreground">
+          <div className="bg-muted p-6 rounded-md mt-8">
+            <h4 className="font-medium mb-3 text-lg">{t('product.sizeRecommender.fitAnalysisTitle')}</h4>
+            <p className="text-base text-muted-foreground">
               {t('product.sizeRecommender.fitAnalysisText', {
                 size: recommendedSize,
                 fit: t(`product.sizeRecommender.fitDescriptions.${preferredFit}`),
@@ -688,7 +688,7 @@ export function SizeRecommendationWizard({
           <span>{t('product.sizeRecommender.findYourSize')}</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] md:max-w-[600px]">
+      <DialogContent className="sm:max-w-[475px] md:max-w-[650px]">
         <DialogHeader>
           <DialogTitle>{t('product.sizeRecommender.title')}</DialogTitle>
           <DialogDescription>
@@ -698,7 +698,7 @@ export function SizeRecommendationWizard({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(calculateRecommendedSize)}>
-            <div className="max-h-[60vh] overflow-y-auto pr-1">
+            <div className="max-h-[65vh] overflow-y-auto pr-1">
               {step === 1 && renderStepOne()}
               {step === 2 && renderStepTwo()}
               {step === 3 && renderStepThree()}
