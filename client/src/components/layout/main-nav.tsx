@@ -4,14 +4,6 @@ import { useTranslation } from "react-i18next";
 export function MainNav() {
   const [location] = useLocation();
   const { t } = useTranslation();
-  
-  // Check if current path is an admin path
-  const isAdminPath = location.startsWith('/admin');
-  
-  // Hide navigation on admin pages
-  if (isAdminPath) {
-    return null;
-  }
 
   const navItems = [
     { id: "home", name: t("common.home"), href: "/" },

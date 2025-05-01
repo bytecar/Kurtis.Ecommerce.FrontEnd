@@ -57,7 +57,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { AlertCircle, Loader2, MoreHorizontal, PlusCircle, Search, Trash2, UserCog, UserPlus } from "lucide-react";
 import { format } from 'date-fns';
-import { AdminLayout } from '@/components/layout/admin-layout';
+
 import { apiRequest } from '@/lib/queryClient';
 
 // Define user type
@@ -422,29 +422,26 @@ const CustomerManagement: React.FC = () => {
   // Show error state if there was an error loading users
   if (error) {
     return (
-      <AdminLayout title={t('adminDashboard.customers')}>
-        <div className="flex flex-col items-center justify-center h-[400px] gap-4">
-          <AlertCircle className="h-16 w-16 text-destructive" />
-          <h2 className="text-2xl font-bold">{t('common.errorOccurred')}</h2>
-          <p className="text-muted-foreground">{(error as Error).message}</p>
-          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] })}>
-            {t('common.tryAgain')}
-          </Button>
-        </div>
-      </AdminLayout>
+      <div className="flex flex-col items-center justify-center h-[400px] gap-4">
+        <AlertCircle className="h-16 w-16 text-destructive" />
+        <h2 className="text-2xl font-bold">{t('common.errorOccurred')}</h2>
+        <p className="text-muted-foreground">{(error as Error).message}</p>
+        <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] })}>
+          {t('common.tryAgain')}
+        </Button>
+      </div>
     );
   }
 
   return (
-    <AdminLayout title={t('adminDashboard.customers')}>
-      <div className="container space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">{t('adminDashboard.customerManagement')}</h1>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <UserPlus className="mr-2 h-4 w-4" />
-            {t('admin.addNewUser')}
-          </Button>
-        </div>
+    <div className="container space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">{t('adminDashboard.customerManagement')}</h1>
+        <Button onClick={() => setIsCreateDialogOpen(true)}>
+          <UserPlus className="mr-2 h-4 w-4" />
+          {t('admin.addNewUser')}
+        </Button>
+      </div>
 
       <Card>
         <CardHeader>
@@ -818,8 +815,7 @@ const CustomerManagement: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      </div>
-    </AdminLayout>
+    </div>
   );
 };
 
