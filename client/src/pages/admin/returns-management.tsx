@@ -339,6 +339,12 @@ const ReturnsManagement: React.FC = () => {
       return false;
     }
   });
+  
+  // Calculate pagination
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedReturns = filteredReturns.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(filteredReturns.length / itemsPerPage);
 
   const handleReturnAction = (action: 'view' | 'delete', returnItem: Return) => {
     setSelectedReturn(returnItem);
@@ -538,7 +544,7 @@ const ReturnsManagement: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredReturns.slice(0, 10).map((returnItem) => (
+                  {paginatedReturns.map((returnItem) => (
                     <TableRow key={returnItem.id}>
                       <TableCell className="font-medium">
                         #{returnItem.orderId}
@@ -601,11 +607,25 @@ const ReturnsManagement: React.FC = () => {
         </CardContent>
         <CardFooter className="flex justify-between">
           <div className="text-sm text-muted-foreground">
-            Showing 1 to 10 of {filteredReturns.length} results
+            Showing {filteredReturns.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, filteredReturns.length)} of {filteredReturns.length} results
           </div>
           <div className="space-x-2">
-            <Button variant="outline" size="sm" disabled>Previous</Button>
-            <Button variant="outline" size="sm">Next</Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage >= totalPages}
+            >
+              Next
+            </Button>
           </div>
         </CardFooter>
       </Card>
