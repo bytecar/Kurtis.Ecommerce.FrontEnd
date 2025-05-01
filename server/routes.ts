@@ -459,9 +459,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let userPreferences = null;
       
       // If user is authenticated, get their preferences and recently viewed products
-      if (req.isAuthenticated() && req.user) {
-        userPreferences = await storage.getUserPreferences(req.user.id);
-        const recentlyViewed = await storage.getRecentlyViewedByUser(req.user.id);
+      if (req.isAuthenticated && req.isAuthenticated()) {
+        // Get authenticated user safely
+        const user = getUserSafely(req);
+        userPreferences = await storage.getUserPreferences(user.id);
+        const recentlyViewed = await storage.getRecentlyViewedByUser(user.id);
         
         // If we have user preferences, use OpenAI for AI-powered recommendations
         if (userPreferences) {
@@ -507,6 +509,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate request body
       const validatedData = insertProductSchema.parse(req.body);
       
+      // Ensure imageUrls is properly typed as string[] if present
+      if (validatedData.imageUrls && !Array.isArray(validatedData.imageUrls)) {
+        validatedData.imageUrls = Array.from(validatedData.imageUrls) as string[];
+      }
+      
       // Create product
       const product = await storage.createProduct(validatedData);
       
@@ -527,6 +534,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Validate request body
       const validatedData = insertProductSchema.partial().parse(req.body);
+      
+      // Ensure imageUrls is properly typed as string[] if present
+      if (validatedData.imageUrls && !Array.isArray(validatedData.imageUrls)) {
+        validatedData.imageUrls = Array.from(validatedData.imageUrls) as string[];
+      }
       
       // Update product
       const product = await storage.updateProduct(id, validatedData);
