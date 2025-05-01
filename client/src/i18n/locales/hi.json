@@ -341,7 +341,7 @@
     "languages": {
       "en": "अंग्रेज़ी",
       "hi": "हिंदी",
-      "gu": "गुजराती"
+      "kn": "कन्नड़"
     }
   },
   "adminDashboard": {
@@ -399,11 +399,11 @@
     "update": "अपडेट",
     "reset": "रीसेट",
     "search": "खोज",
-    "entries": "एंट्रीज",
+    "entriesCount": "एंट्रीज",
     "showing": "दिखा रहा है",
     "to": "से",
     "of": "का",
-    "entries": "एंट्रीज",
+    "entriesLabel": "एंट्रीज",
     "previous": "पिछला",
     "next": "अगला",
     "confirmDelete": "क्या आप वाकई इस आइटम को हटाना चाहते हैं?",
