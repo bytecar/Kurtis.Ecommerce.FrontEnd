@@ -459,7 +459,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let userPreferences = null;
       
       // If user is authenticated, get their preferences and recently viewed products
-      if (req.isAuthenticated()) {
+      if (req.isAuthenticated() && req.user) {
         userPreferences = await storage.getUserPreferences(req.user.id);
         const recentlyViewed = await storage.getRecentlyViewedByUser(req.user.id);
         
@@ -655,8 +655,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate request body
       const validatedData = insertReviewSchema.parse(req.body);
       
+      // Get authenticated user
+      const user = getUserSafely(req);
+      
       // Ensure the user ID matches the authenticated user
-      if (validatedData.userId !== req.user.id) {
+      if (validatedData.userId !== user.id) {
         return res.status(403).json({ error: "Not authorized to create review for another user" });
       }
       
@@ -696,8 +699,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user orders (authenticated users only)
   app.get("/api/orders/user", authenticateJWT, async (req, res) => {
     try {
+      // Get authenticated user
+      const user = getUserSafely(req);
       
-      const orders = await storage.getOrdersByUser(req.user.id);
+      const orders = await storage.getOrdersByUser(user.id);
       
       res.json(orders);
     } catch (error) {
@@ -980,7 +985,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const preferenceData = {
                 favoriteCategories: userPreferences.favoriteCategories,
                 favoriteColors: userPreferences.favoriteColors,
-                gender: user.gender,
+                gender: user.gender || undefined, // Convert null to undefined to match the expected type
                 priceRange: userPreferences.priceRangeMin && userPreferences.priceRangeMax ? 
                   { min: userPreferences.priceRangeMin, max: userPreferences.priceRangeMax } : undefined
               };
@@ -1249,13 +1254,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let updatedCount = 0;
       
       if (action === "discount") {
-        // Apply discount to all selected products
-        for (const id of selectedIds) {
-          const product = await storage.getProduct(id);
-          if (product) {
-            const discountedPrice = product.price - (product.price * (discount / 100));
-            await storage.updateProduct(id, { discountedPrice });
-            updatedCount++;
+        // Ensure discount is defined (validated above)
+        if (discount !== undefined) {
+          // Apply discount to all selected products
+          for (const id of selectedIds) {
+            const product = await storage.getProduct(id);
+            if (product) {
+              const discountedPrice = product.price - (product.price * (discount / 100));
+              await storage.updateProduct(id, { discountedPrice });
+              updatedCount++;
+            }
           }
         }
       } else if (action === "category") {
@@ -1268,25 +1276,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       } else if (action === "stock") {
-        // Update inventory for all selected products
-        for (const id of selectedIds) {
-          const inventoryItems = await storage.getInventoryByProduct(id);
-          const sizeItem = inventoryItems.find(item => item.size === sizeToUpdate);
-          
-          if (sizeItem) {
-            // Update existing inventory
-            const newQuantity = Math.max(0, sizeItem.quantity + stockChange);
-            await storage.updateInventory(sizeItem.id, { quantity: newQuantity });
-            updatedCount++;
-          } else {
-            // Create new inventory if size doesn't exist (only if adding stock)
-            if (stockChange > 0) {
-              await storage.createInventory({
-                productId: id,
-                size: sizeToUpdate,
-                quantity: stockChange
-              });
+        // We already validated stockChange and sizeToUpdate are defined above
+        if (stockChange !== undefined && sizeToUpdate !== undefined) {
+          // Update inventory for all selected products
+          for (const id of selectedIds) {
+            const inventoryItems = await storage.getInventoryByProduct(id);
+            const sizeItem = inventoryItems.find(item => item.size === sizeToUpdate);
+            
+            if (sizeItem) {
+              // stockChange is guaranteed to be defined here by the outer if check
+              const newQuantity = Math.max(0, sizeItem.quantity + (stockChange as number));
+              await storage.updateInventory(sizeItem.id, { quantity: newQuantity });
               updatedCount++;
+            } else {
+              // Create new inventory if size doesn't exist (only if adding stock)
+              if (stockChange > 0 && sizeToUpdate) {
+                await storage.createInventory({
+                  productId: id,
+                  size: sizeToUpdate,
+                  quantity: stockChange
+                });
+                updatedCount++;
+              }
             }
           }
         }
