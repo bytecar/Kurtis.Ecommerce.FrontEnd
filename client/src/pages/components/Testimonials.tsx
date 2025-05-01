@@ -23,7 +23,7 @@ export const Testimonials: React.FC<TestimonialProps> = ({ testimonials }) => {
   return (
     <section className="testimonials-section">
       <div className="container mx-auto px-4">
-        <AnimatedHeading centered>{t('home.testimonials')}</AnimatedHeading>
+        <AnimatedHeading center>{t('home.testimonials')}</AnimatedHeading>
         
         <div className="testimonials-grid">
           {testimonials.map((testimonial, index) => (

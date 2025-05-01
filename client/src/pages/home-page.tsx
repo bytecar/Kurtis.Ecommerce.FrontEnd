@@ -9,6 +9,9 @@ import { Hero } from './components/Hero';
 import { FeaturedProducts } from './components/FeaturedProducts';
 import { NewArrivals } from './components/NewArrivals';
 import { Collections } from './components/Collections';
+import { Testimonials } from './components/Testimonials';
+import { Features } from './components/Features';
+import { Newsletter } from './components/Newsletter';
 
 // Import CSS
 import './styles/home-page.css';
@@ -135,10 +138,9 @@ export default function HomePage() {
         isLoading={isNewLoading}
       />
       
-      {/* We'll add these components later */}
-      {/* <Testimonials testimonials={testimonials} /> */}
-      {/* <Features features={features} /> */}
-      {/* <Newsletter /> */}
+      <Testimonials testimonials={testimonials} />
+      <Features features={features} />
+      <Newsletter />
     </div>
   );
 }
