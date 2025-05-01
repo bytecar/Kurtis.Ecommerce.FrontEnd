@@ -14,6 +14,7 @@ const languages = [
   { code: 'en', label: 'English' },
   { code: 'hi', label: 'हिंदी' }, // Hindi
   { code: 'kn', label: 'ಕನ್ನಡ' }, // Kannada
+  { code: 'te', label: 'తెలుగు' }, // Telugu
 ];
 
 const LanguageSwitcher: React.FC = () => {
