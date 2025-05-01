@@ -122,19 +122,37 @@
       "chestLabel": "Chest/Bust",
       "waistLabel": "Waist",
       "hipsLabel": "Hips",
-      "fitLabel": "Preferred Fit",
+      "preferredFitLabel": "Preferred Fit",
+      "selectPreferredFit": "Select your preferred fit",
       "fitTypes": {
         "tight": "Fitted (Closer to body)",
         "regular": "Regular (Standard fit)",
         "loose": "Loose (Relaxed fit)"
+      },
+      "fitDescriptions": {
+        "tight": "fitted",
+        "regular": "comfortable",
+        "loose": "relaxed"
       },
       "howToMeasure": {
         "chest": "Measure around the fullest part of your bust/chest.",
         "waist": "Measure around your natural waistline.",
         "hips": "Measure around the fullest part of your hips."
       },
+      "advancedMeasurementsTitle": "Advanced Measurements",
+      "advancedMeasurementsDescription": "For a more accurate size recommendation, please provide the following measurements. These are optional but will improve our recommendation.",
+      "enterMeasurementsTab": "Enter Measurements",
+      "measurementGuideTab": "Measurement Guide",
+      "measurementGuideTitle": "How to Measure",
+      "chestBustLabel": "Chest/Bust",
+      "chestBustInstructions": "Measure around the fullest part of your chest/bust, keeping the tape parallel to the floor.",
+      "waistInstructions": "Measure around your natural waistline, at the narrowest part of your waist.",
+      "hipsInstructions": "Measure around the fullest part of your hips, keeping the tape parallel to the floor.",
       "measurementGuideImage": "Measurement guide image",
-      "calculatingSize": "Calculating your size...",
+      "selectBodyType": "Select your body type",
+      "useImperialLabel": "Use imperial measurements (inches/pounds)",
+      "unitSwitchDescription": "Switch between metric and imperial units",
+      "calculatingSize": "Calculating your perfect size...",
       "measurementCm": "cm",
       "measurementInches": "inches",
       "calculateButton": "Calculate My Size",
@@ -145,7 +163,13 @@
       "recommendation": "Based on your measurements, we recommend size:",
       "availabilityNote": "Please note: If your recommended size is not available, we've suggested the closest available size.",
       "tryOnLabel": "Virtual Try-On Preview",
-      "noTryOn": "Virtual try-on preview is not available for this product."
+      "noTryOn": "Virtual try-on preview is not available for this product.",
+      "errorMessage": "Something went wrong. Please try again.",
+      "sizeDetailsTitle": "Size Details",
+      "fitAnalysisTitle": "Fit Analysis",
+      "fitAnalysisText": "Based on your measurements, the {{size}} size should provide a {{fit}} fit for your {{bodyType}} body type.",
+      "sizeVisualization": "Size {{size}} visualization",
+      "virtualTryOnAlt": "Virtual try-on visualization"
     }
   },
   "auth": {
