@@ -334,14 +334,18 @@ const CustomerManagement: React.FC = () => {
     const password = (document.getElementById('resetPassword') as HTMLInputElement)?.value;
     const profilePicture = (document.getElementById('profilePicture') as HTMLInputElement)?.value || selectedUser.profilePicture;
     
-    // Get dropdown values (need to be handled differently from form.value)
-    const statusElement = document.querySelector('[id*="radix-"][data-state="checked"][data-value]') as HTMLElement;
-    const roleElement = document.querySelector('[id*="radix-"][data-state="checked"][data-value]') as HTMLElement;
-    const genderElement = document.querySelector('[id*="radix-"][data-state="checked"][data-value]') as HTMLElement;
+    // Get dropdown values
+    // For status and role, find radix elements in specific tabs
+    const accessTab = document.querySelector('[data-value="access"]')?.parentElement;
+    const statusElement = accessTab?.querySelector('[data-value="active"], [data-value="inactive"], [data-value="suspended"]');
+    const roleElement = accessTab?.querySelector('[data-value="admin"], [data-value="customer"], [data-value="contentManager"]');
+    
+    // For gender, we created a hidden input with the selected value
+    const genderInput = document.getElementById('gender-value') as HTMLInputElement;
     
     const status = statusElement?.getAttribute('data-value') || selectedUser.status;
     const role = roleElement?.getAttribute('data-value') || selectedUser.role;
-    const gender = genderElement?.getAttribute('data-value') || selectedUser.gender;
+    const gender = genderInput?.value || selectedUser.gender;
     
     // Handle birthdate - ensure it's properly processed
     const birthdateEl = document.getElementById('birthdate') as HTMLInputElement;
@@ -729,15 +733,26 @@ const CustomerManagement: React.FC = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="gender">Gender</Label>
-                  <Select defaultValue={selectedUser.gender || ''}>
-                    <SelectTrigger>
+                  <Select 
+                    name="gender" 
+                    defaultValue={selectedUser.gender || "prefer-not-to-say"}
+                    onValueChange={(value) => { 
+                      // Just to ensure the value is captured and stored safely
+                      const genderInput = document.createElement('input');
+                      genderInput.type = 'hidden';
+                      genderInput.id = 'gender-value';
+                      genderInput.value = value;
+                      document.body.appendChild(genderInput);
+                    }}
+                  >
+                    <SelectTrigger id="gender-select">
                       <SelectValue placeholder="Select gender" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="male">Male</SelectItem>
                       <SelectItem value="female">Female</SelectItem>
                       <SelectItem value="non-binary">Non-binary</SelectItem>
-                      <SelectItem value="">Prefer not to say</SelectItem>
+                      <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
