@@ -375,40 +375,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Size filter - Get inventory for each product and check if any item has the requested size
       if (size.length > 0) {
+        console.log("Filtering by sizes:", size);
         const filteredProducts = [];
         
         for (const product of products) {
           const inventory = await storage.getInventoryByProduct(product.id);
-          const hasSizes = inventory.some(item => size.includes(item.size) && item.quantity > 0);
+          console.log(`Product ${product.id} (${product.name}) inventory:`, inventory);
+          
+          const hasSizes = inventory.some(item => {
+            const sizeMatch = size.includes(item.size) && item.quantity > 0;
+            console.log(`Checking size ${item.size} (quantity: ${item.quantity}) against requested sizes:`, sizeMatch);
+            return sizeMatch;
+          });
           
           if (hasSizes) {
+            console.log(`Adding product ${product.id} to filtered results`);
             filteredProducts.push(product);
           }
         }
         
         products = filteredProducts;
+        console.log(`After size filtering, ${products.length} products remain`);
       }
       
       // Rating filter - Check product reviews for average rating
       if (rating) {
+        console.log("Filtering by rating:", rating);
         const filteredProducts = [];
         const ratingValue = rating.split('-')[0]; // Extracts "4" from "4-up"
         const minimumRating = parseInt(ratingValue);
         
         if (!isNaN(minimumRating)) {
+          console.log(`Using minimum rating of ${minimumRating}`);
+          
           for (const product of products) {
             const reviews = await storage.getReviewsByProduct(product.id);
+            console.log(`Product ${product.id} (${product.name}) has ${reviews.length} reviews`);
             
             if (reviews.length > 0) {
               const avgRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+              console.log(`Average rating: ${avgRating.toFixed(1)}, minimum required: ${minimumRating}`);
               
               if (avgRating >= minimumRating) {
+                console.log(`Adding product ${product.id} to rating-filtered results`);
                 filteredProducts.push(product);
               }
             }
           }
           
           products = filteredProducts;
+          console.log(`After rating filtering, ${products.length} products remain`);
+        } else {
+          console.log("Could not parse minimum rating value");
         }
       }
       
@@ -642,12 +660,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Ensure imageUrls is properly typed as string[] if present
       if (validatedData.imageUrls) {
         // Make sure we always have an array of strings
-        const imageUrlArray = Array.isArray(validatedData.imageUrls)
-          ? validatedData.imageUrls
-          : Array.from(validatedData.imageUrls);
+        const imageUrlArray: string[] = Array.isArray(validatedData.imageUrls)
+          ? validatedData.imageUrls.map(url => String(url))
+          : [];
         
-        // Guarantee it's a string array
-        validatedData.imageUrls = imageUrlArray.map(url => String(url));
+        // Assign the properly typed array
+        validatedData.imageUrls = imageUrlArray;
       }
       
       // Create product
@@ -674,12 +692,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Ensure imageUrls is properly typed as string[] if present
       if (validatedData.imageUrls) {
         // Make sure we always have an array of strings
-        const imageUrlArray = Array.isArray(validatedData.imageUrls)
-          ? validatedData.imageUrls
-          : Array.from(validatedData.imageUrls);
+        const imageUrlArray: string[] = Array.isArray(validatedData.imageUrls)
+          ? validatedData.imageUrls.map(url => String(url))
+          : [];
         
-        // Guarantee it's a string array
-        validatedData.imageUrls = imageUrlArray.map(url => String(url));
+        // Assign the properly typed array
+        validatedData.imageUrls = imageUrlArray;
       }
       
       // Update product
