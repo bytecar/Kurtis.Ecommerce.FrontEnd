@@ -1,6 +1,7 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { handleApiError } from './api-error-handler';
 import { info, error as logError, LogCategory } from './logging';
+import { ErrorCategory } from './error-handling';
 
 async function throwIfResNotOk(res: Response, componentName?: string) {
   if (!res.ok) {
@@ -57,7 +58,7 @@ export const getQueryFn: <T>(options: {
       });
 
       if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-        logError(`Unauthorized access to ${endpoint}`, LogCategory.AUTHORIZATION, { 
+        logError(`Unauthorized access to ${endpoint}`, LogCategory.AUTH, { 
           endpoint, 
           status: 401,
           queryKey 
