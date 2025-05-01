@@ -292,7 +292,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user preferences
   app.get("/api/user/preferences", authenticateJWT, async (req, res) => {
     try {
-      const userId = (req as any).user.id;
+      // Get authenticated user safely
+      const user = getUserSafely(req);
+      const userId = user.id;
       const preferences = await storage.getUserPreferences(userId);
       
       if (!preferences) {
@@ -513,8 +515,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertProductSchema.parse(req.body);
       
       // Ensure imageUrls is properly typed as string[] if present
-      if (validatedData.imageUrls && !Array.isArray(validatedData.imageUrls)) {
-        validatedData.imageUrls = Array.from(validatedData.imageUrls) as string[];
+      if (validatedData.imageUrls) {
+        // Make sure we always have an array of strings
+        const imageUrlArray = Array.isArray(validatedData.imageUrls)
+          ? validatedData.imageUrls
+          : Array.from(validatedData.imageUrls);
+        
+        // Guarantee it's a string array
+        validatedData.imageUrls = imageUrlArray.map(url => String(url));
       }
       
       // Create product
@@ -539,8 +547,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertProductSchema.partial().parse(req.body);
       
       // Ensure imageUrls is properly typed as string[] if present
-      if (validatedData.imageUrls && !Array.isArray(validatedData.imageUrls)) {
-        validatedData.imageUrls = Array.from(validatedData.imageUrls) as string[];
+      if (validatedData.imageUrls) {
+        // Make sure we always have an array of strings
+        const imageUrlArray = Array.isArray(validatedData.imageUrls)
+          ? validatedData.imageUrls
+          : Array.from(validatedData.imageUrls);
+        
+        // Guarantee it's a string array
+        validatedData.imageUrls = imageUrlArray.map(url => String(url));
       }
       
       // Update product
