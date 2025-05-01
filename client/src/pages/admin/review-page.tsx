@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { ReviewManagement } from "@/components/admin/review-management";
-import { AdminLayout } from "@/components/layout/admin-layout";
 import { useTranslation } from "react-i18next";
 
 export default function ReviewPage() {
@@ -11,11 +10,9 @@ export default function ReviewPage() {
   }, []);
 
   return (
-    <AdminLayout title={t('adminDashboard.reviews')}>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">{t('adminDashboard.reviews')}</h1>
-        <ReviewManagement />
-      </div>
-    </AdminLayout>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">{t('adminDashboard.reviews')}</h1>
+      <ReviewManagement />
+    </div>
   );
 }
