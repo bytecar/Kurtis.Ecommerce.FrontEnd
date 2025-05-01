@@ -20,6 +20,30 @@ declare global {
   }
 }
 
+// Helper function to safely access req.user
+function getUserSafely(req: Request): User {
+  if (!req.user) {
+    throw new Error("User not authenticated");
+  }
+  return req.user;
+}
+
+// Check if user is admin
+function isAdmin(req: Request): boolean {
+  return req.isAuthenticated() && req.user !== undefined && req.user.role === "admin";
+}
+
+// Safe date handling
+function safeDate(date: Date | null): Date {
+  return date || new Date();
+}
+
+// Safe array handling
+function toStringArray(value: string | string[] | undefined): string[] {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
 // Set up multer for file uploads
 const upload_storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -82,7 +106,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/admin/users/:id", async (req, res) => {
     try {
       // Check if user is admin
-      if (!req.isAuthenticated() || req.user.role !== "admin") {
+      if (!isAdmin(req)) {
         return res.status(403).json({ error: "Unauthorized: Admin access required" });
       }
       
@@ -107,7 +131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/users", async (req, res) => {
     try {
       // Check if user is admin
-      if (!req.isAuthenticated() || req.user.role !== "admin") {
+      if (!isAdmin(req)) {
         return res.status(403).json({ error: "Unauthorized: Admin access required" });
       }
       
@@ -154,7 +178,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/admin/users/:id", async (req, res) => {
     try {
       // Check if user is admin
-      if (!req.isAuthenticated() || req.user.role !== "admin") {
+      if (!isAdmin(req)) {
         return res.status(403).json({ error: "Unauthorized: Admin access required" });
       }
       
@@ -213,14 +237,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/admin/users/:id", async (req, res) => {
     try {
       // Check if user is admin
-      if (!req.isAuthenticated() || req.user.role !== "admin") {
+      if (!isAdmin(req)) {
         return res.status(403).json({ error: "Unauthorized: Admin access required" });
       }
       
       const id = parseInt(req.params.id);
+      const user = getUserSafely(req);
       
       // Don't allow deleting the requesting user
-      if (id === req.user.id) {
+      if (id === user.id) {
         return res.status(400).json({ error: "Cannot delete your own user account" });
       }
       
@@ -395,7 +420,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const products = await storage.getAllProducts();
       // Sort by createdAt descending and take the first 6
       const newArrivals = [...products]
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .sort((a, b) => safeDate(b.createdAt).getTime() - safeDate(a.createdAt).getTime())
         .slice(0, 6);
       
       res.json(newArrivals);
