@@ -342,6 +342,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ======= Product Routes =======
   
+  // Get metadata endpoints for filtering UI
+  app.get("/api/metadata/categories", async (req, res) => {
+    try {
+      const categories = await storage.getAllCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ error: "Failed to fetch categories" });
+    }
+  });
+  
+  app.get("/api/metadata/brands", async (req, res) => {
+    try {
+      const brands = await storage.getAllBrands();
+      res.json(brands);
+    } catch (error) {
+      console.error("Error fetching brands:", error);
+      res.status(500).json({ error: "Failed to fetch brands" });
+    }
+  });
+  
+  app.get("/api/metadata/sizes", async (req, res) => {
+    try {
+      const sizes = await storage.getAllSizes();
+      res.json(sizes);
+    } catch (error) {
+      console.error("Error fetching sizes:", error);
+      res.status(500).json({ error: "Failed to fetch sizes" });
+    }
+  });
+  
+  app.get("/api/metadata/ratings", async (req, res) => {
+    try {
+      const ratings = await storage.getAllRatingOptions();
+      res.json(ratings);
+    } catch (error) {
+      console.error("Error fetching rating options:", error);
+      res.status(500).json({ error: "Failed to fetch rating options" });
+    }
+  });
+  
   // Get all products
   app.get("/api/products", async (req, res) => {
     try {
@@ -354,11 +395,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const minPrice = req.query.minPrice ? parseInt(req.query.minPrice as string) : 0;
       const maxPrice = req.query.maxPrice ? parseInt(req.query.maxPrice as string) : Number.MAX_SAFE_INTEGER;
       const query = req.query.q as string;
-      const collection = req.query.collection as string;
+      const collectionParam = req.query.collection as string;
       
-      console.log("Filter parameters:", { gender, category, brand, size, rating, minPrice, maxPrice, query, collection });
+      console.log("Filter parameters:", { gender, category, brand, size, rating, minPrice, maxPrice, query, collection: collectionParam });
       
-      let products = await storage.getAllProducts();
+      let products: Product[] = [];
+      
+      // If collection filter is applied, get products by collection first
+      if (collectionParam) {
+        try {
+          // First try to find the collection by ID
+          const collectionId = parseInt(collectionParam);
+          if (!isNaN(collectionId)) {
+            // Use collection-specific endpoint to retrieve products
+            products = await storage.getProductsByCollection(collectionId);
+            
+            // Fall back to all products if none found in the collection
+            if (!products || products.length === 0) {
+              products = await storage.getAllProducts();
+            }
+          } else {
+            // If not a number, get all products for other filters
+            products = await storage.getAllProducts();
+          }
+        } catch (err) {
+          console.error("Error retrieving collection products:", err);
+          products = await storage.getAllProducts();
+        }
+      } else {
+        // No collection filter, get all products
+        products = await storage.getAllProducts();
+      }
       
       // Apply filters
       if (gender && gender !== "all" && gender !== "search") {
@@ -464,35 +531,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Collection filter
-      if (collection) {
+      // Legacy string-based collection filtering (festival, summer, etc.)
+      if (collectionParam && isNaN(parseInt(collectionParam))) {
         try {
-          // First try to find the collection by ID
-          const collectionId = parseInt(collection);
-          if (!isNaN(collectionId)) {
-            // Use collection-specific endpoint to retrieve products
-            const collectionProducts = await storage.getProductsByCollection(collectionId);
-            
-            // Only replace products array if we actually found products
-            if (collectionProducts && collectionProducts.length > 0) {
-              products = collectionProducts;
-            }
-          } else {
-            // Otherwise, use the legacy approach for predefined collections
-            if (collection === "festival") {
-              products = products.filter(product => {
-                if (!product.category) return false;
-                return product.category === "lehengas" || product.category === "sarees";
-              });
-            } else if (collection === "summer") {
-              products = products.filter(product => {
-                if (!product.category) return false;
-                return product.category === "kurtis" || product.category === "tops";
-              });
-            }
+          // Use the legacy approach for predefined text-based collections
+          if (collectionParam === "festival") {
+            products = products.filter(product => {
+              if (!product.category) return false;
+              return product.category === "lehengas" || product.category === "sarees";
+            });
+          } else if (collectionParam === "summer") {
+            products = products.filter(product => {
+              if (!product.category) return false;
+              return product.category === "kurtis" || product.category === "tops";
+            });
           }
         } catch (err) {
-          console.error("Error filtering by collection:", err);
+          console.error("Error filtering by legacy collection:", err);
         }
       }
       

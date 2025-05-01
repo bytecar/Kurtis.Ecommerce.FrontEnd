@@ -142,6 +142,23 @@ export class MemStorage implements IStorage {
   private userPreferences: Map<number, UserPreferences>;
   private collections: Map<number, Collection>;
   private productCollections: Map<number, ProductCollection>;
+  
+  // Metadata for the UI filters - implementing the new interfaces
+  async getAllCategories(): Promise<{id: number, name: string, label: string, gender: string}[]> {
+    return this.categoryData;
+  }
+  
+  async getAllBrands(): Promise<{id: number, name: string, label: string}[]> {
+    return this.brandData;
+  }
+  
+  async getAllSizes(): Promise<{id: number, name: string, label: string}[]> {
+    return this.sizeData;
+  }
+  
+  async getAllRatingOptions(): Promise<{id: string, label: string}[]> {
+    return this.ratingData;
+  }
 
   sessionStore: session.Store;
 
