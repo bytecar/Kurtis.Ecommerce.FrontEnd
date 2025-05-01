@@ -51,14 +51,14 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey }) => {
     try {
       const endpoint = queryKey[0] as string;
-      info(`API Query: ${endpoint}`, LogCategory.API, { endpoint, queryKey });
+      logger.info(`API Query: ${endpoint}`, LogCategory.API, { endpoint, queryKey });
       
       const res = await fetch(endpoint, {
         credentials: "include",
       });
 
       if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-        logError(`Unauthorized access to ${endpoint}`, LogCategory.AUTH, { 
+        logger.error(`Unauthorized access to ${endpoint}`, LogCategory.AUTH, { 
           endpoint, 
           status: 401,
           queryKey 
