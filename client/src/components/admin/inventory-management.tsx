@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Product, Inventory } from "@shared/schema";
+import { Product, Inventory, Collection } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { ProductForm } from "@/components/products/product-form";
@@ -10,6 +10,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Table,
@@ -26,6 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -37,7 +39,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Search, Edit, MoreHorizontal, Plus, Package, AlertTriangle } from "lucide-react";
+import { Loader2, Search, Edit, MoreHorizontal, Plus, Package, AlertTriangle, Tags, Trash, Check, X } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import * as z from "zod";
 import {
   Select,
   SelectContent,
@@ -48,14 +65,37 @@ import {
 
 const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
 
+// Form schema for creating/editing collections
+const collectionFormSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  description: z.string().min(1, 'Description is required'),
+  imageUrl: z.string().optional(),
+  active: z.boolean().default(true),
+  startDate: z.date().nullable().optional(),
+  endDate: z.date().nullable().optional(),
+});
+
+type CollectionFormValues = z.infer<typeof collectionFormSchema>;
+
+// Form schema for adding product to collection
+const productCollectionFormSchema = z.object({
+  productIds: z.array(z.number()).min(1, 'At least one product must be selected'),
+});
+
+type ProductCollectionFormValues = z.infer<typeof productCollectionFormSchema>;
+
 export function InventoryManagement() {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [isEditProductOpen, setIsEditProductOpen] = useState(false);
   const [isManageInventoryOpen, setIsManageInventoryOpen] = useState(false);
+  const [isAddCollectionOpen, setIsAddCollectionOpen] = useState(false);
+  const [isEditCollectionOpen, setIsEditCollectionOpen] = useState(false);
+  const [isManageCollectionOpen, setIsManageCollectionOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("products");
 
   // Fetch all products
@@ -75,6 +115,36 @@ export function InventoryManagement() {
   } = useQuery<Inventory[]>({
     queryKey: [`/api/inventory/product/${selectedProduct?.id}`],
     enabled: !!selectedProduct && isManageInventoryOpen,
+  });
+  
+  // Fetch all collections
+  const {
+    data: collections,
+    isLoading: isCollectionsLoading,
+    isError: isCollectionsError,
+    refetch: refetchCollections,
+  } = useQuery<Collection[]>({
+    queryKey: ["/api/collections"],
+  });
+  
+  // Fetch collections for a product
+  const {
+    data: productCollections,
+    isLoading: isProductCollectionsLoading,
+    refetch: refetchProductCollections,
+  } = useQuery<Collection[]>({
+    queryKey: [`/api/products/${selectedProduct?.id}/collections`],
+    enabled: !!selectedProduct && isManageCollectionOpen,
+  });
+  
+  // Fetch products in a collection
+  const {
+    data: collectionProducts,
+    isLoading: isCollectionProductsLoading,
+    refetch: refetchCollectionProducts,
+  } = useQuery<Product[]>({
+    queryKey: [`/api/collections/${selectedCollection?.id}/products`],
+    enabled: !!selectedCollection && isManageCollectionOpen,
   });
 
   // Update inventory mutation
@@ -126,6 +196,141 @@ export function InventoryManagement() {
       toast({
         title: "Size added",
         description: "The new size has been added to inventory.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Create collection mutation
+  const createCollectionMutation = useMutation({
+    mutationFn: async (collection: CollectionFormValues) => {
+      await apiRequest("POST", "/api/collections", collection);
+    },
+    onSuccess: () => {
+      refetchCollections();
+      toast({
+        title: "Collection created",
+        description: "The collection has been created successfully.",
+      });
+      setIsAddCollectionOpen(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Update collection mutation
+  const updateCollectionMutation = useMutation({
+    mutationFn: async ({
+      id,
+      collection,
+    }: {
+      id: number;
+      collection: Partial<CollectionFormValues>;
+    }) => {
+      await apiRequest("PATCH", `/api/collections/${id}`, collection);
+    },
+    onSuccess: () => {
+      refetchCollections();
+      toast({
+        title: "Collection updated",
+        description: "The collection has been updated successfully.",
+      });
+      setIsEditCollectionOpen(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Delete collection mutation
+  const deleteCollectionMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/collections/${id}`);
+    },
+    onSuccess: () => {
+      refetchCollections();
+      toast({
+        title: "Collection deleted",
+        description: "The collection has been deleted successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Add product to collection mutation
+  const addProductToCollectionMutation = useMutation({
+    mutationFn: async ({ 
+      productId, 
+      collectionId 
+    }: { 
+      productId: number; 
+      collectionId: number;
+    }) => {
+      await apiRequest("POST", `/api/products/${productId}/collections/${collectionId}`, {});
+    },
+    onSuccess: () => {
+      if (selectedProduct) {
+        refetchProductCollections();
+      }
+      if (selectedCollection) {
+        refetchCollectionProducts();
+      }
+      toast({
+        title: "Product added to collection",
+        description: "The product has been added to the collection successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Remove product from collection mutation
+  const removeProductFromCollectionMutation = useMutation({
+    mutationFn: async ({ 
+      productId, 
+      collectionId 
+    }: { 
+      productId: number; 
+      collectionId: number;
+    }) => {
+      await apiRequest("DELETE", `/api/products/${productId}/collections/${collectionId}`);
+    },
+    onSuccess: () => {
+      if (selectedProduct) {
+        refetchProductCollections();
+      }
+      if (selectedCollection) {
+        refetchCollectionProducts();
+      }
+      toast({
+        title: "Product removed from collection",
+        description: "The product has been removed from the collection successfully.",
       });
     },
     onError: (error: Error) => {
@@ -192,6 +397,34 @@ export function InventoryManagement() {
     setIsEditProductOpen(true);
   };
 
+  // Manage product collections
+  const openProductCollections = (product: Product) => {
+    setSelectedProduct(product);
+    setIsManageCollectionOpen(true);
+  };
+  
+  // Edit a collection
+  const openCollectionEditor = (collection: Collection) => {
+    setSelectedCollection(collection);
+    setIsEditCollectionOpen(true);
+  };
+  
+  // Manage collection products
+  const openCollectionProducts = (collection: Collection) => {
+    setSelectedCollection(collection);
+    setIsManageCollectionOpen(true);
+  };
+  
+  // Add product to collection
+  const handleAddProductToCollection = (productId: number, collectionId: number) => {
+    addProductToCollectionMutation.mutate({ productId, collectionId });
+  };
+  
+  // Remove product from collection
+  const handleRemoveProductFromCollection = (productId: number, collectionId: number) => {
+    removeProductFromCollectionMutation.mutate({ productId, collectionId });
+  };
+
   // Get unique categories for filtering
   const categories = products
     ? Array.from(new Set(products.map((product) => product.category)))
@@ -224,12 +457,20 @@ export function InventoryManagement() {
           <TabsList>
             <TabsTrigger value="products">Products</TabsTrigger>
             <TabsTrigger value="add-product">Add New Product</TabsTrigger>
+            <TabsTrigger value="collections">Collections</TabsTrigger>
           </TabsList>
           
           {activeTab === "products" && (
             <Button onClick={() => setIsAddProductOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Add Product
+            </Button>
+          )}
+          
+          {activeTab === "collections" && (
+            <Button onClick={() => setIsAddCollectionOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Collection
             </Button>
           )}
         </div>
