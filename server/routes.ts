@@ -434,6 +434,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get top selling products (Admin only)
+  app.get("/api/products/top", authenticateJWT, async (req, res) => {
+    try {
+      // Get authenticated user and verify admin role
+      const user = getUserSafely(req);
+      if (user.role !== "admin") {
+        return res.status(403).json({ error: "Not authorized" });
+      }
+      
+      const products = await storage.getAllProducts();
+      const orders = await storage.getAllOrders();
+      
+      // In a real app, this would be based on actual sales data
+      // For now, we'll generate some mock data based on the available products
+      const productSales = new Map<number, number>();
+      
+      // Initialize all products with 0 sales
+      products.forEach(product => {
+        productSales.set(product.id, 0);
+      });
+      
+      // Calculate sales for each product based on order items
+      for (const order of orders) {
+        const orderItems = await storage.getOrderItemsByOrder(order.id);
+        
+        for (const item of orderItems) {
+          if (productSales.has(item.productId)) {
+            productSales.set(
+              item.productId, 
+              (productSales.get(item.productId) || 0) + item.quantity
+            );
+          }
+        }
+      }
+      
+      // Sort products by sales and take the top 5
+      const topProducts = [...products]
+        .filter(product => productSales.has(product.id))
+        .sort((a, b) => (productSales.get(b.id) || 0) - (productSales.get(a.id) || 0))
+        .slice(0, 5);
+      
+      if (topProducts.length === 0) {
+        // If no top products are found yet (no orders), return some featured products
+        const featured = [...products]
+          .filter(p => p.discountedPrice !== null && p.discountedPrice !== undefined)
+          .slice(0, 5);
+        
+        return res.json(featured);
+      }
+      
+      res.json(topProducts);
+    } catch (error) {
+      console.error("Error getting top products:", error);
+      res.status(500).json({ error: "Failed to retrieve top products" });
+    }
+  });
+  
   // Get product by ID
   app.get("/api/products/:id", async (req, res) => {
     try {
