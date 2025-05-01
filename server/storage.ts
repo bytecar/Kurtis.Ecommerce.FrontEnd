@@ -889,9 +889,36 @@ export class MemStorage implements IStorage {
       "Shweta Bansal",
       "Deepak Nair",
     ];
+    
+    // High-resolution profile pictures from Unsplash
+    const profilePictures = [
+      // Male profile pictures
+      "https://images.unsplash.com/photo-1618641986557-1ecd230959aa?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1hbGUgcG9ydHJhaXR8fHx8fHwxNzE4NTYwMDUw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=500",
+      "https://images.unsplash.com/photo-1629385697093-57be2cc97fa6?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1hbGUgcG9ydHJhaXR8fHx8fHwxNzE4NTYwMDc4&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=500",
+      "https://images.unsplash.com/photo-1624562563808-158a972f5271?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1hbGUgcG9ydHJhaXR8fHx8fHwxNzE4NTYwMTgw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=500",
+      "https://images.unsplash.com/photo-1631022987486-9f88b357647f?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1hbGUgcG9ydHJhaXR8fHx8fHwxNzE4NTYwMjA0&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=500",
+      "https://images.unsplash.com/photo-1570158268183-d296b2892211?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1hbGUgcG9ydHJhaXR8fHx8fHwxNzE4NTYwMjIz&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=500",
+      "https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1hbGUgcG9ydHJhaXR8fHx8fHwxNzE4NTYwMjQw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=500",
+      "https://images.unsplash.com/photo-1595152452543-e5fc28ebc2b8?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1hbGUgcG9ydHJhaXR8fHx8fHwxNzE4NTYwMjY2&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=500",
+      
+      // Female profile pictures
+      "https://images.unsplash.com/photo-1609214071001-16a7d908071b?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHdvbWFuIHBvcnRyYWl0fHx8fHx8MTcxODU2MDI4NA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=500",
+      "https://images.unsplash.com/photo-1611813002647-47661c65223f?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHdvbWFuIHBvcnRyYWl0fHx8fHx8MTcxODU2MDI5OQ&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=500",
+      "https://images.unsplash.com/photo-1590490359683-658d3d23cdf0?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHdvbWFuIHBvcnRyYWl0fHx8fHx8MTcxODU2MDMxNQ&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=500",
+      "https://images.unsplash.com/photo-1626193082211-85ee9a9705a7?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHdvbWFuIHBvcnRyYWl0fHx8fHx8MTcxODU2MDMzMQ&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=500",
+      "https://images.unsplash.com/photo-1624623806877-9e1e3d2eeeb5?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHdvbWFuIHBvcnRyYWl0fHx8fHx8MTcxODU2MDM0OA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=500",
+      "https://images.unsplash.com/photo-1607273177117-0d0f1f9c4efc?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHdvbWFuIHBvcnRyYWl0fHx8fHx8MTcxODU2MDM3Mw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=500",
+      "https://images.unsplash.com/photo-1592124549776-a7f0cc973b24?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHdvbWFuIHBvcnRyYWl0fHx8fHx8MTcxODU2MDM4OA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=500",
+      "https://images.unsplash.com/photo-1599839575945-a9e5af0c3fa5?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=500&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHdvbWFuIHBvcnRyYWl0fHx8fHx8MTcxODU2MDQwMw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=500",
+    ];
+
+    // Gender distribution (alternating male/female)
+    const genders = ["male", "female"];
 
     // Import the hashPassword function
     const { hashPassword } = await import('./auth');
+    
+    console.log("User initialization complete with test credentials");
 
     // Generate 15 users with random roles
     for (let i = 0; i < 15; i++) {
@@ -899,7 +926,16 @@ export class MemStorage implements IStorage {
       const email = `user${i + 1}@example.com`;
       const fullName = fullNames[i];
       const role = roles[i % 3]; // Distribute roles evenly
-
+      const gender = genders[i % 2]; // Alternating genders
+      
+      // Assign profile picture based on gender
+      let profilePictureIndex;
+      if (gender === "male") {
+        profilePictureIndex = Math.floor(i / 2) % 7; // Use male pictures (first 7)
+      } else {
+        profilePictureIndex = 7 + Math.floor(i / 2) % 8; // Use female pictures (last 8)
+      }
+      
       // Use a simple password for all users (with hashing)
       const password = await hashPassword("password123");
 
@@ -909,6 +945,8 @@ export class MemStorage implements IStorage {
         password,
         fullName,
         role,
+        gender,
+        profilePicture: profilePictures[profilePictureIndex],
         status: "active" // Ensure users are active
       };
 
@@ -1125,44 +1163,68 @@ export class MemStorage implements IStorage {
     const genders = ["women", "men"];
 
     const imageUrls = [
-      // Women's ethnic wear
-      "https://images.unsplash.com/photo-1610030469668-ad73b5f315fa?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1612722432474-b971cdcea546?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1611404332938-92111acded8f?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1583392522145-6536faa2ded3?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1604507410202-99a234ed767e?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1586423702505-b13505519074?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1585428126359-117dfe284ddb?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1561795823-9a97d6b30cfc?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1610099733390-47bb77acbbbf?auto=format&fit=crop&q=80&w=500",
-
-      // Sarees
-      "https://images.unsplash.com/photo-1606902168692-BF5954ba5a5d?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1594387903898-7d1235079332?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1610030473192-f4bac2c6124f?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1665077722106-51388e8d9f3c?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1610030473192-f4bac2c6124f?auto=format&fit=crop&q=80&w=500",
-
-      // Kurtis and suits
-      "https://images.unsplash.com/photo-1636628266722-d5448ca44f5a?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1610189025554-708a149676b8?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1581222375407-e19e9f791fff?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1606751071446-d3343720dedf?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1578148541106-219e9b56eb28?auto=format&fit=crop&q=80&w=500",
-
-      // Lehengas and bridal wear
-      "https://images.unsplash.com/photo-1623000963328-6eb604d3f15f?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1596387451750-8a6c93efcdab?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1639680254855-3073add7fa54?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1652384046585-15d13c0b750c?auto=format&fit=crop&q=80&w=500",
-
-      // Men's ethnic wear
-      "https://images.unsplash.com/photo-1625301840055-7c4d6f04b5d5?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1566483232762-b3d5c4b45d3c?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1624032786592-2ade942c727f?auto=format&fit=crop&q=80&w=500",
-      "https://images.unsplash.com/photo-1625301950614-a3c4085f420d?auto=format&fit=crop&q=80&w=500",
+      // Sarees - High-quality vibrant images
+      "https://images.unsplash.com/photo-1606902168692-BF5954ba5a5d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHNhcmVlfHx8fHx8MTcxODU2MDcyOQ&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1623504769538-6b0dc3f2db2a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHNhcmVlfHx8fHx8MTcxODU2MDg3OQ&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1610030473192-f4bac2c6124f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHNhcmVlfHx8fHx8MTcxODU2MDkwMA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1610030473192-f4bac2c6124f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHNhcmVlfHx8fHx8MTcxODU2MDkwMA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1594387903898-7d1235079332?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHNhcmVlfHx8fHx8MTcxODU2MDkyMg&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1665077722106-51388e8d9f3c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHNhcmVlfHx8fHx8MTcxODU2MDk2NA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1609559540661-df12ac42bad3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHNhcmVlfHx8fHx8MTcxODU2MDk4NQ&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1611404332938-92111acded8f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHdlZGRpbmcgc2FyZWV8fHx8fHwxNzE4NTYxMDA3&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1610030469668-ad73b5f315fa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHdlZGRpbmcgc2FyZWV8fHx8fHwxNzE4NTYxMDI3&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1620642439157-09e8ea9b0e90?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIHdlZGRpbmcgc2FyZWV8fHx8fHwxNzE4NTYxMDQ4&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      
+      // Kurtis and Suits - High-quality fashion images
+      "https://images.unsplash.com/photo-1636628266722-d5448ca44f5a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGt1cnRpfHx8fHx8MTcxODU2MTA3Mg&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1610189025554-708a149676b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGt1cnRpfHx8fHx8MTcxODU2MTA5NA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1606751071446-d3343720dedf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGt1cnRpfHx8fHx8MTcxODU2MTExMg&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1606751071446-d3343720dedf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGt1cnRpfHx8fHx8MTcxODU2MTExMg&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1612722432474-b971cdcea546?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGt1cnRpfHx8fHx8MTcxODU2MTEzMA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1591908824904-5f40c14c0b2a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGt1cnRpfHx8fHx8MTcxODU2MTE1MA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1622564637927-efc33081cad2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGt1cnRpfHx8fHx8MTcxODU2MTE2OQ&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1588771930296-88c2cb03f2ff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGt1cnRpfHx8fHx8MTcxODU2MTE4OA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGt1cnRpfHx8fHx8MTcxODU2MTIwOQ&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1581222375407-e19e9f791fff?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGt1cnRpfHx8fHx8MTcxODU2MTIyOA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      
+      // Lehengas and Bridal Wear - High-quality festive images
+      "https://images.unsplash.com/photo-1623000963328-6eb604d3f15f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGxlaGVuZ2F8fHx8fHwxNzE4NTYxMjUw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1596387451750-8a6c93efcdab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGxlaGVuZ2F8fHx8fHwxNzE4NTYxMjcx&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1639680254855-3073add7fa54?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGxlaGVuZ2F8fHx8fHwxNzE4NTYxMjk1&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1652384046585-15d13c0b750c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGxlaGVuZ2F8fHx8fHwxNzE4NTYxMzEy&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1612803155742-9a19b9567b02?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGJyaWRhbHx8fHx8fDE3MTg1NjEzMzc&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1609529499375-e74de223b7d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGJyaWRhbHx8fHx8fDE3MTg1NjEzNTY&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1611244420753-5336ba916776?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGJyaWRhbHx8fHx8fDE3MTg1NjEzNzk&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1610710608685-2a8afbf46c79?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGJyaWRhbHx8fHx8fDE3MTg1NjEzOTU&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1604145559206-e3bce0040e2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGJyaWRhbHx8fHx8fDE3MTg1NjE0MDc&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1610725664285-7c64405d57e4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGJyaWRhbHx8fHx8fDE3MTg1NjE0Mjc&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      
+      // Accessories for Women - High-quality jewelry and accessories
+      "https://images.unsplash.com/photo-1610271340738-726e199f0258?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGpld2Vscnl8fHx8fHwxNzE4NTYxNDQ3&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGpld2Vscnl8fHx8fHwxNzE4NTYxNDY2&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1601971905324-c6c5061ff885?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGpld2Vscnl8fHx8fHwxNzE4NTYxNDg2&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGpld2Vscnl8fHx8fHwxNzE4NTYxNTAz&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1571816757173-0a06d2bce150?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGpld2Vscnl8fHx8fHwxNzE4NTYxNTIx&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      
+      // Men's Ethnic Wear - High-quality kurtas and sherwanis
+      "https://images.unsplash.com/photo-1625301840055-7c4d6f04b5d5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1lbiB3ZWFyfHx8fHx8MTcxODU2MTU0MA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1624032786592-2ade942c727f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1lbiB3ZWFyfHx8fHx8MTcxODU2MTU1OQ&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1625301950614-a3c4085f420d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1lbiB3ZWFyfHx8fHx8MTcxODU2MTU3Ng&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1lbiB3ZWFyfHx8fHx8MTcxODU2MTU5NA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1566483233832-3d408d05b393?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1lbiB3ZWFyfHx8fHx8MTcxODU2MTYxNQ&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1543099678-f5a74c9a599e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1lbiB3ZWFyfHx8fHx8MTcxODU2MTYzMw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      
+      // Nehru Jackets and Fashion Accessories for Men
+      "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1lbiBqYWNrZXR8fHx8fHwxNzE4NTYxNjYw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1591925239811-454af9d98e9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1lbiBqYWNrZXR8fHx8fHwxNzE4NTYxNjc5&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1623170505975-dd18d404c349?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1lbiBqYWNrZXR8fHx8fHwxNzE4NTYxNjk3&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1656878125671-85e19e35d591?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIG1lbiBqYWNrZXR8fHx8fHwxNzE4NTYxNzE1&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      
+      // Indo-Western Fusion
+      "https://images.unsplash.com/photo-1624557446120-884e2ef7b18f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGZ1c2lvbiB3ZWFyfHx8fHx8MTcxODU2MTczNw&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1595429035839-c99c298ffdde?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGZ1c2lvbiB3ZWFyfHx8fHx8MTcxODU2MTc1OQ&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGZ1c2lvbiB3ZWFyfHx8fHx8MTcxODU2MTc4MA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080",
+      "https://images.unsplash.com/photo-1611042553480-a35c5ca1c835?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8aW5kaWFuIGZ1c2lvbiB3ZWFyfHx8fHx8MTcxODU2MTc5OA&ixlib=rb-4.0.3&q=80&utm_campaign=api-credit&utm_medium=referral&utm_source=unsplash_source&w=1080"
     ];
 
     // Create 100 products
