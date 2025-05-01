@@ -341,7 +341,7 @@
     "languages": {
       "en": "English",
       "hi": "Hindi",
-      "gu": "Gujarati"
+      "kn": "Kannada"
     }
   },
   "adminDashboard": {
@@ -399,11 +399,11 @@
     "update": "Update",
     "reset": "Reset",
     "search": "Search",
-    "entries": "Entries",
+    "entriesCount": "Entries",
     "showing": "Showing",
     "to": "to",
     "of": "of",
-    "entries": "entries",
+    "entriesLabel": "entries",
     "previous": "Previous",
     "next": "Next",
     "confirmDelete": "Are you sure you want to delete this item?",
