@@ -1,10 +1,11 @@
 import React from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, AlertTriangle, Info, XCircle, X } from 'lucide-react';
+import { AlertCircle, Ban, XCircle, AlertTriangle, X } from 'lucide-react';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { ErrorSeverity } from '@/lib/error-handling';
 
-interface ErrorAlertProps {
+// Error severity controls the styling
+export interface ErrorAlertProps {
   title: string;
   message: string;
   severity?: ErrorSeverity;
@@ -14,57 +15,62 @@ interface ErrorAlertProps {
 export const ErrorAlert: React.FC<ErrorAlertProps> = ({
   title,
   message,
-  severity = 'error',
+  severity = ErrorSeverity.ERROR,
   onClose,
 }) => {
-  // Configure alert based on severity
-  const config = {
-    variant: 
-      severity === 'info' ? 'default' :
-      severity === 'warning' ? undefined :
-      severity === 'error' || severity === 'critical' ? 'destructive' : 
-      'destructive',
-    icon: 
-      severity === 'info' ? <Info className="h-4 w-4" /> :
-      severity === 'warning' ? <AlertTriangle className="h-4 w-4" /> :
-      severity === 'error' ? <AlertCircle className="h-4 w-4" /> :
-      severity === 'critical' ? <XCircle className="h-4 w-4" /> :
-      <AlertCircle className="h-4 w-4" />,
-    className:
-      severity === 'info' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-      severity === 'warning' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-      severity === 'error' ? '' :
-      severity === 'critical' ? 'animate-pulse' : '',
+  // Define classes based on severity
+  const getAlertClasses = () => {
+    switch (severity) {
+      case ErrorSeverity.INFO:
+        return 'border-blue-300 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300';
+      case ErrorSeverity.WARNING:
+        return 'border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300';
+      case ErrorSeverity.ERROR:
+        return 'border-red-300 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-300';
+      case ErrorSeverity.CRITICAL:
+        return 'border-red-500 bg-red-100 text-red-900 dark:border-red-800 dark:bg-red-950 dark:text-red-300';
+      default:
+        return 'border-red-300 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-300';
+    }
+  };
+
+  // Get the appropriate icon
+  const getIcon = () => {
+    switch (severity) {
+      case ErrorSeverity.INFO:
+        return <AlertCircle className="h-4 w-4 text-blue-500" />;
+      case ErrorSeverity.WARNING:
+        return <AlertTriangle className="h-4 w-4 text-amber-500" />;
+      case ErrorSeverity.ERROR:
+        return <Ban className="h-4 w-4 text-red-500" />;
+      case ErrorSeverity.CRITICAL:
+        return <XCircle className="h-4 w-4 text-red-700" />;
+      default:
+        return <Ban className="h-4 w-4 text-red-500" />;
+    }
   };
 
   return (
-    <Alert variant={config.variant as any} className={config.className}>
-      <div className="flex justify-between items-start">
-        <div className="flex gap-2">
-          {config.icon}
-          <div>
-            <AlertTitle>{title}</AlertTitle>
-            <AlertDescription>{message}</AlertDescription>
-          </div>
+    <Alert className={`mb-4 flex items-center justify-between ${getAlertClasses()}`}>
+      <div className="flex items-start gap-2">
+        {getIcon()}
+        <div className="flex-1">
+          <AlertTitle className="font-semibold">{title}</AlertTitle>
+          <AlertDescription className="text-sm">{message}</AlertDescription>
         </div>
-        
-        {onClose && (
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-6 w-6 p-0 rounded-full"
-            onClick={onClose}
-          >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </Button>
-        )}
       </div>
+      {onClose && (
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onClose}>
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </Button>
+      )}
     </Alert>
   );
 };
 
-interface ErrorAlertListProps {
+// Component for displaying multiple errors
+export interface ErrorAlertListProps {
   errors: Array<{
     title: string;
     message: string;
@@ -77,7 +83,7 @@ export const ErrorAlertList: React.FC<ErrorAlertListProps> = ({
   errors,
   onClose,
 }) => {
-  if (!errors || errors.length === 0) return null;
+  if (!errors.length) return null;
 
   return (
     <div className="space-y-2">

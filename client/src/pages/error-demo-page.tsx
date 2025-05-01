@@ -1,329 +1,350 @@
 import React, { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { 
-  ErrorSeverity, 
-  ErrorCategory, 
-  createError, 
-  handleError,
-  getErrorLogs,
-  clearErrorLogs
-} from '@/lib/error-handling';
-import { handleApiError } from '@/lib/api-error-handler';
-import { ErrorAlert, ErrorAlertList } from '@/components/common/ErrorAlert';
-import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { TabsContent, Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, AlertTriangle, Info, XCircle, CheckCircle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertCircle, BugOff, BadgeAlert, Clock, RefreshCw, Ban, AlertTriangle, XCircle } from 'lucide-react';
+import { ErrorBoundary, withErrorBoundary } from '@/components/common/ErrorBoundary';
+import { ErrorAlert, ErrorAlertList } from '@/components/common/ErrorAlert';
+import { handleError, ErrorCategory, ErrorSeverity } from '@/lib/error-handling';
+import { toast } from '@/hooks/use-toast';
+import { clearErrorLogs, getErrorLogs } from '@/lib/error-handling';
+import { apiRequest } from '@/lib/queryClient';
 
-// Component that intentionally throws an error for demo purposes
-const BuggyComponent: React.FC = () => {
-  React.useEffect(() => {
-    throw new Error('This is an intentional error from BuggyComponent');
-  }, []);
+// Component that will throw an error when the button is clicked
+const ErrorThrower: React.FC = () => {
+  const [shouldThrow, setShouldThrow] = useState(false);
   
-  return <div>This component has a bug that causes it to crash</div>;
+  if (shouldThrow) {
+    throw new Error('This is a demonstration error thrown from a component');
+  }
+  
+  return (
+    <div className="flex flex-col items-center p-4">
+      <Button 
+        variant="outline" 
+        onClick={() => setShouldThrow(true)}
+        className="gap-2"
+      >
+        <BugOff className="h-4 w-4" />
+        Throw Component Error
+      </Button>
+    </div>
+  );
 };
 
-// Main demo page
+// Wrap the error thrower with our error boundary
+const ErrorThrowerWithBoundary = withErrorBoundary(ErrorThrower, {
+  componentName: 'ErrorThrowerDemo'
+});
+
+// Error category selector
+function getErrorTitle(category: ErrorCategory): string {
+  switch (category) {
+    case ErrorCategory.API: return 'API Error';
+    case ErrorCategory.VALIDATION: return 'Validation Error';
+    case ErrorCategory.AUTHENTICATION: return 'Authentication Error';
+    case ErrorCategory.AUTHORIZATION: return 'Authorization Error';
+    case ErrorCategory.DATA: return 'Data Error';
+    case ErrorCategory.UI: return 'UI Error';
+    case ErrorCategory.NETWORK: return 'Network Error';
+    default: return 'Error';
+  }
+}
+
 const ErrorDemoPage: React.FC = () => {
-  const { toast } = useToast();
-  const [severity, setSeverity] = useState<ErrorSeverity>(ErrorSeverity.ERROR);
-  const [category, setCategory] = useState<ErrorCategory>(ErrorCategory.UNKNOWN);
-  const [message, setMessage] = useState('This is a test error message');
-  const [showBuggyComponent, setShowBuggyComponent] = useState(false);
-  const [errorLogs, setErrorLogs] = useState<ReturnType<typeof getErrorLogs>>([]);
+  const [errorMessage, setErrorMessage] = useState('Sample error message');
+  const [errorSeverity, setErrorSeverity] = useState<ErrorSeverity>(ErrorSeverity.ERROR);
+  const [errorCategory, setErrorCategory] = useState<ErrorCategory>(ErrorCategory.API);
+  
   const [errorList, setErrorList] = useState<Array<{title: string; message: string; severity?: ErrorSeverity}>>([
-    {
-      title: 'Form Validation Error',
-      message: 'Please complete all required fields marked with an asterisk (*)',
+    { 
+      title: 'Could not connect to server', 
+      message: 'Please check your network connection and try again.', 
+      severity: ErrorSeverity.ERROR
+    },
+    { 
+      title: 'Form validation failed', 
+      message: 'Please correct the highlighted fields and submit again.', 
       severity: ErrorSeverity.WARNING
     }
   ]);
-
-  // Demonstrate creating and handling an error
+  
   const handleCreateError = () => {
-    const error = createError(
-      message,
-      severity,
-      category,
+    // Create and handle an error with our error handling system
+    const error = new Error(errorMessage);
+    
+    handleError(
+      error,
+      true, // Show toast notification
       {
-        code: 'DEMO_ERROR',
+        severity: errorSeverity,
+        category: errorCategory,
         componentName: 'ErrorDemoPage',
         context: {
-          demoData: 'This is some additional context about the error',
-          timestamp: new Date().toISOString()
-        }
+          demo: true,
+          createdAt: new Date().toISOString(),
+        },
       }
     );
-    
-    handleError(error, true);
-    refreshErrorLogs();
   };
-
-  // Demonstrate API error handling
-  const simulateApiError = () => {
-    // Create a fake Response object to simulate an API error
-    const fakeResponse = new Response(
-      JSON.stringify({
-        message: 'Resource not found',
-        code: 'NOT_FOUND',
-        details: {
-          resourceId: '123',
-          resourceType: 'product'
-        }
-      }),
-      { 
-        status: 404, 
-        statusText: 'Not Found',
-        headers: new Headers({
-          'Content-Type': 'application/json'
-        })
-      }
-    );
-    
-    handleApiError(fakeResponse, 'ErrorDemoPage');
-    refreshErrorLogs();
-  };
-
-  // Simulate different toast notifications
-  const showToastNotification = (type: 'default' | 'success' | 'warning' | 'destructive') => {
-    const titles = {
-      default: 'Information',
-      success: 'Success',
-      warning: 'Warning',
-      destructive: 'Error'
-    };
-    
-    const messages = {
-      default: 'This is an informational message.',
-      success: 'Operation completed successfully!',
-      warning: 'Please review the information before proceeding.',
-      destructive: 'An error occurred while processing your request.'
-    };
-    
-    toast({
-      title: titles[type],
-      description: messages[type],
-      variant: type === 'default' ? undefined : type
-    });
-  };
-
-  // Add error to the error list
-  const addErrorToList = () => {
-    setErrorList(prev => [
-      ...prev,
+  
+  const handleAddToErrorList = () => {
+    setErrorList([
+      ...errorList,
       {
-        title: `${category} Error`,
-        message,
-        severity
+        title: getErrorTitle(errorCategory),
+        message: errorMessage,
+        severity: errorSeverity
       }
     ]);
   };
-
-  // Remove error from the error list
-  const removeErrorFromList = (index: number) => {
-    setErrorList(prev => prev.filter((_, i) => i !== index));
+  
+  const handleClearErrorList = () => {
+    setErrorList([]);
   };
-
-  // Refresh error logs
-  const refreshErrorLogs = () => {
-    setErrorLogs(getErrorLogs());
+  
+  const handleRemoveError = (index: number) => {
+    const newList = [...errorList];
+    newList.splice(index, 1);
+    setErrorList(newList);
   };
-
-  // Clear error logs
+  
+  const handleApiError = async () => {
+    try {
+      // Attempt to access a non-existent endpoint
+      await apiRequest('GET', '/api/non-existent-endpoint', undefined, 'ErrorDemoPage');
+    } catch (error) {
+      // Error is already handled by apiRequest
+      console.log('API error caught in component');
+    }
+  };
+  
+  const handleShowToast = () => {
+    // Map severity to toast variant
+    const variant = 
+      errorSeverity === ErrorSeverity.INFO ? undefined :
+      errorSeverity === ErrorSeverity.WARNING ? "default" : // Use default since warning isn't available
+      errorSeverity === ErrorSeverity.ERROR ? "destructive" :
+      errorSeverity === ErrorSeverity.CRITICAL ? "destructive" :
+      undefined;
+    
+    toast({
+      title: getErrorTitle(errorCategory),
+      description: errorMessage,
+      variant,
+    });
+  };
+  
   const handleClearErrorLogs = () => {
     clearErrorLogs();
-    refreshErrorLogs();
+    toast({
+      title: "Error logs cleared",
+      description: "All error logs have been cleared from memory",
+    });
   };
-
+  
   return (
-    <div className="container py-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Error Handling Demonstration</h1>
-        <div className="flex space-x-2">
-          <Button
-            onClick={() => showToastNotification('success')}
-            variant="outline"
-            className="bg-green-50 text-green-700 hover:bg-green-100 border-green-200"
-          >
-            <CheckCircle className="mr-2 h-4 w-4" />
-            Success Toast
-          </Button>
-          <Button
-            onClick={() => showToastNotification('warning')}
-            variant="outline"
-            className="bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200"
-          >
-            <AlertTriangle className="mr-2 h-4 w-4" />
-            Warning Toast
-          </Button>
-          <Button
-            onClick={() => showToastNotification('destructive')}
-          >
-            <XCircle className="mr-2 h-4 w-4" />
-            Error Toast
-          </Button>
-        </div>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Error Generation</CardTitle>
-          <CardDescription>
-            Create different types of errors to see how they are handled by the system
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="manual">
-            <TabsList className="mb-4">
-              <TabsTrigger value="manual">Manual Error</TabsTrigger>
-              <TabsTrigger value="api">API Error</TabsTrigger>
-              <TabsTrigger value="component">Component Error</TabsTrigger>
-              <TabsTrigger value="alerts">Error Alerts</TabsTrigger>
-              <TabsTrigger value="logs">Error Logs</TabsTrigger>
-            </TabsList>
+    <div className="container mx-auto py-10">
+      <h1 className="text-3xl font-bold tracking-tight mb-6">Error Handling Demo</h1>
+      <p className="text-muted-foreground mb-8 max-w-3xl">
+        This page demonstrates the various error handling capabilities of the application.
+        Try out different error types, severities, and view how they are displayed to users.
+      </p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        <Card>
+          <CardHeader>
+            <CardTitle>Error Configuration</CardTitle>
+            <CardDescription>Create custom errors with different severities and categories</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="error-message">Error Message</Label>
+              <Input 
+                id="error-message" 
+                value={errorMessage} 
+                onChange={(e) => setErrorMessage(e.target.value)}
+              />
+            </div>
             
-            <TabsContent value="manual" className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="error-message">Error Message</Label>
-                  <Input
-                    id="error-message"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="error-severity">Error Severity</Label>
-                    <Select
-                      value={severity}
-                      onValueChange={(value) => setSeverity(value as ErrorSeverity)}
-                    >
-                      <SelectTrigger id="error-severity">
-                        <SelectValue placeholder="Select severity" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={ErrorSeverity.INFO}>Info</SelectItem>
-                        <SelectItem value={ErrorSeverity.WARNING}>Warning</SelectItem>
-                        <SelectItem value={ErrorSeverity.ERROR}>Error</SelectItem>
-                        <SelectItem value={ErrorSeverity.CRITICAL}>Critical</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="error-category">Error Category</Label>
-                    <Select
-                      value={category}
-                      onValueChange={(value) => setCategory(value as ErrorCategory)}
-                    >
-                      <SelectTrigger id="error-category">
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={ErrorCategory.API}>API</SelectItem>
-                        <SelectItem value={ErrorCategory.VALIDATION}>Validation</SelectItem>
-                        <SelectItem value={ErrorCategory.AUTHENTICATION}>Authentication</SelectItem>
-                        <SelectItem value={ErrorCategory.AUTHORIZATION}>Authorization</SelectItem>
-                        <SelectItem value={ErrorCategory.DATA}>Data</SelectItem>
-                        <SelectItem value={ErrorCategory.UI}>UI</SelectItem>
-                        <SelectItem value={ErrorCategory.NETWORK}>Network</SelectItem>
-                        <SelectItem value={ErrorCategory.UNKNOWN}>Unknown</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-              <Button onClick={handleCreateError}>
-                <AlertTriangle className="mr-2 h-4 w-4" />
-                Generate Error
-              </Button>
-            </TabsContent>
+            <div className="space-y-2">
+              <Label htmlFor="error-severity">Error Severity</Label>
+              <Select 
+                value={errorSeverity} 
+                onValueChange={(value) => setErrorSeverity(value as ErrorSeverity)}
+              >
+                <SelectTrigger id="error-severity">
+                  <SelectValue placeholder="Select severity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ErrorSeverity.INFO}>
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4 text-blue-500" />
+                      <span>Information</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value={ErrorSeverity.WARNING}>
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-amber-500" />
+                      <span>Warning</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value={ErrorSeverity.ERROR}>
+                    <div className="flex items-center gap-2">
+                      <Ban className="h-4 w-4 text-red-500" />
+                      <span>Error</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value={ErrorSeverity.CRITICAL}>
+                    <div className="flex items-center gap-2">
+                      <XCircle className="h-4 w-4 text-red-700" />
+                      <span>Critical</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             
-            <TabsContent value="api" className="space-y-4">
-              <p className="text-sm text-gray-500">
-                This tab demonstrates how API errors are handled in the application.
-                Click the button below to simulate a 404 API error.
-              </p>
-              <Button onClick={simulateApiError}>
-                <Info className="mr-2 h-4 w-4" />
-                Simulate API Error
-              </Button>
-            </TabsContent>
-            
-            <TabsContent value="component" className="space-y-4">
-              <p className="text-sm text-gray-500">
-                This tab demonstrates how component errors are caught by ErrorBoundary.
-                The buggy component below will crash, but the error will be contained.
-              </p>
-              <div className="flex items-center justify-between">
-                <Button 
-                  onClick={() => setShowBuggyComponent(prev => !prev)}
-                  variant={showBuggyComponent ? "destructive" : "default"}
-                >
-                  {showBuggyComponent ? "Hide" : "Show"} Buggy Component
-                </Button>
-              </div>
-              {showBuggyComponent && (
-                <div className="mt-4 border rounded-md p-4">
-                  <ErrorBoundary>
-                    <BuggyComponent />
-                  </ErrorBoundary>
-                </div>
-              )}
-            </TabsContent>
-            
-            <TabsContent value="alerts" className="space-y-4">
-              <div className="mb-4">
-                <Button onClick={addErrorToList}>
-                  Add Error to List
-                </Button>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="error-category">Error Category</Label>
+              <Select 
+                value={errorCategory} 
+                onValueChange={(value) => setErrorCategory(value as ErrorCategory)}
+              >
+                <SelectTrigger id="error-category">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ErrorCategory.API}>API</SelectItem>
+                  <SelectItem value={ErrorCategory.VALIDATION}>Validation</SelectItem>
+                  <SelectItem value={ErrorCategory.AUTHENTICATION}>Authentication</SelectItem>
+                  <SelectItem value={ErrorCategory.AUTHORIZATION}>Authorization</SelectItem>
+                  <SelectItem value={ErrorCategory.DATA}>Data</SelectItem>
+                  <SelectItem value={ErrorCategory.UI}>UI</SelectItem>
+                  <SelectItem value={ErrorCategory.NETWORK}>Network</SelectItem>
+                  <SelectItem value={ErrorCategory.UNKNOWN}>Unknown</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-wrap gap-2">
+            <Button onClick={handleCreateError} className="gap-2">
+              <BadgeAlert className="h-4 w-4" />
+              Create & Log Error
+            </Button>
+            <Button onClick={handleShowToast} variant="outline" className="gap-2">
+              <AlertCircle className="h-4 w-4" />
+              Show Toast
+            </Button>
+            <Button onClick={handleApiError} variant="secondary" className="gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Trigger API Error
+            </Button>
+            <Button onClick={handleClearErrorLogs} variant="ghost" className="gap-2">
+              <Clock className="h-4 w-4" />
+              Clear Error Logs
+            </Button>
+          </CardFooter>
+        </Card>
+        
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Error Boundary Demo</CardTitle>
+              <CardDescription>
+                See how components are isolated with error boundaries
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ErrorBoundary componentName="ErrorBoundaryDemo">
+                <ErrorThrowerWithBoundary />
+              </ErrorBoundary>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Error Alert Demo</CardTitle>
+              <CardDescription>
+                Display multiple errors with different severities
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
               <ErrorAlertList 
                 errors={errorList} 
-                onClose={removeErrorFromList}
+                onClose={handleRemoveError} 
               />
-            </TabsContent>
+              
+              {errorList.length === 0 && (
+                <p className="text-muted-foreground text-center py-4">
+                  No errors to display
+                </p>
+              )}
+            </CardContent>
+            <CardFooter className="gap-2">
+              <Button onClick={handleAddToErrorList} variant="outline" className="gap-2">
+                <AlertCircle className="h-4 w-4" />
+                Add to List
+              </Button>
+              <Button onClick={handleClearErrorList} variant="ghost" className="gap-2">
+                <RefreshCw className="h-4 w-4" />
+                Clear List
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Error Logs</CardTitle>
+          <CardDescription>View the last 5 errors that have been logged</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="prettified">
+            <TabsList className="mb-4">
+              <TabsTrigger value="prettified">Prettified</TabsTrigger>
+              <TabsTrigger value="raw">Raw</TabsTrigger>
+            </TabsList>
             
-            <TabsContent value="logs" className="space-y-4">
-              <div className="flex justify-between mb-4">
-                <Button onClick={refreshErrorLogs} variant="outline">
-                  <Loader2 className="mr-2 h-4 w-4" />
-                  Refresh Logs
-                </Button>
-                <Button onClick={handleClearErrorLogs} variant="destructive">
-                  Clear Logs
-                </Button>
-              </div>
-              <div className="max-h-[400px] overflow-y-auto border rounded-md p-4 bg-gray-50 dark:bg-gray-900">
-                {errorLogs.length === 0 ? (
-                  <p className="text-center text-gray-500 py-8">No error logs found</p>
-                ) : (
-                  <ul className="space-y-4">
-                    {errorLogs.map((log, index) => (
-                      <li key={index} className="border-b pb-3 last:border-0 last:pb-0">
-                        <div className="flex justify-between">
-                          <span className="font-medium">{getErrorTitle(log.category)}</span>
-                          <span className="text-xs text-gray-500">{new Date(log.timestamp).toLocaleString()}</span>
-                        </div>
-                        <p className="mt-1 text-red-600 dark:text-red-400">{log.message}</p>
-                        <div className="mt-2 text-xs">
-                          <span className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-full mr-2">
-                            {log.severity}
-                          </span>
-                          <span className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-full">
-                            {log.category}
-                          </span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+            <TabsContent value="prettified">
+              <div className="space-y-4">
+                {getErrorLogs(5).map((log, index) => (
+                  <div key={index} className="border rounded-md p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      {log.severity === ErrorSeverity.INFO && <AlertCircle className="h-4 w-4 text-blue-500" />}
+                      {log.severity === ErrorSeverity.WARNING && <AlertTriangle className="h-4 w-4 text-amber-500" />}
+                      {log.severity === ErrorSeverity.ERROR && <Ban className="h-4 w-4 text-red-500" />}
+                      {log.severity === ErrorSeverity.CRITICAL && <XCircle className="h-4 w-4 text-red-700" />}
+                      <h3 className="font-semibold">{getErrorTitle(log.category)}</h3>
+                      <span className="ml-auto text-xs text-muted-foreground">
+                        {new Date(log.timestamp).toLocaleTimeString()}
+                      </span>
+                    </div>
+                    <p className="text-sm">{log.message}</p>
+                    {log.componentName && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Component: {log.componentName}
+                      </p>
+                    )}
+                  </div>
+                ))}
+                
+                {getErrorLogs(5).length === 0 && (
+                  <p className="text-muted-foreground text-center py-10">
+                    No error logs available. Try creating some errors!
+                  </p>
                 )}
               </div>
+            </TabsContent>
+            
+            <TabsContent value="raw">
+              <pre className="bg-muted p-4 rounded-md overflow-auto text-xs">
+                {JSON.stringify(getErrorLogs(5), null, 2)}
+              </pre>
             </TabsContent>
           </Tabs>
         </CardContent>
@@ -331,27 +352,5 @@ const ErrorDemoPage: React.FC = () => {
     </div>
   );
 };
-
-// Helper function to get error title
-function getErrorTitle(category: ErrorCategory): string {
-  switch (category) {
-    case ErrorCategory.API:
-      return 'API Error';
-    case ErrorCategory.VALIDATION:
-      return 'Validation Error';
-    case ErrorCategory.AUTHENTICATION:
-      return 'Authentication Error';
-    case ErrorCategory.AUTHORIZATION:
-      return 'Authorization Error';
-    case ErrorCategory.DATA:
-      return 'Data Error';
-    case ErrorCategory.UI:
-      return 'UI Error';
-    case ErrorCategory.NETWORK:
-      return 'Network Error';
-    default:
-      return 'Error';
-  }
-}
 
 export default ErrorDemoPage;

@@ -1,6 +1,6 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { handleApiError } from './api-error-handler';
-import { info, error as logError, LogCategory } from './logging';
+import { logger, LogCategory } from './logging';
 import { ErrorCategory } from './error-handling';
 
 async function throwIfResNotOk(res: Response, componentName?: string) {
@@ -22,7 +22,7 @@ export async function apiRequest(
   componentName?: string
 ): Promise<Response> {
   try {
-    info(`API Request: ${method} ${url}`, LogCategory.API, { method, url, data });
+    logger.info(`API Request: ${method} ${url}`, LogCategory.API, { method, url, data });
     
     const res = await fetch(url, {
       method,
