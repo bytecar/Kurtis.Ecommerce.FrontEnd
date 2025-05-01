@@ -13,25 +13,25 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { FilterIcon } from "lucide-react";
 
-// Filter options
+// Filter options - Make sure IDs match the exact values stored in the database
 const categories = [
   { id: "kurtis", label: "Kurtis" },
   { id: "sarees", label: "Sarees" },
   { id: "lehengas", label: "Lehengas" },
-  { id: "kurta-sets", label: "Kurta Sets" },
+  { id: "kurta_sets", label: "Kurta Sets" },
   { id: "gowns", label: "Gowns" },
   { id: "pants", label: "Pants" },
   { id: "tops", label: "Tops" },
 ];
 
 const brands = [
-  { id: "ethnic-bloom", label: "Ethnic Bloom" },
-  { id: "royal-ethnix", label: "Royal Ethnix" },
-  { id: "manyavar", label: "Manyavar" },
-  { id: "saree-house", label: "Saree House" },
-  { id: "fabindia", label: "FabIndia" },
-  { id: "biba", label: "Biba" },
-  { id: "kalyan", label: "Kalyan" },
+  { id: "Ethnic Bloom", label: "Ethnic Bloom" },
+  { id: "Royal Ethnix", label: "Royal Ethnix" },
+  { id: "Manyavar", label: "Manyavar" },
+  { id: "Saree House", label: "Saree House" },
+  { id: "Fabindia", label: "FabIndia" },
+  { id: "Biba", label: "Biba" },
+  { id: "Kalyan", label: "Kalyan" },
 ];
 
 const sizes = [
