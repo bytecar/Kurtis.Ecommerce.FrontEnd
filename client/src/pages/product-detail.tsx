@@ -285,7 +285,22 @@ export default function ProductDetail() {
             <div className="mb-6">
               <div className="flex justify-between items-center mb-2">
                 <h3 className="font-medium">Select Size</h3>
-                <Button variant="link" className="p-0 h-auto">Size Guide</Button>
+                <div className="flex gap-2">
+                  {!isInventoryLoading && (
+                    <SizeRecommendationWizard 
+                      productType={product.category}
+                      productGender={product.gender}
+                      availableSizes={getSizeOptions()}
+                      onSizeSelect={handleSizeSelect}
+                    />
+                  )}
+                  {product && selectedSize && (
+                    <VirtualTryOn 
+                      product={product}
+                      selectedSize={selectedSize}
+                    />
+                  )}
+                </div>
               </div>
               <SizeSelector
                 sizes={getSizeOptions()}
