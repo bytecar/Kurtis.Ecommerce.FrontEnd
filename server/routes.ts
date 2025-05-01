@@ -477,11 +477,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/products/featured", async (req, res) => {
     try {
       const products = await storage.getAllProducts();
-      // In a real app, you might have a featured flag or another way to determine featured products
-      // Here we'll just return some products with a discount
+      // Use the featured flag to get featured products
       const featured = products
-        .filter(p => p.discountedPrice !== null && p.discountedPrice !== undefined)
-        .slice(0, 8);
+        .filter(p => p.featured === true)
+        .slice(0, 12);
+      
+      // If there aren't enough featured products, fall back to products with discounts
+      if (featured.length < 8) {
+        const discountedProducts = products
+          .filter(p => p.discountedPrice !== null && p.discountedPrice !== undefined && !p.featured)
+          .slice(0, 8 - featured.length);
+        
+        featured.push(...discountedProducts);
+      }
       
       res.json(featured);
     } catch (error) {
@@ -489,33 +497,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get collections
+  app.get("/api/collections", async (req, res) => {
+    try {
+      const collections = await storage.getAllCollections();
+      res.json(collections);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to retrieve collections" });
+    }
+  });
+  
+  // Get a specific collection with its products
+  app.get("/api/collections/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid collection ID" });
+      }
+      
+      const collection = await storage.getCollection(id);
+      if (!collection) {
+        return res.status(404).json({ error: "Collection not found" });
+      }
+      
+      const products = await storage.getProductsByCollection(id);
+      
+      res.json({
+        ...collection,
+        products
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to retrieve collection details" });
+    }
+  });
+  
   // Get new arrivals
   app.get("/api/products/new", async (req, res) => {
     try {
-      // Find the "New Arrivals" collection
+      // First try to get products with the isNew flag set to true
+      const products = await storage.getAllProducts();
+      const newFlaggedProducts = products.filter(p => p.isNew === true);
+      
+      if (newFlaggedProducts.length >= 6) {
+        // If we have enough products marked as new, use those
+        res.json(newFlaggedProducts.slice(0, 12));
+        return;
+      }
+      
+      // Next, try to get products from the "New Arrivals" collection
       const collections = await storage.getAllCollections();
       const newArrivalsCollection = collections.find(collection => collection.name === "New Arrivals");
       
       if (newArrivalsCollection) {
         // Get products from the "New Arrivals" collection
-        const newArrivals = await storage.getProductsByCollection(newArrivalsCollection.id);
+        const collectionProducts = await storage.getProductsByCollection(newArrivalsCollection.id);
         
-        // Sort by creation date (newest first) and limit to 6 items
-        const sortedNewArrivals = [...newArrivals]
+        // Combine flagged new products with collection products, avoiding duplicates
+        const combinedProducts = [...newFlaggedProducts];
+        
+        // Add products from the collection that aren't already included
+        for (const product of collectionProducts) {
+          if (!combinedProducts.some(p => p.id === product.id)) {
+            combinedProducts.push(product);
+          }
+        }
+        
+        // Sort by creation date (newest first) and limit to 12 items
+        const sortedNewArrivals = combinedProducts
           .sort((a, b) => safeDate(b.createdAt).getTime() - safeDate(a.createdAt).getTime())
-          .slice(0, 6);
+          .slice(0, 12);
         
         res.json(sortedNewArrivals);
       } else {
-        // Fallback to the old method if collection doesn't exist
-        const products = await storage.getAllProducts();
-        const newArrivals = [...products]
+        // Fallback to the old method if collection doesn't exist and not enough flagged products
+        const sortedByDate = [...products]
           .sort((a, b) => safeDate(b.createdAt).getTime() - safeDate(a.createdAt).getTime())
-          .slice(0, 6);
+          .slice(0, 12);
         
-        res.json(newArrivals);
+        res.json(sortedByDate);
       }
     } catch (error) {
+      console.error("Error retrieving new arrivals:", error);
       res.status(500).json({ error: "Failed to retrieve new arrivals" });
     }
   });
