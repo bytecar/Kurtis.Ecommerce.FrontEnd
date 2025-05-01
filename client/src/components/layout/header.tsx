@@ -21,11 +21,13 @@ export function Header() {
     }
   };
 
+  const { t } = useTranslation();
+  
   return (
     <header className="sticky top-0 z-50 bg-background shadow-sm">
       {/* Top announcement bar */}
       <div className="bg-primary text-white px-4 py-1 text-xs md:text-sm flex justify-center">
-        <p>Free shipping on orders above ₹999 | Use code FIRST10 for 10% off on your first order</p>
+        <p>{t('common.announcementBar', 'Free shipping on orders above ₹999 | Use code FIRST10 for 10% off on your first order')}</p>
       </div>
       
       {/* Main header */}
@@ -41,7 +43,7 @@ export function Header() {
           <div className="relative w-full">
             <Input
               type="text"
-              placeholder="Search for products, brands and more..."
+              placeholder={t('common.search', 'Search for products, brands and more...')}
               className="pl-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -60,6 +62,7 @@ export function Header() {
             <Search className="h-5 w-5" />
           </button>
           
+          <LanguageSwitcher />
           <ThemeToggle />
           <UserNav />
         </div>
@@ -73,7 +76,7 @@ export function Header() {
         >
           <Input
             type="text"
-            placeholder="Search for products, brands and more..."
+            placeholder={t('common.search', 'Search for products, brands and more...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
