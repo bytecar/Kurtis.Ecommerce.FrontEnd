@@ -366,72 +366,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (category.length > 0) {
-        products = products.filter(product => category.includes(product.category));
+        products = products.filter(product => {
+          if (!product.category) return false;
+          return category.includes(product.category);
+        });
       }
       
       if (brand.length > 0) {
-        products = products.filter(product => brand.includes(product.brand));
+        products = products.filter(product => {
+          if (!product.brand) return false;
+          return brand.includes(product.brand);
+        });
       }
       
       // Size filter - Get inventory for each product and check if any item has the requested size
       if (size.length > 0) {
-        console.log("Filtering by sizes:", size);
         const filteredProducts = [];
         
         for (const product of products) {
           const inventory = await storage.getInventoryByProduct(product.id);
-          console.log(`Product ${product.id} (${product.name}) inventory:`, inventory);
           
           const hasSizes = inventory.some(item => {
-            const sizeMatch = size.includes(item.size) && item.quantity > 0;
-            console.log(`Checking size ${item.size} (quantity: ${item.quantity}) against requested sizes:`, sizeMatch);
-            return sizeMatch;
+            if (!item.size || item.size === null) return false;
+            return size.includes(item.size) && item.quantity > 0;
           });
           
           if (hasSizes) {
-            console.log(`Adding product ${product.id} to filtered results`);
             filteredProducts.push(product);
           }
         }
         
         products = filteredProducts;
-        console.log(`After size filtering, ${products.length} products remain`);
       }
       
-      // Rating filter - Check product reviews for average rating
+      // Rating filter
       if (rating) {
-        console.log("Filtering by rating:", rating);
-        const filteredProducts = [];
+        // First try using the averageRating field if available
         const ratingValue = rating.split('-')[0]; // Extracts "4" from "4-up"
         const minimumRating = parseInt(ratingValue);
         
         if (!isNaN(minimumRating)) {
-          console.log(`Using minimum rating of ${minimumRating}`);
-          
-          for (const product of products) {
-            const reviews = await storage.getReviewsByProduct(product.id);
-            console.log(`Product ${product.id} (${product.name}) has ${reviews.length} reviews`);
+          products = products.filter(product => {
+            // If product has averageRating field, use it
+            if (product.averageRating !== undefined && product.averageRating !== null) {
+              return product.averageRating >= minimumRating;
+            }
             
-            if (reviews.length > 0) {
-              const avgRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
-              console.log(`Average rating: ${avgRating.toFixed(1)}, minimum required: ${minimumRating}`);
+            // Otherwise, calculate from reviews
+            return false; // Will check reviews below
+          });
+          
+          // For products without averageRating, calculate from reviews
+          const productsToCheck = products.filter(p => 
+            p.averageRating === undefined || p.averageRating === null
+          );
+          
+          if (productsToCheck.length > 0) {
+            const additionalFilteredProducts = [];
+            
+            for (const product of productsToCheck) {
+              const reviews = await storage.getReviewsByProduct(product.id);
               
-              if (avgRating >= minimumRating) {
-                console.log(`Adding product ${product.id} to rating-filtered results`);
-                filteredProducts.push(product);
+              if (reviews.length > 0) {
+                const avgRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+                if (avgRating >= minimumRating) {
+                  additionalFilteredProducts.push(product);
+                }
               }
             }
+            
+            // Combine products with valid averageRating and products with calculated rating
+            products = [
+              ...products.filter(p => p.averageRating !== undefined && p.averageRating !== null),
+              ...additionalFilteredProducts
+            ];
           }
-          
-          products = filteredProducts;
-          console.log(`After rating filtering, ${products.length} products remain`);
-        } else {
-          console.log("Could not parse minimum rating value");
         }
       }
       
       // Price filter
       products = products.filter(product => {
+        if (!product.price) return false;
         const price = product.discountedPrice || product.price;
         return price >= minPrice && price <= maxPrice;
       });
@@ -439,12 +454,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Search filter
       if (query) {
         const searchLower = query.toLowerCase();
-        products = products.filter(product => 
-          product.name.toLowerCase().includes(searchLower) || 
-          product.description.toLowerCase().includes(searchLower) || 
-          product.brand.toLowerCase().includes(searchLower) ||
-          product.category.toLowerCase().includes(searchLower)
-        );
+        products = products.filter(product => {
+          const nameMatch = product.name ? product.name.toLowerCase().includes(searchLower) : false;
+          const descMatch = product.description ? product.description.toLowerCase().includes(searchLower) : false;
+          const brandMatch = product.brand ? product.brand.toLowerCase().includes(searchLower) : false;
+          const categoryMatch = product.category ? product.category.toLowerCase().includes(searchLower) : false;
+          
+          return nameMatch || descMatch || brandMatch || categoryMatch;
+        });
       }
       
       // Collection filter
@@ -453,13 +470,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // First try to find the collection by ID
           const collectionId = parseInt(collection);
           if (!isNaN(collectionId)) {
-            products = await storage.getProductsByCollection(collectionId);
+            // Use collection-specific endpoint to retrieve products
+            const collectionProducts = await storage.getProductsByCollection(collectionId);
+            
+            // Only replace products array if we actually found products
+            if (collectionProducts && collectionProducts.length > 0) {
+              products = collectionProducts;
+            }
           } else {
             // Otherwise, use the legacy approach for predefined collections
             if (collection === "festival") {
-              products = products.filter(product => product.category === "lehengas" || product.category === "sarees");
+              products = products.filter(product => {
+                if (!product.category) return false;
+                return product.category === "lehengas" || product.category === "sarees";
+              });
             } else if (collection === "summer") {
-              products = products.filter(product => product.category === "kurtis" || product.category === "tops");
+              products = products.filter(product => {
+                if (!product.category) return false;
+                return product.category === "kurtis" || product.category === "tops";
+              });
             }
           }
         } catch (err) {
@@ -748,22 +777,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const id = parseInt(req.params.id);
       
-      // Validate request body
-      const validatedData = insertProductSchema.partial().parse(req.body);
+      // Create a copy of request body without the imageUrls field
+      const { imageUrls, ...otherFields } = req.body;
       
-      // Ensure imageUrls is properly typed as string[] if present
-      if (validatedData.imageUrls) {
-        // Make sure we always have an array of strings
-        const imageUrlArray: string[] = Array.isArray(validatedData.imageUrls)
-          ? validatedData.imageUrls.map(url => String(url))
+      // Validate other fields
+      const validatedData = insertProductSchema.partial().parse(otherFields);
+      
+      // Handle imageUrls separately if present
+      let updatedData: Partial<Product> = validatedData;
+      
+      if (imageUrls !== undefined) {
+        // Process imageUrls into a proper string array
+        const imageUrlArray: string[] = Array.isArray(imageUrls) 
+          ? imageUrls.map(url => String(url))
           : [];
-        
-        // Assign the properly typed array
-        validatedData.imageUrls = imageUrlArray;
+          
+        // Add properly typed imageUrls to the update data
+        updatedData = {
+          ...validatedData,
+          imageUrls: imageUrlArray
+        };
       }
       
       // Update product
-      const product = await storage.updateProduct(id, validatedData);
+      const product = await storage.updateProduct(id, updatedData);
       
       if (!product) {
         return res.status(404).json({ error: "Product not found" });
