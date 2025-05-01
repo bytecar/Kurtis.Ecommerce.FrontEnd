@@ -84,6 +84,48 @@ export default function ProductDetail() {
       inventory: item.quantity
     }));
   };
+  
+  // Handle size selection with availability toast notification
+  const handleSizeSelect = (size: string) => {
+    setSelectedSize(size);
+    
+    // Show availability toast message if we have inventory data
+    if (inventory) {
+      const stockItem = inventory.find(item => item.size === size);
+      
+      if (stockItem) {
+        if (stockItem.quantity === 0) {
+          toast({
+            title: "Out of Stock",
+            description: "This size is currently out of stock. Please select another size or check back later.",
+            variant: "destructive",
+            duration: 3000,
+          });
+        } else if (stockItem.quantity === 1) {
+          toast({
+            title: "Limited Stock",
+            description: "Only 1 item left in this size!",
+            variant: "destructive",
+            duration: 3000,
+          });
+        } else if (stockItem.quantity <= 5) {
+          toast({
+            title: "Limited Stock",
+            description: `Only ${stockItem.quantity} items left in this size!`,
+            variant: "destructive",
+            duration: 3000,
+          });
+        } else {
+          toast({
+            title: "In Stock",
+            description: `${stockItem.quantity} items available in this size`,
+            variant: "default",
+            duration: 2000,
+          });
+        }
+      }
+    }
+  };
 
   // Handle adding to cart
   const handleAddToCart = () => {
@@ -216,6 +258,23 @@ export default function ProductDetail() {
                     </Badge>
                   </>
                 )}
+                
+                {/* Stock Status Badge */}
+                {!isInventoryLoading && inventory && (
+                  <div className="ml-auto">
+                    {inventory.reduce((total, item) => total + item.quantity, 0) > 0 ? (
+                      <Badge className="bg-green-100 text-green-700 hover:bg-green-100 flex gap-1 items-center px-3 py-1">
+                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                        <span>In Stock</span>
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-red-100 text-red-700 hover:bg-red-100 flex gap-1 items-center px-3 py-1">
+                        <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                        <span>Out of Stock</span>
+                      </Badge>
+                    )}
+                  </div>
+                )}
               </div>
               <p className="text-muted-foreground text-sm mt-1">Inclusive of all taxes</p>
             </div>
@@ -229,24 +288,48 @@ export default function ProductDetail() {
               <SizeSelector
                 sizes={getSizeOptions()}
                 selectedSize={selectedSize}
-                onSizeSelect={setSelectedSize}
+                onSizeSelect={handleSizeSelect}
                 showInventory
               />
               
-              {selectedSize && inventory?.find(item => item.size === selectedSize)?.quantity === 0 && (
-                <p className="text-destructive text-sm mt-2">Out of Stock</p>
-              )}
-              
-              {selectedSize && inventory?.find(item => item.size === selectedSize)?.quantity === 1 && (
-                <p className="text-orange-600 text-sm mt-2">Only 1 left!</p>
-              )}
-              
-              {selectedSize && inventory?.find(item => item.size === selectedSize)?.quantity !== undefined && inventory?.find(item => item.size === selectedSize)?.quantity! > 1 && inventory?.find(item => item.size === selectedSize)?.quantity! <= 5 && (
-                <p className="text-orange-600 text-sm mt-2">Only {inventory?.find(item => item.size === selectedSize)?.quantity} left!</p>
-              )}
-              
-              {selectedSize && inventory?.find(item => item.size === selectedSize)?.quantity !== undefined && inventory?.find(item => item.size === selectedSize)?.quantity! > 5 && (
-                <p className="text-green-600 text-sm mt-2">In Stock</p>
+              {selectedSize && (
+                <div className="mt-2">
+                  {(() => {
+                    const stockQuantity = inventory?.find(item => item.size === selectedSize)?.quantity;
+                    
+                    if (stockQuantity === 0) {
+                      return (
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                          <p className="text-red-600 text-sm font-medium">Out of Stock</p>
+                        </div>
+                      );
+                    } else if (stockQuantity === 1) {
+                      return (
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                          <p className="text-orange-600 text-sm font-medium">Only 1 left!</p>
+                        </div>
+                      );
+                    } else if (stockQuantity !== undefined && stockQuantity > 1 && stockQuantity <= 5) {
+                      return (
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                          <p className="text-orange-600 text-sm font-medium">Only {stockQuantity} left!</p>
+                        </div>
+                      );
+                    } else if (stockQuantity !== undefined && stockQuantity > 5) {
+                      return (
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                          <p className="text-green-600 text-sm font-medium">In Stock</p>
+                        </div>
+                      );
+                    }
+                    
+                    return null;
+                  })()}
+                </div>
               )}
             </div>
             
