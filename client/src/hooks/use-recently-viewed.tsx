@@ -55,15 +55,33 @@ export function RecentlyViewedProvider({ children }: { children: ReactNode }) {
         return queryClient.invalidateQueries({ queryKey: ["/api/recently-viewed"] });
       } else {
         // For guests, handle locally
-        const product = await fetch(`/api/products/${productId}`).then(res => res.json());
-        return product;
+        try {
+          const response = await fetch(`/api/products/${productId}`);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch product: ${response.status}`);
+          }
+          return await response.json();
+        } catch (error) {
+          console.error("Error fetching product for recently viewed:", error);
+          return null;
+        }
       }
     },
     onSuccess: (data, productId) => {
       if (!user && data) {
         setItems(prevItems => {
-          // Remove existing instance of the product if it exists
-          const filteredItems = prevItems.filter(item => item.id !== productId);
+          // Check if product already exists in the list
+          const existingProductIndex = prevItems.findIndex(item => item.id === productId);
+          
+          // If product exists, don't modify the state to prevent re-renders
+          if (existingProductIndex === 0) {
+            return prevItems;
+          }
+          
+          // Remove existing instance of the product if it exists elsewhere in the list
+          const filteredItems = existingProductIndex > 0 
+            ? [...prevItems.slice(0, existingProductIndex), ...prevItems.slice(existingProductIndex + 1)]
+            : [...prevItems];
           
           // Add product to the beginning of the array
           const newItems = [data, ...filteredItems].slice(0, MAX_ITEMS);
