@@ -69,6 +69,22 @@ export function ProductFilters({
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedRating, setSelectedRating] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  
+  // Track accordion state for collapsibility
+  const [openAccordions, setOpenAccordions] = useState({
+    categories: true,
+    brands: true,
+    sizes: true,
+    ratings: true
+  });
+
+  // Toggle accordion state
+  const toggleAccordion = (accordionId: string) => {
+    setOpenAccordions((prev) => ({
+      ...prev,
+      [accordionId]: !prev[accordionId],
+    }));
+  };
 
   // Handle category selection
   const handleCategoryChange = (categoryId: string) => {
@@ -164,10 +180,158 @@ export function ProductFilters({
     onFilterChange,
   ]);
 
+  // Category filter section
+  const CategoryFilter = () => (
+    <div className="border-b pb-4">
+      <button 
+        className="w-full flex justify-between items-center py-2 font-medium text-base"
+        onClick={() => toggleAccordion("categories")}
+      >
+        Categories
+        <span>{openAccordions.categories ? "▲" : "▼"}</span>
+      </button>
+      
+      {openAccordions.categories && (
+        <div className="space-y-2 mt-2">
+          {categories.map((category) => (
+            <div 
+              key={category.id} 
+              className="flex items-center space-x-2 cursor-pointer"
+              onClick={() => handleCategoryChange(category.id)}
+            >
+              <Checkbox
+                id={`category-${category.id}`}
+                checked={selectedCategories.includes(category.id)}
+                className="cursor-pointer"
+              />
+              <Label
+                htmlFor={`category-${category.id}`}
+                className="text-sm cursor-pointer w-full"
+              >
+                {category.label}
+              </Label>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  // Brand filter section
+  const BrandFilter = () => (
+    <div className="border-b pb-4">
+      <button 
+        className="w-full flex justify-between items-center py-2 font-medium text-base"
+        onClick={() => toggleAccordion("brands")}
+      >
+        Brands
+        <span>{openAccordions.brands ? "▲" : "▼"}</span>
+      </button>
+      
+      {openAccordions.brands && (
+        <div className="space-y-2 mt-2">
+          {brands.map((brand) => (
+            <div 
+              key={brand.id} 
+              className="flex items-center space-x-2 cursor-pointer"
+              onClick={() => handleBrandChange(brand.id)}
+            >
+              <Checkbox
+                id={`brand-${brand.id}`}
+                checked={selectedBrands.includes(brand.id)}
+                className="cursor-pointer"
+              />
+              <Label
+                htmlFor={`brand-${brand.id}`}
+                className="text-sm cursor-pointer w-full"
+              >
+                {brand.label}
+              </Label>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  // Size filter section
+  const SizeFilter = () => (
+    <div className="border-b pb-4">
+      <button 
+        className="w-full flex justify-between items-center py-2 font-medium text-base"
+        onClick={() => toggleAccordion("sizes")}
+      >
+        Sizes
+        <span>{openAccordions.sizes ? "▲" : "▼"}</span>
+      </button>
+      
+      {openAccordions.sizes && (
+        <div className="space-y-2 mt-2">
+          {sizes.map((size) => (
+            <div 
+              key={size.id} 
+              className="flex items-center space-x-2 cursor-pointer"
+              onClick={() => handleSizeChange(size.id)}
+            >
+              <Checkbox
+                id={`size-${size.id}`}
+                checked={selectedSizes.includes(size.id)}
+                className="cursor-pointer"
+              />
+              <Label
+                htmlFor={`size-${size.id}`}
+                className="text-sm cursor-pointer w-full"
+              >
+                {size.label}
+              </Label>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  // Rating filter section
+  const RatingFilter = () => (
+    <div className="border-b pb-4">
+      <button 
+        className="w-full flex justify-between items-center py-2 font-medium text-base"
+        onClick={() => toggleAccordion("ratings")}
+      >
+        Customer Ratings
+        <span>{openAccordions.ratings ? "▲" : "▼"}</span>
+      </button>
+      
+      {openAccordions.ratings && (
+        <div className="space-y-2 mt-2">
+          {ratings.map((rating) => (
+            <div 
+              key={rating.id} 
+              className="flex items-center space-x-2 cursor-pointer"
+              onClick={() => handleRatingChange(rating.id)}
+            >
+              <Checkbox
+                id={`rating-${rating.id}`}
+                checked={selectedRating === rating.id}
+                className="cursor-pointer"
+              />
+              <Label
+                htmlFor={`rating-${rating.id}`}
+                className="text-sm cursor-pointer w-full"
+              >
+                {rating.label}
+              </Label>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
   const FilterContent = () => (
-    <div className={`flex flex-col space-y-6 ${className}`}>
+    <div className={`flex flex-col space-y-4 ${className}`}>
       {/* Price Range */}
-      <div className="mb-6">
+      <div className="mb-4 border-b pb-4">
         <h3 className="font-medium text-base mb-3">Price Range</h3>
         <Slider
           defaultValue={priceRange}
@@ -184,141 +348,15 @@ export function ProductFilters({
         </div>
       </div>
 
-      {/* Categories */}
-      <Accordion type="single" collapsible defaultValue="categories">
-        <AccordionItem value="categories" className="border-b">
-          <AccordionTrigger className="font-medium text-base">
-            Categories
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-2">
-              {categories.map((category) => (
-                <div key={category.id} className="flex items-center space-x-2">
-                  <div 
-                    className="cursor-pointer"
-                    onClick={() => handleCategoryChange(category.id)}
-                  >
-                    <Checkbox
-                      id={`category-${category.id}`}
-                      checked={selectedCategories.includes(category.id)}
-                    />
-                  </div>
-                  <Label
-                    htmlFor={`category-${category.id}`}
-                    className="text-sm cursor-pointer"
-                    onClick={() => handleCategoryChange(category.id)}
-                  >
-                    {category.label}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-
-      {/* Brands */}
-      <Accordion type="single" collapsible defaultValue="brands">
-        <AccordionItem value="brands" className="border-b">
-          <AccordionTrigger className="font-medium text-base">
-            Brands
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-2">
-              {brands.map((brand) => (
-                <div key={brand.id} className="flex items-center space-x-2">
-                  <div 
-                    className="cursor-pointer"
-                    onClick={() => handleBrandChange(brand.id)}
-                  >
-                    <Checkbox
-                      id={`brand-${brand.id}`}
-                      checked={selectedBrands.includes(brand.id)}
-                    />
-                  </div>
-                  <Label
-                    htmlFor={`brand-${brand.id}`}
-                    className="text-sm cursor-pointer"
-                    onClick={() => handleBrandChange(brand.id)}
-                  >
-                    {brand.label}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-
-      {/* Sizes */}
-      <Accordion type="single" collapsible defaultValue="sizes">
-        <AccordionItem value="sizes" className="border-b">
-          <AccordionTrigger className="font-medium text-base">
-            Sizes
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-2">
-              {sizes.map((size) => (
-                <div key={size.id} className="flex items-center space-x-2">
-                  <div 
-                    className="cursor-pointer"
-                    onClick={() => handleSizeChange(size.id)}
-                  >
-                    <Checkbox
-                      id={`size-${size.id}`}
-                      checked={selectedSizes.includes(size.id)}
-                    />
-                  </div>
-                  <Label
-                    htmlFor={`size-${size.id}`}
-                    className="text-sm cursor-pointer"
-                    onClick={() => handleSizeChange(size.id)}
-                  >
-                    {size.label}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-
-      {/* Customer Ratings */}
-      <Accordion type="single" collapsible defaultValue="ratings">
-        <AccordionItem value="ratings" className="border-b">
-          <AccordionTrigger className="font-medium text-base">
-            Customer Ratings
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-2">
-              {ratings.map((rating) => (
-                <div key={rating.id} className="flex items-center space-x-2">
-                  <div 
-                    className="cursor-pointer"
-                    onClick={() => handleRatingChange(rating.id)}
-                  >
-                    <Checkbox
-                      id={`rating-${rating.id}`}
-                      checked={selectedRating === rating.id}
-                    />
-                  </div>
-                  <Label
-                    htmlFor={`rating-${rating.id}`}
-                    className="text-sm cursor-pointer"
-                    onClick={() => handleRatingChange(rating.id)}
-                  >
-                    {rating.label}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+      {/* Filter sections */}
+      <CategoryFilter />
+      <BrandFilter />
+      <SizeFilter />
+      <RatingFilter />
 
       {/* Mobile Filter Buttons */}
       {isMobile && (
-        <div className="flex gap-3 pt-4 border-t">
+        <div className="flex gap-3 pt-4 border-t mt-4">
           <Button variant="outline" className="flex-1" onClick={resetFilters}>
             Reset
           </Button>
