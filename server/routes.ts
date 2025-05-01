@@ -889,16 +889,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get authenticated user
       const user = getUserSafely(req);
       
-      const wishlistItems = await storage.getWishlistByUser(user.id);
-      
-      // Fetch full product details for each wishlist item
-      const products = [];
-      for (const item of wishlistItems) {
-        const product = await storage.getProduct(item.productId);
-        if (product) {
-          products.push(product);
-        }
-      }
+      // This already returns the Product objects directly
+      const products = await storage.getWishlistByUser(user.id);
       
       res.json(products);
     } catch (error) {
@@ -971,7 +963,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (isAuthenticated) {
         try {
           // Get authenticated user (safe now since we checked authentication)
-          const user = req.user!;
+          const user = getUserSafely(req);
 
           const userPreferences = await storage.getUserPreferences(user.id);
           
@@ -1052,16 +1044,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get authenticated user
       const user = getUserSafely(req);
       
-      const recentlyViewedItems = await storage.getRecentlyViewedByUser(user.id);
-      
-      // Fetch full product details for each recently viewed item
-      const products = [];
-      for (const item of recentlyViewedItems) {
-        const product = await storage.getProduct(item.productId);
-        if (product) {
-          products.push(product);
-        }
-      }
+      // This already returns the Product objects directly
+      const products = await storage.getRecentlyViewedByUser(user.id);
       
       res.json(products);
     } catch (error) {
