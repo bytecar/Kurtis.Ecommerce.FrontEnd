@@ -54,7 +54,13 @@ export function RecentlyViewedProvider({ children }: { children: ReactNode }) {
         await apiRequest("POST", "/api/recently-viewed", { productId });
         return queryClient.invalidateQueries({ queryKey: ["/api/recently-viewed"] });
       } else {
-        // For guests, handle locally
+        // For guests, check if we already have the product data
+        const existingItem = items.find(item => item.id === productId);
+        if (existingItem) {
+          return existingItem;
+        }
+        
+        // Only fetch if we don't have the data
         try {
           const response = await fetch(`/api/products/${productId}`);
           if (!response.ok) {
@@ -70,21 +76,11 @@ export function RecentlyViewedProvider({ children }: { children: ReactNode }) {
     onSuccess: (data, productId) => {
       if (!user && data) {
         setItems(prevItems => {
-          // Check if product already exists in the list
-          const existingProductIndex = prevItems.findIndex(item => item.id === productId);
-          
-          // If product exists, don't modify the state to prevent re-renders
-          if (existingProductIndex === 0) {
-            return prevItems;
-          }
-          
-          // Remove existing instance of the product if it exists elsewhere in the list
-          const filteredItems = existingProductIndex > 0 
-            ? [...prevItems.slice(0, existingProductIndex), ...prevItems.slice(existingProductIndex + 1)]
-            : [...prevItems];
-          
-          // Add product to the beginning of the array
-          const newItems = [data, ...filteredItems].slice(0, MAX_ITEMS);
+          // Move existing item to front or add new item
+          const newItems = [
+            data,
+            ...prevItems.filter(item => item.id !== productId)
+          ].slice(0, MAX_ITEMS);
           
           // Save to local storage
           localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newItems));
