@@ -4,6 +4,7 @@ import { NewArrivalsProps } from '@/types/component.types';
 import { ProductCard } from '@/components/products/ProductCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatedHeading } from './AnimatedHeading';
+import { useTranslation } from 'react-i18next';
 import {
   Carousel,
   CarouselContent,
@@ -16,14 +17,15 @@ import {
 import './styles/NewArrivals.css';
 
 export const NewArrivals: React.FC<NewArrivalsProps> = ({ products, isLoading }) => {
+  const { t } = useTranslation();
   return (
     <section className="new-arrivals-section">
       <div className="container mx-auto px-4">
         <div className="section-header">
-          <AnimatedHeading>New Arrivals</AnimatedHeading>
+          <AnimatedHeading>{t('home.newArrivals')}</AnimatedHeading>
           <Link href="/products/new">
             <div className="view-all-link">
-              View All
+              {t('common.viewAll')}
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
               </svg>
