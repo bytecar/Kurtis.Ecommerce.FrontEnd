@@ -35,7 +35,9 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -111,6 +113,7 @@ export default function ReturnsPage() {
     defaultValues: {
       orderId: selectedOrder || 0,
       orderItemId: 0,
+      returnReason: "",
       reason: "",
     },
   });
@@ -124,7 +127,7 @@ export default function ReturnsPage() {
   
   // Submit return request mutation
   const submitReturnMutation = useMutation({
-    mutationFn: async (data: ReturnFormValues) => {
+    mutationFn: async (data: { orderId: number, orderItemId: number, reason: string }) => {
       const res = await apiRequest("POST", "/api/returns", data);
       return await res.json();
     },
@@ -147,7 +150,14 @@ export default function ReturnsPage() {
   
   // Handle form submission
   const onSubmit = (data: ReturnFormValues) => {
-    submitReturnMutation.mutate(data);
+    // Combine returnReason and reason for API submission
+    const submitData = {
+      orderId: data.orderId,
+      orderItemId: data.orderItemId,
+      reason: `${data.returnReason}: ${data.reason}`
+    };
+    
+    submitReturnMutation.mutate(submitData);
   };
   
   return (
@@ -233,7 +243,7 @@ export default function ReturnsPage() {
                         <SelectContent>
                           {orders?.filter(order => order.status === "delivered").map((order) => (
                             <SelectItem key={order.id} value={order.id.toString()}>
-                              Order #{order.id} - {new Date(order.createdAt).toLocaleDateString()}
+                              Order #{order.id} - {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}
                             </SelectItem>
                           ))}
                           {orders && orders.filter(order => order.status === "delivered").length === 0 && (
@@ -312,16 +322,49 @@ export default function ReturnsPage() {
                   </div>
                 )}
                 
-                {/* Return Reason */}
+                {/* Return Reason Type */}
+                <FormField
+                  control={form.control}
+                  name="returnReason"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Reason for Return</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a reason for your return" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Return Reasons</SelectLabel>
+                            {returnReasons.map(reason => (
+                              <SelectItem key={reason} value={reason}>
+                                {reason}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Additional Return Details */}
                 <FormField
                   control={form.control}
                   name="reason"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Reason for Return</FormLabel>
+                      <FormLabel>Additional Details</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Please explain why you're returning this item"
+                          placeholder="Please provide more details about your return"
                           className="min-h-[120px]"
                           {...field}
                         />
