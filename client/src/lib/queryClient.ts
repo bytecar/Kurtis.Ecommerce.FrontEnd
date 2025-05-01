@@ -57,7 +57,7 @@ export const getQueryFn: <T>(options: {
       });
 
       if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-        logError(`Unauthorized access to ${endpoint}`, LogCategory.AUTHENTICATION, { 
+        logError(`Unauthorized access to ${endpoint}`, LogCategory.AUTHORIZATION, { 
           endpoint, 
           status: 401,
           queryKey 
