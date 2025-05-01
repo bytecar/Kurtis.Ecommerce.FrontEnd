@@ -96,7 +96,57 @@
     "category": "श्रेणी",
     "gender": "लिंग",
     "soldOut": "बिक चुका है",
-    "discount": "छूट"
+    "discount": "छूट",
+    "sizeRecommender": {
+      "title": "आकार अनुशंसा विज़ार्ड",
+      "description": "कुछ मापों को दर्ज करके अपना सही आकार खोजें",
+      "findYourSize": "अपना आकार खोजें",
+      "tryAgain": "पुनः प्रयास करें",
+      "heightLabel": "ऊंचाई*",
+      "weightLabel": "वजन*",
+      "ageLabel": "उम्र*",
+      "bodyTypeLabel": "शरीर का प्रकार*",
+      "bodyTypes": {
+        "slim": "पतला",
+        "athletic": "एथलेटिक",
+        "average": "औसत",
+        "curvy": "घुमावदार",
+        "plus": "प्लस साइज़"
+      },
+      "imperialUnits": "इंपीरियल मापन (इंच/पाउंड) का उपयोग करें",
+      "metricUnitsHint": "मीट्रिक और इंपीरियल इकाइयों के बीच स्विच करें",
+      "advancedMeasurements": "उन्नत मापन",
+      "advancedDescription": "अधिक सटीक आकार की सिफारिश के लिए, कृपया निम्नलिखित माप प्रदान करें। ये वैकल्पिक हैं लेकिन हमारी सिफारिश को बेहतर बनाएंगे।",
+      "enterMeasurements": "माप दर्ज करें",
+      "measurementGuide": "मापन गाइड",
+      "chestLabel": "छाती/बस्ट",
+      "waistLabel": "कमर",
+      "hipsLabel": "हिप्स",
+      "fitLabel": "पसंदीदा फिट",
+      "fitTypes": {
+        "tight": "फिटेड (शरीर के करीब)",
+        "regular": "रेगुलर (स्टैंडर्ड फिट)",
+        "loose": "लूज़ (आरामदायक फिट)"
+      },
+      "howToMeasure": {
+        "chest": "अपने बस्ट/छाती के सबसे चौड़े हिस्से के चारों ओर मापें।",
+        "waist": "अपनी प्राकृतिक कमर के चारों ओर मापें।",
+        "hips": "अपने हिप्स के सबसे चौड़े हिस्से के चारों ओर मापें।"
+      },
+      "measurementGuideImage": "मापन गाइड चित्र",
+      "calculatingSize": "आपका आकार की गणना की जा रही है...",
+      "measurementCm": "सेमी",
+      "measurementInches": "इंच",
+      "calculateButton": "मेरा आकार की गणना करें",
+      "backButton": "वापस",
+      "nextButton": "अगला",
+      "selectSizeButton": "इस आकार का चयन करें",
+      "recommendedSize": "आपका अनुशंसित आकार",
+      "recommendation": "आपके मापों के आधार पर, हम आकार की सिफारिश करते हैं:",
+      "availabilityNote": "कृपया ध्यान दें: यदि आपका अनुशंसित आकार उपलब्ध नहीं है, तो हमने निकटतम उपलब्ध आकार का सुझाव दिया है।",
+      "tryOnLabel": "वर्चुअल ट्राई-ऑन प्रीव्यू",
+      "noTryOn": "इस प्रोडक्ट के लिए वर्चुअल ट्राई-ऑन प्रीव्यू उपलब्ध नहीं है।"
+    }
   },
   "auth": {
     "loginTitle": "अपने अकाउंट में लॉगिन करें",
