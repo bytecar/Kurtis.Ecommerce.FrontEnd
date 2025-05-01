@@ -422,13 +422,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get new arrivals
   app.get("/api/products/new", async (req, res) => {
     try {
-      const products = await storage.getAllProducts();
-      // Sort by createdAt descending and take the first 6
-      const newArrivals = [...products]
-        .sort((a, b) => safeDate(b.createdAt).getTime() - safeDate(a.createdAt).getTime())
-        .slice(0, 6);
+      // Find the "New Arrivals" collection
+      const collections = await storage.getAllCollections();
+      const newArrivalsCollection = collections.find(collection => collection.name === "New Arrivals");
       
-      res.json(newArrivals);
+      if (newArrivalsCollection) {
+        // Get products from the "New Arrivals" collection
+        const newArrivals = await storage.getProductsByCollection(newArrivalsCollection.id);
+        
+        // Sort by creation date (newest first) and limit to 6 items
+        const sortedNewArrivals = [...newArrivals]
+          .sort((a, b) => safeDate(b.createdAt).getTime() - safeDate(a.createdAt).getTime())
+          .slice(0, 6);
+        
+        res.json(sortedNewArrivals);
+      } else {
+        // Fallback to the old method if collection doesn't exist
+        const products = await storage.getAllProducts();
+        const newArrivals = [...products]
+          .sort((a, b) => safeDate(b.createdAt).getTime() - safeDate(a.createdAt).getTime())
+          .slice(0, 6);
+        
+        res.json(newArrivals);
+      }
     } catch (error) {
       res.status(500).json({ error: "Failed to retrieve new arrivals" });
     }

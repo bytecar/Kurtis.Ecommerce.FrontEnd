@@ -299,6 +299,12 @@ export class MemStorage implements IStorage {
   private initializeCollections() {
     const collections = [
       {
+        name: "New Arrivals",
+        description: "Recently added products to our collection",
+        imageUrl: "https://example.com/new-arrivals.jpg",
+        active: true
+      },
+      {
         name: "Summer Collection",
         description: "Light and colorful ethnic wear for summer",
         imageUrl: "https://example.com/summer.jpg",
@@ -331,15 +337,20 @@ export class MemStorage implements IStorage {
       });
       
       // Associate some products with collections
-      if (id === 1) { // Summer Collection
+      if (id === 1) { // New Arrivals Collection
+        // Most recent products go here (1, 2, 3)
+        [1, 2, 3].forEach(productId => {
+          this.addProductToCollection({ productId, collectionId: id });
+        });
+      } else if (id === 2) { // Summer Collection
         [1, 3, 5].forEach(productId => {
           this.addProductToCollection({ productId, collectionId: id });
         });
-      } else if (id === 2) { // Wedding Collection
+      } else if (id === 3) { // Wedding Collection
         [2, 6, 8].forEach(productId => {
           this.addProductToCollection({ productId, collectionId: id });
         });
-      } else if (id === 3) { // Festival Collection
+      } else if (id === 4) { // Festival Collection
         [4, 7, 9].forEach(productId => {
           this.addProductToCollection({ productId, collectionId: id });
         });
@@ -429,6 +440,20 @@ export class MemStorage implements IStorage {
       updatedAt: now,
     };
     this.products.set(id, newProduct);
+    
+    // Automatically add new products to the "New Arrivals" collection
+    const newArrivalsCollection = Array.from(this.collections.values()).find(
+      collection => collection.name === "New Arrivals"
+    );
+    
+    if (newArrivalsCollection) {
+      // Add the product to the "New Arrivals" collection
+      this.addProductToCollection({
+        productId: id,
+        collectionId: newArrivalsCollection.id
+      });
+    }
+    
     return newProduct;
   }
 
