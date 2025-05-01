@@ -595,7 +595,7 @@ export function SizeRecommendationWizard({
         <div className="flex flex-col items-center justify-center py-8">
           <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
           <p className="text-center text-muted-foreground">
-            Calculating your perfect size...
+            {t('product.sizeRecommender.calculatingSize')}
           </p>
         </div>
       ) : recommendedSize ? (
@@ -604,26 +604,26 @@ export function SizeRecommendationWizard({
             <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-3">
               <Shirt className="h-6 w-6" />
             </div>
-            <h3 className="text-xl font-medium">Your Recommended Size</h3>
+            <h3 className="text-xl font-medium">{t('product.sizeRecommender.recommendedSize')}</h3>
             <div className="mt-2 text-4xl font-bold text-primary">{recommendedSize}</div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <Card>
               <CardContent className="pt-6">
-                <h4 className="font-medium mb-2">Size Details</h4>
+                <h4 className="font-medium mb-2">{t('product.sizeRecommender.sizeDetailsTitle')}</h4>
                 <ul className="space-y-2 text-sm">
                   <li className="flex justify-between">
-                    <span className="text-muted-foreground">Product:</span>
+                    <span className="text-muted-foreground">{t('product.category')}:</span>
                     <span className="font-medium">{productType}</span>
                   </li>
                   <li className="flex justify-between">
-                    <span className="text-muted-foreground">Body Type:</span>
-                    <span className="font-medium">{bodyTypeOptions.find(o => o.value === bodyType)?.label}</span>
+                    <span className="text-muted-foreground">{t('product.sizeRecommender.bodyTypeLabel')}:</span>
+                    <span className="font-medium">{t(`product.sizeRecommender.bodyTypes.${bodyType}`)}</span>
                   </li>
                   <li className="flex justify-between">
-                    <span className="text-muted-foreground">Preferred Fit:</span>
-                    <span className="font-medium">{fitOptions.find(o => o.value === preferredFit)?.label}</span>
+                    <span className="text-muted-foreground">{t('product.sizeRecommender.preferredFitLabel')}:</span>
+                    <span className="font-medium">{t(`product.sizeRecommender.fitTypes.${preferredFit}`)}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -631,24 +631,24 @@ export function SizeRecommendationWizard({
 
             <Card>
               <CardContent className="pt-6">
-                <h4 className="font-medium mb-2">Virtual Try-On</h4>
+                <h4 className="font-medium mb-2">{t('product.sizeRecommender.tryOnLabel')}</h4>
                 {virtualTryOnUrl ? (
                   <div className="relative rounded-md overflow-hidden aspect-[3/4]">
                     <img 
                       src={virtualTryOnUrl} 
-                      alt="Virtual try-on visualization" 
+                      alt={t('product.sizeRecommender.virtualTryOnAlt')}
                       className="object-cover w-full h-full"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end p-2">
                       <span className="text-xs text-white bg-black/60 px-2 py-1 rounded">
-                        Size {recommendedSize} visualization
+                        {t('product.sizeRecommender.sizeVisualization', { size: recommendedSize })}
                       </span>
                     </div>
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-48 bg-muted rounded-md">
                     <p className="text-sm text-muted-foreground">
-                      Try-on visualization unavailable
+                      {t('product.sizeRecommender.noTryOn')}
                     </p>
                   </div>
                 )}
@@ -657,23 +657,23 @@ export function SizeRecommendationWizard({
           </div>
 
           <div className="bg-muted p-4 rounded-md">
-            <h4 className="font-medium mb-2">Fit Analysis</h4>
+            <h4 className="font-medium mb-2">{t('product.sizeRecommender.fitAnalysisTitle')}</h4>
             <p className="text-sm text-muted-foreground">
-              Based on your measurements, the {recommendedSize} size should provide a 
-              {preferredFit === 'tight' ? ' fitted ' : 
-               preferredFit === 'loose' ? ' relaxed ' : 
-               ' comfortable '} 
-              fit for your {bodyTypeOptions.find(o => o.value === bodyType)?.label.toLowerCase()} body type.
+              {t('product.sizeRecommender.fitAnalysisText', {
+                size: recommendedSize,
+                fit: t(`product.sizeRecommender.fitDescriptions.${preferredFit}`),
+                bodyType: t(`product.sizeRecommender.bodyTypes.${bodyType}`)
+              })}
             </p>
           </div>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-8">
           <p className="text-center text-muted-foreground">
-            Something went wrong. Please try again.
+            {t('product.sizeRecommender.errorMessage')}
           </p>
           <Button variant="outline" onClick={resetWizard} className="mt-4">
-            Try Again
+            {t('product.sizeRecommender.tryAgain')}
           </Button>
         </div>
       )}
