@@ -96,7 +96,57 @@
     "category": "Category",
     "gender": "Gender",
     "soldOut": "Sold Out",
-    "discount": "Discount"
+    "discount": "Discount",
+    "sizeRecommender": {
+      "title": "Size Recommendation Wizard",
+      "description": "Find your perfect size by entering a few measurements",
+      "findYourSize": "Find Your Size",
+      "tryAgain": "Try Again",
+      "heightLabel": "Height*",
+      "weightLabel": "Weight*",
+      "ageLabel": "Age*",
+      "bodyTypeLabel": "Body Type*",
+      "bodyTypes": {
+        "slim": "Slim",
+        "athletic": "Athletic",
+        "average": "Average",
+        "curvy": "Curvy",
+        "plus": "Plus Size"
+      },
+      "imperialUnits": "Use imperial measurements (inches/pounds)",
+      "metricUnitsHint": "Switch between metric and imperial units",
+      "advancedMeasurements": "Advanced Measurements",
+      "advancedDescription": "For a more accurate size recommendation, please provide the following measurements. These are optional but will improve our recommendation.",
+      "enterMeasurements": "Enter Measurements",
+      "measurementGuide": "Measurement Guide",
+      "chestLabel": "Chest/Bust",
+      "waistLabel": "Waist",
+      "hipsLabel": "Hips",
+      "fitLabel": "Preferred Fit",
+      "fitTypes": {
+        "tight": "Fitted (Closer to body)",
+        "regular": "Regular (Standard fit)",
+        "loose": "Loose (Relaxed fit)"
+      },
+      "howToMeasure": {
+        "chest": "Measure around the fullest part of your bust/chest.",
+        "waist": "Measure around your natural waistline.",
+        "hips": "Measure around the fullest part of your hips."
+      },
+      "measurementGuideImage": "Measurement guide image",
+      "calculatingSize": "Calculating your size...",
+      "measurementCm": "cm",
+      "measurementInches": "inches",
+      "calculateButton": "Calculate My Size",
+      "backButton": "Back",
+      "nextButton": "Next",
+      "selectSizeButton": "Select This Size",
+      "recommendedSize": "Your Recommended Size",
+      "recommendation": "Based on your measurements, we recommend size:",
+      "availabilityNote": "Please note: If your recommended size is not available, we've suggested the closest available size.",
+      "tryOnLabel": "Virtual Try-On Preview",
+      "noTryOn": "Virtual try-on preview is not available for this product."
+    }
   },
   "auth": {
     "loginTitle": "Login to Your Account",
