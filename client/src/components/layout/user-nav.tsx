@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
 import { Button } from "@/components/ui/button";
@@ -19,10 +19,19 @@ export function UserNav() {
   const { user, logoutMutation } = useAuth();
   const { totalItems } = useCart();
   const { t } = useTranslation();
+  const [location] = useLocation();
 
   const handleLogout = () => {
     logoutMutation.mutate();
   };
+  
+  // Check if current path is an admin path
+  const isAdminPath = location.startsWith('/admin');
+
+  // If we're on an admin page, don't show the normal user navigation
+  if (isAdminPath) {
+    return null;
+  }
 
   return (
     <div className="flex items-center gap-3 md:gap-5">
