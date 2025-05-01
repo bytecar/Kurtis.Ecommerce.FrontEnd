@@ -1,14 +1,24 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, hashPassword } from "./auth";
 import { authenticateJWT, requirePermission, requireRole } from "./jwt-auth";
 import { z } from "zod";
-import { insertProductSchema, insertInventorySchema, insertReviewSchema, insertOrderSchema, insertOrderItemSchema, insertReturnSchema, insertRecentlyViewedSchema, insertWishlistSchema } from "@shared/schema";
+import { insertProductSchema, insertInventorySchema, insertReviewSchema, insertOrderSchema, insertOrderItemSchema, insertReturnSchema, insertRecentlyViewedSchema, insertWishlistSchema, User, Product } from "@shared/schema";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+
+// Extend Express Request
+declare global {
+  namespace Express {
+    interface Request {
+      user?: User;
+      isAuthenticated(): boolean;
+    }
+  }
+}
 
 // Set up multer for file uploads
 const upload_storage = multer.diskStorage({

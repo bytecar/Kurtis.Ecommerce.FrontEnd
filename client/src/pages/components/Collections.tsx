@@ -2,17 +2,20 @@ import React from 'react';
 import { Link } from 'wouter';
 import { CollectionsProps } from '@/types/component.types';
 import { AnimatedHeading } from './AnimatedHeading';
+import { useTranslation } from 'react-i18next';
 
 // Import CSS
 import './styles/Collections.css';
 
 export const Collections: React.FC<CollectionsProps> = ({ collections }) => {
-  // The HTML structure is maintained in './html/Collections.html'
+  // Get translation function
+  const { t } = useTranslation();
+  
   return (
     <section className="collections-section">
       <div className="container mx-auto px-4">
         <div className="section-header">
-          <AnimatedHeading>Collections</AnimatedHeading>
+          <AnimatedHeading>{t('home.collections', 'Collections')}</AnimatedHeading>
         </div>
         
         <div className="collections-grid">
@@ -29,7 +32,7 @@ export const Collections: React.FC<CollectionsProps> = ({ collections }) => {
                   <h3 className="collection-title">{collection.name}</h3>
                   <p className="collection-description">{collection.description}</p>
                   <span className="collection-button">
-                    Explore Now
+                    {t('collections.explore', 'Explore Now')}
                   </span>
                 </div>
               </div>
