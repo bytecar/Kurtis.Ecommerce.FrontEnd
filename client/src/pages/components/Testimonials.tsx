@@ -1,59 +1,51 @@
 import React from 'react';
-import { Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { AnimatedHeading } from './AnimatedHeading';
+import { Card, CardContent } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Quote } from 'lucide-react';
 
-interface Testimonial {
-  text: string;
-  name: string;
-  location: string;
-  image: string;
+// Import CSS
+import './styles/Testimonials.css';
+
+interface TestimonialProps {
+  testimonials: {
+    text: string;
+    name: string;
+    location: string;
+    image: string;
+  }[];
 }
 
-interface TestimonialsProps {
-  testimonials: Testimonial[];
-}
+export const Testimonials: React.FC<TestimonialProps> = ({ testimonials }) => {
+  const { t } = useTranslation();
 
-export const Testimonials: React.FC<TestimonialsProps> = ({ testimonials }) => {
   return (
     <section className="testimonials-section">
       <div className="container mx-auto px-4">
-        <div className="testimonials-header">
-          <AnimatedHeading center>What Our Customers Say</AnimatedHeading>
-          <p className="testimonials-subtitle">
-            Our customers love our products and service. Here's what they have to say about their experience shopping with us.
-          </p>
-        </div>
+        <AnimatedHeading centered>{t('home.testimonials')}</AnimatedHeading>
         
         <div className="testimonials-grid">
           {testimonials.map((testimonial, index) => (
-            <div key={index} className="testimonial-card">
-              <div className="testimonial-stars">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    fill="currentColor" 
-                    className="testimonial-star h-4 w-4"
-                  />
-                ))}
-              </div>
-              <p className="testimonial-text">{testimonial.text}</p>
-              <div className="testimonial-author">
-                <div className="testimonial-avatar">
-                  <img 
-                    src={testimonial.image} 
-                    alt={testimonial.name}
-                    className="testimonial-avatar-img" 
-                  />
+            <Card key={index} className="testimonial-card">
+              <CardContent className="p-6">
+                <div className="flex items-start mb-4">
+                  <Avatar className="testimonial-avatar">
+                    <AvatarImage src={testimonial.image} alt={testimonial.name} />
+                    <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div className="ml-4">
+                    <h3 className="font-medium">{testimonial.name}</h3>
+                    <p className="text-sm text-muted-foreground">{testimonial.location}</p>
+                  </div>
+                  <Quote className="ml-auto h-6 w-6 text-primary opacity-50" />
                 </div>
-                <div className="testimonial-info">
-                  <h4>{testimonial.name}</h4>
-                  <span className="testimonial-location">{testimonial.location}</span>
-                </div>
-              </div>
-            </div>
+                <p className="testimonial-text">{testimonial.text}</p>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
     </section>
   );
-}
+};
