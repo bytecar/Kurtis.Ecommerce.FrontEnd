@@ -13,6 +13,12 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at"),
   gender: text("gender"),
+  status: text("status").default("active"),
+  profilePicture: text("profile_picture"),
+  lastLogin: timestamp("last_login"),
+  phoneNumber: text("phone_number"),
+  address: text("address"),
+  birthdate: timestamp("birthdate"),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -21,10 +27,24 @@ export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   fullName: true,
   role: true,
+  gender: true,
+  status: true,
+  profilePicture: true,
+  lastLogin: true,
+  phoneNumber: true,
+  address: true,
+  birthdate: true,
 }).extend({
   // Make email and fullName optional for flexibility in admin user creation
   email: z.string().email().optional(), 
   fullName: z.string().optional(),
+  gender: z.string().optional(),
+  status: z.string().default("active"),
+  profilePicture: z.string().optional(),
+  lastLogin: z.date().optional(),
+  phoneNumber: z.string().optional(),
+  address: z.string().optional(),
+  birthdate: z.date().optional(),
 });
 
 // Products

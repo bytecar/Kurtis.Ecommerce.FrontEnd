@@ -19,6 +19,9 @@ import ReturnsPage from "@/pages/returns-page";
 import DashboardPage from "@/pages/admin/dashboard-page";
 import InventoryPage from "@/pages/admin/inventory-page";
 import ReviewPage from "@/pages/admin/review-page";
+import CustomerManagement from "@/pages/admin/customer-management";
+import RatingManagement from "@/pages/admin/rating-management";
+import ReturnsManagement from "@/pages/admin/returns-management";
 import { AuthProvider } from "@/hooks/use-auth";
 import { CartProvider } from "@/hooks/use-cart";
 import { WishlistProvider } from "@/hooks/use-wishlist";
@@ -54,6 +57,9 @@ function Router() {
           {/* Admin routes */}
           <AdminRoute path="/admin/dashboard" component={DashboardPage} />
           <AdminRoute path="/admin/reviews" component={ReviewPage} />
+          <AdminRoute path="/admin/customers" component={CustomerManagement} />
+          <AdminRoute path="/admin/ratings" component={RatingManagement} />
+          <AdminRoute path="/admin/returns" component={ReturnsManagement} />
           
           {/* Content Manager routes */}
           <ContentManagerRoute path="/admin/inventory" component={InventoryPage} />
