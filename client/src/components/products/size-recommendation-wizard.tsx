@@ -529,20 +529,20 @@ export function SizeRecommendationWizard({
             name="preferredFit"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Preferred Fit</FormLabel>
+                <FormLabel>{t('product.sizeRecommender.preferredFitLabel')}</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select your preferred fit" />
+                      <SelectValue placeholder={t('product.sizeRecommender.selectPreferredFit')} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     {fitOptions.map(option => (
                       <SelectItem key={option.value} value={option.value}>
-                        {option.label}
+                        {t(`product.sizeRecommender.fitTypes.${option.value}`)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -554,33 +554,33 @@ export function SizeRecommendationWizard({
         </TabsContent>
         <TabsContent value="guide" className="pt-4">
           <div className="rounded-lg border p-4 space-y-4">
-            <h4 className="font-medium">How to Measure</h4>
+            <h4 className="font-medium">{t('product.sizeRecommender.measurementGuideTitle')}</h4>
             
             <div className="space-y-2">
-              <h5 className="font-medium text-sm">Chest/Bust</h5>
+              <h5 className="font-medium text-sm">{t('product.sizeRecommender.chestBustLabel')}</h5>
               <p className="text-sm text-muted-foreground">
-                Measure around the fullest part of your chest/bust, keeping the tape parallel to the floor.
+                {t('product.sizeRecommender.chestBustInstructions')}
               </p>
             </div>
             
             <div className="space-y-2">
-              <h5 className="font-medium text-sm">Waist</h5>
+              <h5 className="font-medium text-sm">{t('product.sizeRecommender.waistLabel')}</h5>
               <p className="text-sm text-muted-foreground">
-                Measure around your natural waistline, at the narrowest part of your waist.
+                {t('product.sizeRecommender.waistInstructions')}
               </p>
             </div>
             
             <div className="space-y-2">
-              <h5 className="font-medium text-sm">Hips</h5>
+              <h5 className="font-medium text-sm">{t('product.sizeRecommender.hipsLabel')}</h5>
               <p className="text-sm text-muted-foreground">
-                Measure around the fullest part of your hips, keeping the tape parallel to the floor.
+                {t('product.sizeRecommender.hipsInstructions')}
               </p>
             </div>
             
             <div className="relative aspect-video mt-4 rounded-md overflow-hidden">
               <div className="absolute inset-0 flex items-center justify-center bg-muted">
                 <RulerIcon className="h-8 w-8 text-muted-foreground opacity-50" />
-                <p className="text-sm text-muted-foreground">Measurement guide image</p>
+                <p className="text-sm text-muted-foreground">{t('product.sizeRecommender.measurementGuideImage')}</p>
               </div>
             </div>
           </div>

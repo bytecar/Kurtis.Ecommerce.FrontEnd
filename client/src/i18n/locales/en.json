@@ -391,7 +391,8 @@
     "languages": {
       "en": "English",
       "hi": "Hindi",
-      "kn": "Kannada"
+      "kn": "Kannada",
+      "te": "Telugu"
     }
   },
   "adminDashboard": {
