@@ -255,13 +255,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ======= User Preferences Routes =======
   
   // Get user preferences
-  app.get("/api/user/preferences", async (req, res) => {
+  app.get("/api/user/preferences", authenticateJWT, async (req, res) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Not authenticated" });
-      }
-      
-      const userId = req.user.id;
+      const userId = (req as any).user.id;
       const preferences = await storage.getUserPreferences(userId);
       
       if (!preferences) {
@@ -276,13 +272,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create or update user preferences
-  app.post("/api/user/preferences", async (req, res) => {
+  app.post("/api/user/preferences", authenticateJWT, async (req, res) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Not authenticated" });
-      }
-      
-      const userId = req.user.id;
+      const userId = (req as any).user.id;
       const { favoriteCategories, favoriteColors, favoriteOccasions, priceRangeMin, priceRangeMax } = req.body;
       
       // Validate input
@@ -474,13 +466,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create product (ContentManager or Admin only)
-  app.post("/api/products", async (req, res) => {
+  app.post("/api/products", authenticateJWT, requireRole(["contentManager", "admin"]), async (req, res) => {
     try {
-      // Verify user role
-      if (!req.isAuthenticated() || 
-          (req.user.role !== "contentManager" && req.user.role !== "admin")) {
-        return res.status(403).json({ error: "Not authorized" });
-      }
       
       // Validate request body
       const validatedData = insertProductSchema.parse(req.body);
@@ -498,13 +485,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update product (ContentManager or Admin only)
-  app.patch("/api/products/:id", async (req, res) => {
+  app.patch("/api/products/:id", authenticateJWT, requireRole(["contentManager", "admin"]), async (req, res) => {
     try {
-      // Verify user role
-      if (!req.isAuthenticated() || 
-          (req.user.role !== "contentManager" && req.user.role !== "admin")) {
-        return res.status(403).json({ error: "Not authorized" });
-      }
       
       const id = parseInt(req.params.id);
       
@@ -528,13 +510,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Delete product (ContentManager or Admin only)
-  app.delete("/api/products/:id", async (req, res) => {
+  app.delete("/api/products/:id", authenticateJWT, requireRole(["contentManager", "admin"]), async (req, res) => {
     try {
-      // Verify user role
-      if (!req.isAuthenticated() || 
-          (req.user.role !== "contentManager" && req.user.role !== "admin")) {
-        return res.status(403).json({ error: "Not authorized" });
-      }
       
       const id = parseInt(req.params.id);
       
@@ -566,13 +543,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create inventory item (ContentManager or Admin only)
-  app.post("/api/inventory", async (req, res) => {
+  app.post("/api/inventory", authenticateJWT, requireRole(["contentManager", "admin"]), async (req, res) => {
     try {
-      // Verify user role
-      if (!req.isAuthenticated() || 
-          (req.user.role !== "contentManager" && req.user.role !== "admin")) {
-        return res.status(403).json({ error: "Not authorized" });
-      }
       
       // Validate request body
       const validatedData = insertInventorySchema.parse(req.body);
@@ -590,13 +562,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update inventory item (ContentManager or Admin only)
-  app.patch("/api/inventory/:id", async (req, res) => {
+  app.patch("/api/inventory/:id", authenticateJWT, requireRole(["contentManager", "admin"]), async (req, res) => {
     try {
-      // Verify user role
-      if (!req.isAuthenticated() || 
-          (req.user.role !== "contentManager" && req.user.role !== "admin")) {
-        return res.status(403).json({ error: "Not authorized" });
-      }
       
       const id = parseInt(req.params.id);
       
@@ -635,12 +602,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get all reviews (Admin only)
-  app.get("/api/reviews", async (req, res) => {
+  app.get("/api/reviews", authenticateJWT, requireRole("admin"), async (req, res) => {
     try {
-      // Verify user role
-      if (!req.isAuthenticated() || req.user.role !== "admin") {
-        return res.status(403).json({ error: "Not authorized" });
-      }
       
       const reviews = await storage.getAllReviews();
       
@@ -651,12 +614,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Create review (authenticated users only)
-  app.post("/api/reviews", async (req, res) => {
+  app.post("/api/reviews", authenticateJWT, async (req, res) => {
     try {
-      // Verify authentication
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
       
       // Validate request body
       const validatedData = insertReviewSchema.parse(req.body);
