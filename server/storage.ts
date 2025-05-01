@@ -20,9 +20,11 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, userData: Partial<User>): Promise<User | undefined>;
   updateUserPassword(id: number, password: string): Promise<boolean>;
+  deleteUser(id: number): Promise<boolean>;
   
   // Product management
   getAllProducts(): Promise<Product[]>;
@@ -192,6 +194,10 @@ export class MemStorage implements IStorage {
     user.updatedAt = new Date();
     this.users.set(id, user);
     return true;
+  }
+  
+  async deleteUser(id: number): Promise<boolean> {
+    return this.users.delete(id);
   }
   
   // Product management methods
