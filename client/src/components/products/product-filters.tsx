@@ -78,7 +78,7 @@ export function ProductFilters({
     data: categoriesData = [], 
     isLoading: isCategoriesLoading 
   } = useQuery<CategoryData[]>({
-    queryKey: ['/api/categories'],
+    queryKey: ['/api/metadata/categories'],
   });
   
   // Fetch brands from the server
@@ -86,7 +86,7 @@ export function ProductFilters({
     data: brandsData = [], 
     isLoading: isBrandsLoading 
   } = useQuery<BrandData[]>({
-    queryKey: ['/api/brands'],
+    queryKey: ['/api/metadata/brands'],
   });
   
   // Use the fetched data or placeholders while loading
