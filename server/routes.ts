@@ -397,7 +397,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const query = req.query.q as string;
       const collectionParam = req.query.collection as string;
       
-      console.log("Filter parameters:", { gender, category, brand, size, rating, minPrice, maxPrice, query, collection: collectionParam });
+      // Filter parameters are now silently applied (removed excessive logging)
       
       let products: Product[] = [];
       
