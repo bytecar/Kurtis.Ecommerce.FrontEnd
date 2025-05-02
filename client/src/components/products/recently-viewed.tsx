@@ -40,24 +40,22 @@ export function RecentlyViewed({ className, limit = 5 }: RecentlyViewedProps) {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {displayItems.map((product) => (
           <Card key={product.id} className="border-0 shadow-none group overflow-hidden transition-all duration-300 hover:shadow-md transform hover:-translate-y-1">
-            <Link href={`/product/${product.id}`}>
-              <a className="group">
-                <div className="overflow-hidden rounded-lg">
-                  <img 
-                    src={Array.isArray(product.imageUrls) && product.imageUrls.length > 0
-                      ? product.imageUrls[0]
-                      : "https://images.unsplash.com/photo-1612722432474-b971cdcea546"}
-                    alt={product.name}
-                    className="w-full aspect-[3/4] object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
-                  />
-                </div>
-                <CardContent className="p-3 pt-4">
-                  <h3 className="text-sm font-medium truncate group-hover:text-primary transition-colors duration-300">{product.name}</h3>
-                  <p className="text-muted-foreground text-xs mt-1 transform group-hover:translate-x-1 transition-all duration-300 ease-out">
-                    ₹{product.discountedPrice ?? product.price}
-                  </p>
-                </CardContent>
-              </a>
+            <Link href={`/product/${product.id}`} className="group">
+              <div className="overflow-hidden rounded-lg">
+                <img 
+                  src={Array.isArray(product.imageUrls) && product.imageUrls.length > 0
+                    ? product.imageUrls[0]
+                    : "https://images.unsplash.com/photo-1612722432474-b971cdcea546"}
+                  alt={product.name}
+                  className="w-full aspect-[3/4] object-cover transition-transform duration-500 ease-in-out group-hover:scale-110"
+                />
+              </div>
+              <CardContent className="p-3 pt-4">
+                <h3 className="text-sm font-medium truncate group-hover:text-primary transition-colors duration-300">{product.name}</h3>
+                <p className="text-muted-foreground text-xs mt-1 transform group-hover:translate-x-1 transition-all duration-300 ease-out">
+                  ₹{product.discountedPrice ?? product.price}
+                </p>
+              </CardContent>
             </Link>
           </Card>
         ))}
