@@ -36,8 +36,8 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     },
     {
       enabled: !!user,
-      onError: (error) => {
-        console.error('Error fetching wishlist:', error);
+      onError: () => {
+        // Silent error handling with toast notification only
         showToast({
           message: 'Failed to load wishlist',
           type: 'error',
@@ -57,8 +57,8 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
           type: 'success',
         });
       },
-      onError: (error) => {
-        console.error('Error adding to wishlist:', error);
+      onError: () => {
+        // Silent error handling with toast notification only
         showToast({
           message: 'Failed to add to wishlist',
           type: 'error',
@@ -78,8 +78,8 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
           type: 'success',
         });
       },
-      onError: (error) => {
-        console.error('Error removing from wishlist:', error);
+      onError: () => {
+        // Silent error handling with toast notification only
         showToast({
           message: 'Failed to remove from wishlist',
           type: 'error',
@@ -96,8 +96,12 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
         if (storedWishlist) {
           setLocalWishlist(JSON.parse(storedWishlist));
         }
-      } catch (error) {
-        console.error('Error loading wishlist from storage:', error);
+      } catch {
+        // Silent error handling (storage access failed)
+        showToast({
+          message: 'Failed to load saved wishlist',
+          type: 'error',
+        });
       }
     };
 
@@ -110,7 +114,13 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!user && localWishlist.length > 0) {
       AsyncStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(localWishlist))
-        .catch(error => console.error('Error saving wishlist to storage:', error));
+        .catch(() => {
+          // Silent error handling with toast only
+          showToast({
+            message: 'Failed to save wishlist',
+            type: 'error',
+          });
+        });
     }
   }, [localWishlist, user]);
 
