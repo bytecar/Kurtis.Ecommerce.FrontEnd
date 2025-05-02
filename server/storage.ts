@@ -26,6 +26,10 @@ import {
   InsertCollection,
   ProductCollection,
   InsertProductCollection,
+  Category,
+  InsertCategory,
+  Brand,
+  InsertBrand,
 } from "@shared/schema";
 
 const MemoryStore = createMemoryStore(session);
@@ -40,6 +44,22 @@ export interface IStorage {
   updateUser(id: number, userData: Partial<User>): Promise<User | undefined>;
   updateUserPassword(id: number, password: string): Promise<boolean>;
   deleteUser(id: number): Promise<boolean>;
+
+  // Category management
+  getAllCategoriesData(): Promise<Category[]>;
+  getCategory(id: number): Promise<Category | undefined>;
+  getCategoryByName(name: string): Promise<Category | undefined>;
+  createCategory(category: InsertCategory): Promise<Category>;
+  updateCategory(id: number, categoryData: Partial<Category>): Promise<Category | undefined>;
+  deleteCategory(id: number): Promise<boolean>;
+
+  // Brand management
+  getAllBrandsData(): Promise<Brand[]>;
+  getBrand(id: number): Promise<Brand | undefined>;
+  getBrandByName(name: string): Promise<Brand | undefined>;
+  createBrand(brand: InsertBrand): Promise<Brand>;
+  updateBrand(id: number, brandData: Partial<Brand>): Promise<Brand | undefined>;
+  deleteBrand(id: number): Promise<boolean>;
 
   // Product management
   getAllProducts(): Promise<Product[]>;
@@ -131,6 +151,8 @@ export interface IStorage {
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
+  private categories: Map<number, Category>;
+  private brands: Map<number, Brand>;
   private products: Map<number, Product>;
   private inventory: Map<number, Inventory>;
   private reviews: Map<number, Review>;
@@ -164,6 +186,8 @@ export class MemStorage implements IStorage {
 
   // IDs for auto-increment
   currentUserId: number;
+  currentCategoryId: number;
+  currentBrandId: number;
   currentProductId: number;
   currentInventoryId: number;
   currentReviewId: number;
