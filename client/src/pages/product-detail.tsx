@@ -190,8 +190,8 @@ export default function ProductDetail() {
               {product.gender.charAt(0).toUpperCase() + product.gender.slice(1)}
             </a>
             <span className="mx-2">/</span>
-            <a href={`/products/${product.gender}?category=${product.category}`} className="hover:text-primary">
-              {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
+            <a href={`/products/${product.gender}?categoryId=${product.categoryId}`} className="hover:text-primary">
+              {product.categoryId.toString()}
             </a>
             <span className="mx-2">/</span>
             <span className="text-gray-900">{product.name}</span>
@@ -235,7 +235,7 @@ export default function ProductDetail() {
           {/* Product Info */}
           <div>
             <h1 className="text-2xl font-medium mb-2">{product.name}</h1>
-            <p className="text-muted-foreground mb-4">By {product.brand}</p>
+            <p className="text-muted-foreground mb-4">By Brand ID: {product.brandId}</p>
             
             {/* Ratings */}
             <div className="flex items-center mb-4">
@@ -288,7 +288,7 @@ export default function ProductDetail() {
                 <div className="flex gap-2">
                   {!isInventoryLoading && (
                     <SizeRecommendationWizard 
-                      productType={product.category}
+                      productType={product.categoryId.toString()}
                       productGender={product.gender}
                       availableSizes={getSizeOptions()}
                       onSizeSelect={handleSizeSelect}
@@ -399,9 +399,9 @@ export default function ProductDetail() {
                 title={product.name}
                 description={product.description}
                 imageUrl={Array.isArray(product.imageUrls) && product.imageUrls.length > 0 ? product.imageUrls[0] : undefined}
-                category={product.category}
+                category={product.categoryId.toString()}
                 // Example occasion and region - these could be properties of the product in a real setup
-                occasion={product.category.includes('wedding') ? 'wedding' : product.category.includes('festival') ? 'festival' : 'casual'}
+                occasion="casual"
                 region="north-india"
                 buttonSize="icon"
               />
