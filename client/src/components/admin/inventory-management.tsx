@@ -347,14 +347,20 @@ export function InventoryManagement() {
     ? products.filter((product) => {
         let matchesCategory = true;
         if (filterCategory !== "all") {
-          matchesCategory = product.category === filterCategory;
+          // Use categoryId for filtering instead of category
+          matchesCategory = product.categoryId.toString() === filterCategory;
         }
         
         let matchesSearch = true;
         if (searchQuery) {
+          // Get brand and category names from their IDs
+          const brandName = product.brandId ? product.brandId.toString() : '';
+          const categoryName = product.categoryId ? product.categoryId.toString() : '';
+          
           matchesSearch = 
             product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            brandName.includes(searchQuery) ||
+            categoryName.includes(searchQuery) ||
             product.id.toString().includes(searchQuery);
         }
         
@@ -425,9 +431,9 @@ export function InventoryManagement() {
     removeProductFromCollectionMutation.mutate({ productId, collectionId });
   };
 
-  // Get unique categories for filtering
+  // Get unique category IDs for filtering
   const categories = products
-    ? Array.from(new Set(products.map((product) => product.category)))
+    ? Array.from(new Set(products.map((product) => product.categoryId.toString())))
     : [];
 
   if (isProductsLoading) {
@@ -555,10 +561,10 @@ export function InventoryManagement() {
                             </div>
                           </TableCell>
                           <TableCell>{product.name}</TableCell>
-                          <TableCell>{product.brand}</TableCell>
+                          <TableCell>{product.brandId}</TableCell>
                           <TableCell>
                             <Badge variant="outline">
-                              {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
+                              {product.categoryId.toString()}
                             </Badge>
                           </TableCell>
                           <TableCell>
