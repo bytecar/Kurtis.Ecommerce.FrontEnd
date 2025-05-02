@@ -1374,6 +1374,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // ======= Return Routes =======
   
+  // Get all returns (admin only)
+  app.get("/api/returns", authenticateJWT, requireRole("admin"), async (req, res) => {
+    try {
+      const returns = await storage.getAllReturns();
+      res.json(returns);
+    } catch (error) {
+      console.error("Error fetching returns:", error);
+      res.status(500).json({ error: "Failed to retrieve returns" });
+    }
+  });
+
+  // Get returns for specific user (authenticated users only)
+  app.get("/api/user/returns", authenticateJWT, async (req, res) => {
+    try {
+      // Get authenticated user
+      const user = getUserSafely(req);
+      
+      const returns = await storage.getReturnsByUser(user.id);
+      res.json(returns);
+    } catch (error) {
+      console.error("Error fetching user returns:", error);
+      res.status(500).json({ error: "Failed to retrieve user returns" });
+    }
+  });
+
+  // Get a specific return (admin or owner)
+  app.get("/api/returns/:id", authenticateJWT, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const returnItem = await storage.getAllReturns();
+      const foundReturn = returnItem.find(item => item.id === id);
+      
+      if (!foundReturn) {
+        return res.status(404).json({ error: "Return not found" });
+      }
+
+      // Get authenticated user
+      const user = getUserSafely(req);
+      
+      // If the user is not an admin, check if they own the return
+      if (user.role !== "admin") {
+        const order = await storage.getOrder(foundReturn.orderId);
+        if (!order || order.userId !== user.id) {
+          return res.status(403).json({ error: "Not authorized to view this return" });
+        }
+      }
+      
+      res.json(foundReturn);
+    } catch (error) {
+      console.error("Error fetching return:", error);
+      res.status(500).json({ error: "Failed to retrieve return" });
+    }
+  });
+  
+  // Update return status (admin only)
+  app.patch("/api/returns/:id", authenticateJWT, requireRole("admin"), async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { status } = req.body;
+      
+      // Validate status
+      if (!['pending', 'approved', 'rejected', 'completed'].includes(status)) {
+        return res.status(400).json({ error: "Invalid status. Must be one of: pending, approved, rejected, completed" });
+      }
+      
+      // Update return status
+      const updatedReturn = await storage.updateReturnStatus(id, status);
+      
+      if (!updatedReturn) {
+        return res.status(404).json({ error: "Return not found" });
+      }
+      
+      res.json(updatedReturn);
+    } catch (error) {
+      console.error("Error updating return status:", error);
+      res.status(500).json({ error: "Failed to update return status" });
+    }
+  });
+  
   // Create return (authenticated users only)
   app.post("/api/returns", authenticateJWT, async (req, res) => {
     try {
