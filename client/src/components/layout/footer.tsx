@@ -39,23 +39,23 @@ export function Footer() {
             <h3 className="text-lg font-medium mb-4">Shop</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/products/women" className="text-gray-400 hover:text-white cursor-pointer">
-                  Women's Wear
+                <Link href="/products/women">
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Women's Wear</div>
                 </Link>
               </li>
               <li>
-                <Link href="/products/men" className="text-gray-400 hover:text-white cursor-pointer">
-                  Men's Wear
+                <Link href="/products/men">
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Men's Wear</div>
                 </Link>
               </li>
               <li>
-                <Link href="/products/new" className="text-gray-400 hover:text-white cursor-pointer">
-                  New Arrivals
+                <Link href="/products/new">
+                  <div className="text-gray-400 hover:text-white cursor-pointer">New Arrivals</div>
                 </Link>
               </li>
               <li>
-                <Link href="/products/sale" className="text-gray-400 hover:text-white cursor-pointer">
-                  Sale
+                <Link href="/products/sale">
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Sale</div>
                 </Link>
               </li>
             </ul>
@@ -66,8 +66,8 @@ export function Footer() {
             <h3 className="text-lg font-medium mb-4">Customer Service</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/contact" className="text-gray-400 hover:text-white cursor-pointer">
-                  Contact Us
+                <Link href="/contact">
+                  <div className="text-gray-400 hover:text-white cursor-pointer">Contact Us</div>
                 </Link>
               </li>
               <li>
