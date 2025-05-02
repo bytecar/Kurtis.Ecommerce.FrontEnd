@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -72,33 +72,32 @@ export function ProductFilters({
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedRating, setSelectedRating] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-  
+
   // Fetch categories from the server
-  const { 
-    data: categoriesData = [], 
-    isLoading: isCategoriesLoading 
-  } = useQuery<CategoryData[]>({
-    queryKey: ['/api/metadata/categories'],
-  });
-  
+  const { data: categoriesData = [], isLoading: isCategoriesLoading } =
+    useQuery<CategoryData[]>({
+      queryKey: ["/api/metadata/categories"],
+    });
+
   // Fetch brands from the server
-  const { 
-    data: brandsData = [], 
-    isLoading: isBrandsLoading 
-  } = useQuery<BrandData[]>({
-    queryKey: ['/api/metadata/brands'],
+  const { data: brandsData = [], isLoading: isBrandsLoading } = useQuery<
+    BrandData[]
+  >({
+    queryKey: ["/api/metadata/brands"],
   });
-  
+
   // Use the fetched data or placeholders while loading
-  const categories = isCategoriesLoading ? placeholderCategories : categoriesData;
+  const categories = isCategoriesLoading
+    ? placeholderCategories
+    : categoriesData;
   const brands = isBrandsLoading ? placeholderBrands : brandsData;
-  
+
   // Track accordion state for collapsibility
   const [openAccordions, setOpenAccordions] = useState({
     categories: true,
     brands: true,
     sizes: true,
-    ratings: true
+    ratings: true,
   });
 
   // Toggle accordion state
@@ -114,7 +113,7 @@ export function ProductFilters({
     setSelectedCategories((prev) =>
       prev.includes(categoryId)
         ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId]
+        : [...prev, categoryId],
     );
   };
 
@@ -123,7 +122,7 @@ export function ProductFilters({
     setSelectedBrands((prev) =>
       prev.includes(brandId)
         ? prev.filter((id) => id !== brandId)
-        : [...prev, brandId]
+        : [...prev, brandId],
     );
   };
 
@@ -143,28 +142,31 @@ export function ProductFilters({
     setSelectedRating(newRating);
   };
 
-  // Apply filters
-  const applyFilters = () => {
+  // Create a memoized filters object to avoid unnecessary re-renders
+  const currentFilters = useMemo(() => ({
+    categories: selectedCategories,
+    brands: selectedBrands,
+    sizes: selectedSizes,
+    rating: selectedRating,
+    price: priceRange,
+  }), [selectedCategories, selectedBrands, selectedSizes, selectedRating, priceRange]);
+  
+  // Apply filters - memoized to prevent recreating function on every render
+  const applyFilters = useCallback(() => {
     if (onFilterChange) {
-      onFilterChange({
-        categories: selectedCategories,
-        brands: selectedBrands,
-        sizes: selectedSizes,
-        rating: selectedRating,
-        price: priceRange,
-      });
+      onFilterChange(currentFilters);
     }
     setOpen(false);
-  };
+  }, [onFilterChange, currentFilters, setOpen]);
 
-  // Reset filters
-  const resetFilters = () => {
+  // Reset filters - memoized to prevent recreating function on every render
+  const resetFilters = useCallback(() => {
     setSelectedCategories([]);
     setSelectedBrands([]);
     setSelectedSizes([]);
     setSelectedRating(null);
     setPriceRange([500, 5000]);
-    
+
     if (onFilterChange) {
       onFilterChange({
         categories: [],
@@ -175,40 +177,34 @@ export function ProductFilters({
       });
     }
     setOpen(false);
-  };
+  }, [onFilterChange, setOpen]);
 
+  // This effect runs only when the filters actually change, not on every render
   useEffect(() => {
+    // Only update filters when component is in desktop mode to avoid 
+    // continuously updating as the user makes selections in mobile
     if (!isMobile && onFilterChange) {
-      const filterData = {
-        categories: selectedCategories,
-        brands: selectedBrands,
-        sizes: selectedSizes,
-        rating: selectedRating,
-        price: priceRange,
-      };
-      onFilterChange(filterData);
+      // Using a small timeout to debounce frequent changes
+      // This significantly improves performance when using filters
+      const timer = setTimeout(() => {
+        onFilterChange(currentFilters);
+      }, 200);
+      
+      return () => clearTimeout(timer);
     }
-  }, [
-    selectedCategories,
-    selectedBrands,
-    selectedSizes,
-    selectedRating,
-    priceRange,
-    isMobile,
-    onFilterChange,
-  ]);
+  }, [currentFilters, isMobile, onFilterChange]);
 
   // Category filter section
   const CategoryFilter = () => (
     <div className="border-b pb-4">
-      <button 
+      <button
         className="w-full flex justify-between items-center py-2 font-medium text-base"
         onClick={() => toggleAccordion("categories")}
       >
         Categories
         <span>{openAccordions.categories ? "▲" : "▼"}</span>
       </button>
-      
+
       {openAccordions.categories && (
         <div className="space-y-2 mt-2">
           {isCategoriesLoading ? (
@@ -218,8 +214,8 @@ export function ProductFilters({
             </div>
           ) : (
             categoriesData.map((category) => (
-              <div 
-                key={category.id} 
+              <div
+                key={category.id}
                 className="flex items-center space-x-2 cursor-pointer"
               >
                 <Checkbox
@@ -231,7 +227,6 @@ export function ProductFilters({
                 <Label
                   htmlFor={`category-${category.id}`}
                   className="text-sm cursor-pointer w-full"
-                  onClick={() => handleCategoryChange(category.name)}
                 >
                   {category.label}
                 </Label>
@@ -246,14 +241,14 @@ export function ProductFilters({
   // Brand filter section
   const BrandFilter = () => (
     <div className="border-b pb-4">
-      <button 
+      <button
         className="w-full flex justify-between items-center py-2 font-medium text-base"
         onClick={() => toggleAccordion("brands")}
       >
         Brands
         <span>{openAccordions.brands ? "▲" : "▼"}</span>
       </button>
-      
+
       {openAccordions.brands && (
         <div className="space-y-2 mt-2">
           {isBrandsLoading ? (
@@ -263,20 +258,19 @@ export function ProductFilters({
             </div>
           ) : (
             brandsData.map((brand) => (
-              <div 
-                key={brand.id} 
+              <div
+                key={brand.id}
                 className="flex items-center space-x-2 cursor-pointer"
               >
                 <Checkbox
                   id={`brand-${brand.id}`}
-                  checked={selectedBrands.includes(brand.name)}
-                  onCheckedChange={() => handleBrandChange(brand.name)}
+                  checked={selectedBrands.includes(brand.id.toString())}
+                  onCheckedChange={() => handleBrandChange(brand.id.toString())}
                   className="cursor-pointer"
                 />
                 <Label
                   htmlFor={`brand-${brand.id}`}
                   className="text-sm cursor-pointer w-full"
-                  onClick={() => handleBrandChange(brand.name)}
                 >
                   {brand.label}
                 </Label>
@@ -291,19 +285,19 @@ export function ProductFilters({
   // Size filter section
   const SizeFilter = () => (
     <div className="border-b pb-4">
-      <button 
+      <button
         className="w-full flex justify-between items-center py-2 font-medium text-base"
         onClick={() => toggleAccordion("sizes")}
       >
         Sizes
         <span>{openAccordions.sizes ? "▲" : "▼"}</span>
       </button>
-      
+
       {openAccordions.sizes && (
         <div className="space-y-2 mt-2">
           {sizes.map((size) => (
-            <div 
-              key={size.id} 
+            <div
+              key={size.id}
               className="flex items-center space-x-2 cursor-pointer"
             >
               <Checkbox
@@ -315,7 +309,6 @@ export function ProductFilters({
               <Label
                 htmlFor={`size-${size.id}`}
                 className="text-sm cursor-pointer w-full"
-                onClick={() => handleSizeChange(size.id)}
               >
                 {size.label}
               </Label>
@@ -329,19 +322,19 @@ export function ProductFilters({
   // Rating filter section
   const RatingFilter = () => (
     <div className="border-b pb-4">
-      <button 
+      <button
         className="w-full flex justify-between items-center py-2 font-medium text-base"
         onClick={() => toggleAccordion("ratings")}
       >
         Customer Ratings
         <span>{openAccordions.ratings ? "▲" : "▼"}</span>
       </button>
-      
+
       {openAccordions.ratings && (
         <div className="space-y-2 mt-2">
           {ratings.map((rating) => (
-            <div 
-              key={rating.id} 
+            <div
+              key={rating.id}
               className="flex items-center space-x-2 cursor-pointer"
             >
               <Checkbox
@@ -414,7 +407,10 @@ export function ProductFilters({
             Filters
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-[300px] sm:w-[400px] overflow-y-auto">
+        <SheetContent
+          side="left"
+          className="w-[300px] sm:w-[400px] overflow-y-auto"
+        >
           <h2 className="text-lg font-medium mb-4">Filter Products</h2>
           <FilterContent />
         </SheetContent>
