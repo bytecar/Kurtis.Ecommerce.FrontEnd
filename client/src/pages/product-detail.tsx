@@ -55,10 +55,10 @@ export default function ProductDetail() {
     enabled: !isNaN(productId),
   });
 
-  // Add product to recently viewed on mount
+  // Add product to recently viewed on mount only once
   useEffect(() => {
     // Only add to recently viewed if product ID is valid
-    if (productId && !isNaN(productId)) {
+    if (productId && !isNaN(productId) && product) {
       // Using setTimeout to ensure this happens after the component has fully mounted
       const timer = setTimeout(() => {
         addToRecentlyViewed(productId);
@@ -66,7 +66,7 @@ export default function ProductDetail() {
       
       return () => clearTimeout(timer);
     }
-  }, [productId, addToRecentlyViewed]);
+  }, [productId, product]); // Only run when product or productId changes
   
   // Update page title when product data is available
   useEffect(() => {
@@ -184,15 +184,15 @@ export default function ProductDetail() {
         {/* Breadcrumbs */}
         <div className="mb-6">
           <div className="flex items-center text-sm text-gray-500">
-            <a href="/" className="hover:text-primary">Home</a>
+            <Link href="/" className="hover:text-primary">Home</Link>
             <span className="mx-2">/</span>
-            <a href={`/products/${product.gender}`} className="hover:text-primary">
+            <Link href={`/products/${product.gender}`} className="hover:text-primary">
               {product.gender.charAt(0).toUpperCase() + product.gender.slice(1)}
-            </a>
+            </Link>
             <span className="mx-2">/</span>
-            <a href={`/products/${product.gender}?categoryId=${product.categoryId}`} className="hover:text-primary">
+            <Link href={`/products/${product.gender}?categoryId=${product.categoryId}`} className="hover:text-primary">
               {product.categoryId.toString()}
-            </a>
+            </Link>
             <span className="mx-2">/</span>
             <span className="text-gray-900">{product.name}</span>
           </div>
