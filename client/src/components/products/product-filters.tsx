@@ -108,39 +108,39 @@ export function ProductFilters({
     }));
   };
 
-  // Handle category selection
-  const handleCategoryChange = (categoryId: string) => {
+  // Handle category selection - memoized to prevent recreation on every render
+  const handleCategoryChange = useCallback((categoryId: string) => {
     setSelectedCategories((prev) =>
       prev.includes(categoryId)
         ? prev.filter((id) => id !== categoryId)
         : [...prev, categoryId],
     );
-  };
+  }, []);
 
-  // Handle brand selection
-  const handleBrandChange = (brandId: string) => {
+  // Handle brand selection - memoized to prevent recreation on every render
+  const handleBrandChange = useCallback((brandId: string) => {
     setSelectedBrands((prev) =>
       prev.includes(brandId)
         ? prev.filter((id) => id !== brandId)
         : [...prev, brandId],
     );
-  };
+  }, []);
 
-  // Handle size selection
-  const handleSizeChange = (sizeId: string) => {
+  // Handle size selection - memoized to prevent recreation on every render
+  const handleSizeChange = useCallback((sizeId: string) => {
     setSelectedSizes((prev) => {
       const newSizes = prev.includes(sizeId)
         ? prev.filter((id) => id !== sizeId)
         : [...prev, sizeId];
       return newSizes;
     });
-  };
+  }, []);
 
-  // Handle rating selection
-  const handleRatingChange = (ratingId: string) => {
+  // Handle rating selection - memoized to prevent recreation on every render
+  const handleRatingChange = useCallback((ratingId: string) => {
     const newRating = selectedRating === ratingId ? null : ratingId;
     setSelectedRating(newRating);
-  };
+  }, [selectedRating]);
 
   // Create a memoized filters object to avoid unnecessary re-renders
   const currentFilters = useMemo(() => ({
@@ -194,8 +194,8 @@ export function ProductFilters({
     }
   }, [currentFilters, isMobile, onFilterChange]);
 
-  // Category filter section
-  const CategoryFilter = () => (
+  // Category filter section - memoized to prevent unnecessary rerenders
+  const CategoryFilter = useMemo(() => (
     <div className="border-b pb-4">
       <button
         className="w-full flex justify-between items-center py-2 font-medium text-base"
@@ -236,10 +236,10 @@ export function ProductFilters({
         </div>
       )}
     </div>
-  );
+  ), [openAccordions.categories, isCategoriesLoading, categoriesData, selectedCategories, handleCategoryChange]);
 
-  // Brand filter section
-  const BrandFilter = () => (
+  // Brand filter section - memoized to prevent unnecessary rerenders
+  const BrandFilter = useMemo(() => (
     <div className="border-b pb-4">
       <button
         className="w-full flex justify-between items-center py-2 font-medium text-base"
@@ -280,10 +280,10 @@ export function ProductFilters({
         </div>
       )}
     </div>
-  );
+  ), [openAccordions.brands, isBrandsLoading, brandsData, selectedBrands, handleBrandChange]);
 
-  // Size filter section
-  const SizeFilter = () => (
+  // Size filter section - memoized to prevent unnecessary rerenders
+  const SizeFilter = useMemo(() => (
     <div className="border-b pb-4">
       <button
         className="w-full flex justify-between items-center py-2 font-medium text-base"
@@ -317,10 +317,10 @@ export function ProductFilters({
         </div>
       )}
     </div>
-  );
+  ), [openAccordions.sizes, sizes, selectedSizes, handleSizeChange]);
 
-  // Rating filter section
-  const RatingFilter = () => (
+  // Rating filter section - memoized to prevent unnecessary rerenders
+  const RatingFilter = useMemo(() => (
     <div className="border-b pb-4">
       <button
         className="w-full flex justify-between items-center py-2 font-medium text-base"
@@ -346,7 +346,6 @@ export function ProductFilters({
               <Label
                 htmlFor={`rating-${rating.id}`}
                 className="text-sm cursor-pointer w-full"
-                onClick={() => handleRatingChange(rating.id)}
               >
                 {rating.label}
               </Label>
@@ -355,9 +354,10 @@ export function ProductFilters({
         </div>
       )}
     </div>
-  );
+  ), [openAccordions.ratings, ratings, selectedRating, handleRatingChange]);
 
-  const FilterContent = () => (
+  // FilterContent also memoized to prevent unnecessary rerenders
+  const FilterContent = useMemo(() => (
     <div className={`flex flex-col space-y-4 ${className}`}>
       {/* Price Range */}
       <div className="mb-4 border-b pb-4">
@@ -377,11 +377,11 @@ export function ProductFilters({
         </div>
       </div>
 
-      {/* Filter sections */}
-      <CategoryFilter />
-      <BrandFilter />
-      <SizeFilter />
-      <RatingFilter />
+      {/* Filter sections - using fragments here since these are already ReactNodes from useMemo */}
+      {CategoryFilter}
+      {BrandFilter}
+      {SizeFilter}
+      {RatingFilter}
 
       {/* Mobile Filter Buttons */}
       {isMobile && (
@@ -395,7 +395,7 @@ export function ProductFilters({
         </div>
       )}
     </div>
-  );
+  ), [className, priceRange, setPriceRange, CategoryFilter, BrandFilter, SizeFilter, RatingFilter, isMobile, resetFilters, applyFilters]);
 
   // Mobile view with sheet
   if (isMobile) {
@@ -412,12 +412,12 @@ export function ProductFilters({
           className="w-[300px] sm:w-[400px] overflow-y-auto"
         >
           <h2 className="text-lg font-medium mb-4">Filter Products</h2>
-          <FilterContent />
+          {FilterContent}
         </SheetContent>
       </Sheet>
     );
   }
 
   // Desktop view
-  return <FilterContent />;
+  return FilterContent;
 }
