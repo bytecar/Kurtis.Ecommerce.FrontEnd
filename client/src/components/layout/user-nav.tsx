@@ -93,6 +93,13 @@ export function UserNav() {
                         </div>
                       </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin/returns">
+                        <div className="w-full cursor-pointer">
+                          {t("adminDashboard.returns")}
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
                   </>
                 )}
 
