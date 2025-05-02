@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "wouter";
+import { useParams, Link } from "wouter";
 import { Product, Review } from "@shared/schema";
 import { StarRating } from "@/components/products/star-rating";
 import { Badge } from "@/components/ui/badge";
@@ -188,15 +188,15 @@ export default function ProductDetail() {
         {/* Breadcrumbs */}
         <div className="mb-6">
           <div className="flex items-center text-sm text-gray-500">
-            <Link href="/" className="hover:text-primary">Home</Link>
+            <a href="/" className="hover:text-primary">Home</a>
             <span className="mx-2">/</span>
-            <Link href={`/products/${product.gender}`} className="hover:text-primary">
+            <a href={`/products/${product.gender}`} className="hover:text-primary">
               {product.gender.charAt(0).toUpperCase() + product.gender.slice(1)}
-            </Link>
+            </a>
             <span className="mx-2">/</span>
-            <Link href={`/products/${product.gender}?categoryId=${product.categoryId}`} className="hover:text-primary">
+            <a href={`/products/${product.gender}?categoryId=${product.categoryId}`} className="hover:text-primary">
               {product.categoryId.toString()}
-            </Link>
+            </a>
             <span className="mx-2">/</span>
             <span className="text-gray-900">{product.name}</span>
           </div>
