@@ -21,7 +21,7 @@ import InventoryPage from "@/pages/admin/inventory-page";
 import ReviewPage from "@/pages/admin/review-page";
 import CustomerManagement from "@/pages/admin/customer-management";
 import RatingManagement from "@/pages/admin/rating-management";
-import ReturnsManagement from "@/pages/admin/returns-management";
+import AdminReturnsPage from "@/pages/admin/returns";
 import ErrorDemoPage from "@/pages/error-demo-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { CartProvider } from "@/hooks/use-cart";
@@ -60,7 +60,7 @@ function Router() {
           <AdminRoute path="/admin/reviews" component={ReviewPage} />
           <AdminRoute path="/admin/customers" component={CustomerManagement} />
           <AdminRoute path="/admin/ratings" component={RatingManagement} />
-          <AdminRoute path="/admin/returns" component={ReturnsManagement} />
+          <AdminRoute path="/admin/returns" component={AdminReturnsPage} />
           
           {/* Content Manager routes */}
           <ContentManagerRoute path="/admin/inventory" component={InventoryPage} />
