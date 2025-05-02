@@ -58,6 +58,42 @@ export const insertUserSchema = createInsertSchema(users)
     birthdate: z.date().optional(),
   });
 
+// Categories
+export const categories = pgTable("categories", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  label: text("label").notNull(),
+  description: text("description"),
+  gender: text("gender"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertCategorySchema = createInsertSchema(categories).pick({
+  name: true,
+  label: true,
+  description: true,
+  gender: true,
+});
+
+// Brands
+export const brands = pgTable("brands", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  label: text("label").notNull(),
+  description: text("description"),
+  logo: text("logo"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertBrandSchema = createInsertSchema(brands).pick({
+  name: true,
+  label: true,
+  description: true,
+  logo: true,
+});
+
 // Products
 export const products = pgTable("products", {
   id: serial("id").primaryKey(),
@@ -65,8 +101,8 @@ export const products = pgTable("products", {
   description: text("description").notNull(),
   price: integer("price").notNull(),
   discountedPrice: integer("discounted_price"),
-  brand: text("brand").notNull(),
-  category: text("category").notNull(),
+  brandId: integer("brand_id").notNull(), // Foreign key to brands table
+  categoryId: integer("category_id").notNull(), // Foreign key to categories table
   gender: text("gender").notNull(),
   sizes: json("sizes").$type<string[]>(),
   averageRating: doublePrecision("average_rating").default(0),
@@ -83,8 +119,8 @@ export const insertProductSchema = createInsertSchema(products).pick({
   description: true,
   price: true,
   discountedPrice: true,
-  brand: true,
-  category: true,
+  brandId: true,
+  categoryId: true,
   gender: true,
   sizes: true,
   averageRating: true,
@@ -221,6 +257,12 @@ export const insertRecentlyViewedSchema = createInsertSchema(
 // Type definitions
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+
+export type Category = typeof categories.$inferSelect;
+export type InsertCategory = z.infer<typeof insertCategorySchema>;
+
+export type Brand = typeof brands.$inferSelect;
+export type InsertBrand = z.infer<typeof insertBrandSchema>;
 
 export type Product = typeof products.$inferSelect;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
