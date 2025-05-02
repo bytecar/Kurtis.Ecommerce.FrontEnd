@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import {
   Accordion,
   AccordionContent,
@@ -11,32 +12,29 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { FilterIcon } from "lucide-react";
+import { FilterIcon, Loader2 } from "lucide-react";
 
-// Filter options - Make sure IDs match the exact values stored in the database
-const categories = [
-  { id: "kurtis", label: "Kurtis" },
-  { id: "sarees", label: "Sarees" },
-  { id: "lehengas", label: "Lehengas" },
-  { id: "salwar_kameez", label: "Salwar Kameez" },
-  { id: "anarkali_suits", label: "Anarkali Suits" },
-  { id: "palazzo_suits", label: "Palazzo Suits" },
-  { id: "gowns", label: "Gowns" },
-  { id: "kurtas", label: "Kurtas" },
-  { id: "nehru_jackets", label: "Nehru Jackets" },
-  { id: "jewelry", label: "Jewelry" },
-  { id: "footwear", label: "Footwear" },
+// Types for category and brand data
+interface CategoryData {
+  id: number;
+  name: string;
+  label: string;
+  gender: string | null;
+}
+
+interface BrandData {
+  id: number;
+  name: string;
+  label: string;
+}
+
+// Placeholder data while loading
+const placeholderCategories = [
+  { id: "loading", name: "loading", label: "Loading...", gender: null },
 ];
 
-const brands = [
-  { id: "Fabindia", label: "Fabindia" },
-  { id: "Biba", label: "Biba" },
-  { id: "W", label: "W" },
-  { id: "Global Desi", label: "Global Desi" },
-  { id: "Manyavar", label: "Manyavar" },
-  { id: "Ritu Kumar", label: "Ritu Kumar" },
-  { id: "House of Masaba", label: "House of Masaba" },
-  { id: "Anita Dongre", label: "Anita Dongre" },
+const placeholderBrands = [
+  { id: "loading", name: "loading", label: "Loading..." },
 ];
 
 const sizes = [
@@ -74,6 +72,26 @@ export function ProductFilters({
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedRating, setSelectedRating] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  
+  // Fetch categories from the server
+  const { 
+    data: categoriesData = [], 
+    isLoading: isCategoriesLoading 
+  } = useQuery<CategoryData[]>({
+    queryKey: ['/api/categories'],
+  });
+  
+  // Fetch brands from the server
+  const { 
+    data: brandsData = [], 
+    isLoading: isBrandsLoading 
+  } = useQuery<BrandData[]>({
+    queryKey: ['/api/brands'],
+  });
+  
+  // Use the fetched data or placeholders while loading
+  const categories = isCategoriesLoading ? placeholderCategories : categoriesData;
+  const brands = isBrandsLoading ? placeholderBrands : brandsData;
   
   // Track accordion state for collapsibility
   const [openAccordions, setOpenAccordions] = useState({
@@ -193,26 +211,33 @@ export function ProductFilters({
       
       {openAccordions.categories && (
         <div className="space-y-2 mt-2">
-          {categories.map((category) => (
-            <div 
-              key={category.id} 
-              className="flex items-center space-x-2 cursor-pointer"
-            >
-              <Checkbox
-                id={`category-${category.id}`}
-                checked={selectedCategories.includes(category.id)}
-                onCheckedChange={() => handleCategoryChange(category.id)}
-                className="cursor-pointer"
-              />
-              <Label
-                htmlFor={`category-${category.id}`}
-                className="text-sm cursor-pointer w-full"
-                onClick={() => handleCategoryChange(category.id)}
-              >
-                {category.label}
-              </Label>
+          {isCategoriesLoading ? (
+            <div className="flex items-center justify-center py-2">
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              <span className="text-sm">Loading categories...</span>
             </div>
-          ))}
+          ) : (
+            categoriesData.map((category) => (
+              <div 
+                key={category.id} 
+                className="flex items-center space-x-2 cursor-pointer"
+              >
+                <Checkbox
+                  id={`category-${category.id}`}
+                  checked={selectedCategories.includes(category.name)}
+                  onCheckedChange={() => handleCategoryChange(category.name)}
+                  className="cursor-pointer"
+                />
+                <Label
+                  htmlFor={`category-${category.id}`}
+                  className="text-sm cursor-pointer w-full"
+                  onClick={() => handleCategoryChange(category.name)}
+                >
+                  {category.label}
+                </Label>
+              </div>
+            ))
+          )}
         </div>
       )}
     </div>
@@ -231,26 +256,33 @@ export function ProductFilters({
       
       {openAccordions.brands && (
         <div className="space-y-2 mt-2">
-          {brands.map((brand) => (
-            <div 
-              key={brand.id} 
-              className="flex items-center space-x-2 cursor-pointer"
-            >
-              <Checkbox
-                id={`brand-${brand.id}`}
-                checked={selectedBrands.includes(brand.id)}
-                onCheckedChange={() => handleBrandChange(brand.id)}
-                className="cursor-pointer"
-              />
-              <Label
-                htmlFor={`brand-${brand.id}`}
-                className="text-sm cursor-pointer w-full"
-                onClick={() => handleBrandChange(brand.id)}
-              >
-                {brand.label}
-              </Label>
+          {isBrandsLoading ? (
+            <div className="flex items-center justify-center py-2">
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              <span className="text-sm">Loading brands...</span>
             </div>
-          ))}
+          ) : (
+            brandsData.map((brand) => (
+              <div 
+                key={brand.id} 
+                className="flex items-center space-x-2 cursor-pointer"
+              >
+                <Checkbox
+                  id={`brand-${brand.id}`}
+                  checked={selectedBrands.includes(brand.name)}
+                  onCheckedChange={() => handleBrandChange(brand.name)}
+                  className="cursor-pointer"
+                />
+                <Label
+                  htmlFor={`brand-${brand.id}`}
+                  className="text-sm cursor-pointer w-full"
+                  onClick={() => handleBrandChange(brand.name)}
+                >
+                  {brand.label}
+                </Label>
+              </div>
+            ))
+          )}
         </div>
       )}
     </div>
