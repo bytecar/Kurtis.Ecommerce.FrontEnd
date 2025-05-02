@@ -56,15 +56,17 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   // Remove item from wishlist
   const removeMutation = useMutation({
     mutationFn: async (productId: number) => {
+      // No need to parse response as server returns 204 No Content
       const res = await apiRequest("DELETE", `/api/wishlist/${productId}`);
-      return await res.json();
+      return null; // Just return null, no need to parse response
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/wishlist"] });
     },
     onError: (error: Error) => {
+      console.error("Failed to remove from wishlist:", error);
       toast({
-        title: "Error",
+        title: "Error removing from wishlist",
         description: error.message,
         variant: "destructive",
       });
