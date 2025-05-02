@@ -202,6 +202,8 @@ export class MemStorage implements IStorage {
 
   constructor() {
     this.users = new Map();
+    this.categories = new Map();
+    this.brands = new Map();
     this.products = new Map();
     this.inventory = new Map();
     this.reviews = new Map();
@@ -215,6 +217,8 @@ export class MemStorage implements IStorage {
     this.productCollections = new Map();
 
     this.currentUserId = 1;
+    this.currentCategoryId = 1;
+    this.currentBrandId = 1;
     this.currentProductId = 1;
     this.currentInventoryId = 1;
     this.currentReviewId = 1;
@@ -231,6 +235,10 @@ export class MemStorage implements IStorage {
       checkPeriod: 86400000, // prune expired entries every 24h
     });
 
+    // Initialize categories and brands first
+    this.initializeCategories();
+    this.initializeBrands();
+    
     // Initialize with products, preferences, and reviews (non-async)
     this.initializeProducts();
     this.initializeUserPreferences();
@@ -241,6 +249,120 @@ export class MemStorage implements IStorage {
     this.initializeUsersAsync();
   }
   
+  // Category management methods
+  async getAllCategoriesData(): Promise<Category[]> {
+    return Array.from(this.categories.values());
+  }
+
+  async getCategory(id: number): Promise<Category | undefined> {
+    return this.categories.get(id);
+  }
+
+  async getCategoryByName(name: string): Promise<Category | undefined> {
+    return Array.from(this.categories.values()).find(
+      (category) => category.name.toLowerCase() === name.toLowerCase()
+    );
+  }
+
+  async createCategory(category: InsertCategory): Promise<Category> {
+    const id = this.currentCategoryId++;
+    const now = new Date();
+    const newCategory: Category = {
+      ...category,
+      id,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.categories.set(id, newCategory);
+    return newCategory;
+  }
+
+  async updateCategory(
+    id: number,
+    categoryData: Partial<Category>
+  ): Promise<Category | undefined> {
+    const category = this.categories.get(id);
+    if (!category) return undefined;
+
+    const updatedCategory = {
+      ...category,
+      ...categoryData,
+      updatedAt: new Date(),
+    };
+    this.categories.set(id, updatedCategory);
+    return updatedCategory;
+  }
+
+  async deleteCategory(id: number): Promise<boolean> {
+    // Check if any products are using this category
+    const productsUsingCategory = Array.from(this.products.values()).filter(
+      product => product.categoryId === id
+    );
+    
+    if (productsUsingCategory.length > 0) {
+      throw new Error(`Cannot delete category with ID ${id} because it's still being used by ${productsUsingCategory.length} product(s).`);
+    }
+    
+    return this.categories.delete(id);
+  }
+
+  // Brand management methods
+  async getAllBrandsData(): Promise<Brand[]> {
+    return Array.from(this.brands.values());
+  }
+
+  async getBrand(id: number): Promise<Brand | undefined> {
+    return this.brands.get(id);
+  }
+
+  async getBrandByName(name: string): Promise<Brand | undefined> {
+    return Array.from(this.brands.values()).find(
+      (brand) => brand.name.toLowerCase() === name.toLowerCase()
+    );
+  }
+
+  async createBrand(brand: InsertBrand): Promise<Brand> {
+    const id = this.currentBrandId++;
+    const now = new Date();
+    const newBrand: Brand = {
+      ...brand,
+      id,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.brands.set(id, newBrand);
+    return newBrand;
+  }
+
+  async updateBrand(
+    id: number,
+    brandData: Partial<Brand>
+  ): Promise<Brand | undefined> {
+    const brand = this.brands.get(id);
+    if (!brand) return undefined;
+
+    const updatedBrand = {
+      ...brand,
+      ...brandData,
+      updatedAt: new Date(),
+    };
+    this.brands.set(id, updatedBrand);
+    return updatedBrand;
+  }
+
+  async deleteBrand(id: number): Promise<boolean> {
+    // Check if any products are using this brand
+    const productsUsingBrand = Array.from(this.products.values()).filter(
+      product => product.brandId === id
+    );
+    
+    if (productsUsingBrand.length > 0) {
+      throw new Error(`Cannot delete brand with ID ${id} because it's still being used by ${productsUsingBrand.length} product(s).`);
+    }
+    
+    return this.brands.delete(id);
+  }
+
   // Collections management methods
   async getAllCollections(): Promise<Collection[]> {
     return Array.from(this.collections.values());
@@ -1232,6 +1354,86 @@ export class MemStorage implements IStorage {
     { id: "1-up", label: "1★ & Above" },
   ];
 
+  // Initialize the categories
+  private initializeCategories() {
+    const categories = [
+      // Women's ethnic wear
+      { name: "sarees", label: "Sarees", gender: "women", description: "Traditional Indian drape with blouse, typically 5-9 yards in length" },
+      { name: "kurtis", label: "Kurtis", gender: "women", description: "Traditional upper garment for women in various designs" },
+      { name: "lehengas", label: "Lehengas", gender: "women", description: "Traditional skirt with choli and dupatta for special occasions" },
+      { name: "salwar_kameez", label: "Salwar Kameez", gender: "women", description: "Complete traditional outfit with top, bottom and dupatta" },
+      { name: "anarkali_suits", label: "Anarkali Suits", gender: "women", description: "Floor length suits with fitted bodice and flared bottom" },
+      { name: "palazzo_suits", label: "Palazzo Suits", gender: "women", description: "Modern ethnic outfit with wide-legged pants" },
+      { name: "gowns", label: "Gowns", gender: "women", description: "Full-length formal dress in Indian styles" },
+      { name: "dupattas", label: "Dupattas", gender: "women", description: "Long scarf worn with suits and lehengas" },
+      { name: "blouses", label: "Blouses", gender: "women", description: "Upper garment worn with sarees" },
+      { name: "skirts", label: "Skirts", gender: "women", description: "Traditional Indian long skirts" },
+      { name: "dresses", label: "Dresses", gender: "women", description: "Indo-western fusion dresses" },
+      // Men's ethnic wear
+      { name: "kurtas", label: "Kurtas", gender: "men", description: "Traditional Indian upper garment for men" },
+      { name: "sherwanis", label: "Sherwanis", gender: "men", description: "Long coat-like garment for formal occasions" },
+      { name: "nehru_jackets", label: "Nehru Jackets", gender: "men", description: "Traditional embellished jackets worn over kurtas" },
+      { name: "dhoti_sets", label: "Dhoti Sets", gender: "men", description: "Traditional lower garment with matching kurta" },
+      { name: "indo_western", label: "Indo Western", gender: "men", description: "Fusion of Indian and Western styles" },
+      // Accessories (unisex)
+      { name: "jewelry", label: "Jewelry", gender: "unisex", description: "Traditional Indian jewelry for various occasions" },
+      { name: "footwear", label: "Footwear", gender: "unisex", description: "Traditional footwear to complement ethnic outfits" },
+      { name: "bags", label: "Bags", gender: "unisex", description: "Traditional and modern bags to match ethnic wear" },
+    ];
+
+    categories.forEach(category => {
+      const id = this.currentCategoryId++;
+      const now = new Date();
+      this.categories.set(id, {
+        ...category,
+        id,
+        createdAt: now,
+        updatedAt: now,
+      });
+    });
+  }
+
+  // Initialize the brands
+  private initializeBrands() {
+    const brands = [
+      { name: "Fabindia", label: "Fabindia", description: "India's largest private platform for products that are made from traditional techniques, skills and hand-based processes", logo: "https://example.com/fabindia_logo.png" },
+      { name: "Biba", label: "Biba", description: "Leading ethnic wear brand offering salwar suits, kurtas, dresses and bottom wear for women and girls", logo: "https://example.com/biba_logo.png" },
+      { name: "W", label: "W", description: "Contemporary Indian wear brand focusing on modern silhouettes with traditional aesthetics", logo: "https://example.com/w_logo.png" },
+      { name: "Global Desi", label: "Global Desi", description: "Bohemian-inspired ethnic wear with global influences", logo: "https://example.com/global_desi_logo.png" },
+      { name: "Anokhi", label: "Anokhi", description: "Known for hand-block printed garments using traditional techniques", logo: "https://example.com/anokhi_logo.png" },
+      { name: "Aurelia", label: "Aurelia", description: "Contemporary ethnic wear brand for the modern woman", logo: "https://example.com/aurelia_logo.png" },
+      { name: "Manyavar", label: "Manyavar", description: "India's leading celebration wear brand offering ethnic wear for men and their families", logo: "https://example.com/manyavar_logo.png" },
+      { name: "Ritu Kumar", label: "Ritu Kumar", description: "Luxury designer brand known for traditional craftsmanship", logo: "https://example.com/ritu_kumar_logo.png" },
+      { name: "Soch", label: "Soch", description: "Quality ethnic wear brand offering sarees, salwar suits, kurtas and fusion wear", logo: "https://example.com/soch_logo.png" },
+      { name: "Khaadi", label: "Khaadi", description: "Known for hand-woven fabrics and vibrant prints", logo: "https://example.com/khaadi_logo.png" },
+      { name: "Jaypore", label: "Jaypore", description: "Curated marketplace for handmade, handwoven and hand-crafted apparel", logo: "https://example.com/jaypore_logo.png" },
+      { name: "House of Masaba", label: "House of Masaba", description: "Contemporary and quirky prints on traditional Indian silhouettes", logo: "https://example.com/house_of_masaba_logo.png" },
+      { name: "Sabyasachi", label: "Sabyasachi", description: "Luxury designer brand known for traditional bridal wear", logo: "https://example.com/sabyasachi_logo.png" },
+      { name: "Tarun Tahiliani", label: "Tarun Tahiliani", description: "Luxury designer brand known for draping and construction", logo: "https://example.com/tarun_tahiliani_logo.png" },
+      { name: "Anita Dongre", label: "Anita Dongre", description: "Sustainable luxury brand with focus on Rajasthani crafts", logo: "https://example.com/anita_dongre_logo.png" },
+      { name: "Raymond", label: "Raymond", description: "Known for quality fabrics and men's ethnic wear", logo: "https://example.com/raymond_logo.png" },
+      { name: "Rangriti", label: "Rangriti", description: "Affordable ethnic wear with vibrant colors and prints", logo: "https://example.com/rangriti_logo.png" },
+      { name: "Ethnic Basket", label: "Ethnic Basket", description: "Offering a wide range of traditional and contemporary ethnic wear", logo: "https://example.com/ethnic_basket_logo.png" },
+      { name: "Libas", label: "Libas", description: "Contemporary ethnic wear with focus on comfort and style", logo: "https://example.com/libas_logo.png" },
+      { name: "Neerus", label: "Neerus", description: "Known for sarees and ethnic wear with traditional craftsmanship", logo: "https://example.com/neerus_logo.png" },
+      { name: "Meena Bazaar", label: "Meena Bazaar", description: "Traditional ethnic wear with contemporary touches", logo: "https://example.com/meena_bazaar_logo.png" },
+      { name: "Chhabra 555", label: "Chhabra 555", description: "Known for bridal and festive ethnic wear collections", logo: "https://example.com/chhabra_555_logo.png" },
+      { name: "Tikhi Imli", label: "Tikhi Imli", description: "Eclectic fusion of Indian and Western styles", logo: "https://example.com/tikhi_imli_logo.png" },
+      { name: "Sangria", label: "Sangria", description: "Modern interpretations of traditional Indian wear", logo: "https://example.com/sangria_logo.png" },
+    ];
+
+    brands.forEach(brand => {
+      const id = this.currentBrandId++;
+      const now = new Date();
+      this.brands.set(id, {
+        ...brand,
+        id,
+        createdAt: now,
+        updatedAt: now,
+      });
+    });
+  }
+
   private fabricData = [
     "Cotton",
     "Silk",
@@ -1258,9 +1460,13 @@ export class MemStorage implements IStorage {
   ];
   
   private initializeProducts() {
-    // Extract simple arrays for backward compatibility in product generation
-    const categories = this.categoryData.map(cat => cat.name);
-    const brands = this.brandData.map(brand => brand.name);
+    // Get categories and brands from our normalized data structures
+    const categoryMap = Array.from(this.categories.values());
+    const brandMap = Array.from(this.brands.values());
+    
+    // Create arrays of category and brand names for easier random selection
+    const categories = categoryMap.map(cat => cat.name);
+    const brands = brandMap.map(brand => brand.name);
 
     const occasions = [
       "Casual",
@@ -1377,13 +1583,21 @@ export class MemStorage implements IStorage {
       const featured = Math.random() < 0.2; // 20% chance to be featured
       const isNew = Math.random() < 0.3; // 30% chance to be new
       
+      // Get random indices for brand and category
+      const brandIndex = i % brandMap.length;
+      const categoryIndex = i % categoryMap.length;
+      
+      // Get the actual brand and category objects
+      const selectedBrand = brandMap[brandIndex];
+      const selectedCategory = categoryMap[categoryIndex];
+      
       const product: InsertProduct = {
-        name: `${brands[i % brands.length]} ${categories[i % categories.length].slice(0, -1)}`,
-        description: `Beautiful ethnic ${categories[i % categories.length].slice(0, -1)} from ${brands[i % brands.length]}. Perfect for festive occasions.`,
+        name: `${selectedBrand.label} ${selectedCategory.label}`,
+        description: `Beautiful ethnic ${selectedCategory.label} from ${selectedBrand.label}. Perfect for festive occasions.`,
         price,
         discountedPrice,
-        brand: brands[i % brands.length],
-        category: categories[i % categories.length],
+        brandId: selectedBrand.id,
+        categoryId: selectedCategory.id,
         gender: genders[i % 2],
         sizes: [...new Set(productSizes)], // Remove duplicates
         averageRating: parseFloat(averageRating),

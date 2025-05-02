@@ -432,17 +432,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         products = products.filter(product => product.gender === gender);
       }
       
+      // Get category and brand lookup data to match IDs to names
+      const allCategories = await storage.getAllCategoriesData();
+      const allBrands = await storage.getAllBrandsData();
+      
+      // Create maps for efficient lookups
+      const categoryNameToIdMap = new Map(allCategories.map(cat => [cat.name, cat.id]));
+      const brandNameToIdMap = new Map(allBrands.map(brand => [brand.name, brand.id]));
+
       if (category.length > 0) {
+        // Get category IDs from selected category names
+        const categoryIds = category.map(catName => categoryNameToIdMap.get(catName)).filter(Boolean);
+        
         products = products.filter(product => {
-          if (!product.category) return false;
-          return category.includes(product.category);
+          if (!product.categoryId) return false;
+          return categoryIds.includes(product.categoryId);
         });
       }
       
       if (brand.length > 0) {
+        // Get brand IDs from selected brand names
+        const brandIds = brand.map(brandName => brandNameToIdMap.get(brandName)).filter(Boolean);
+        
         products = products.filter(product => {
-          if (!product.brand) return false;
-          return brand.includes(product.brand);
+          if (!product.brandId) return false;
+          return brandIds.includes(product.brandId);
         });
       }
       
@@ -524,8 +538,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         products = products.filter(product => {
           const nameMatch = product.name ? product.name.toLowerCase().includes(searchLower) : false;
           const descMatch = product.description ? product.description.toLowerCase().includes(searchLower) : false;
-          const brandMatch = product.brand ? product.brand.toLowerCase().includes(searchLower) : false;
-          const categoryMatch = product.category ? product.category.toLowerCase().includes(searchLower) : false;
+          
+          // Look up brand and category names using their IDs
+          let brandMatch = false;
+          let categoryMatch = false;
+          
+          if (product.brandId) {
+            const brand = allBrands.find(b => b.id === product.brandId);
+            if (brand) {
+              brandMatch = brand.name.toLowerCase().includes(searchLower) || 
+                           brand.label.toLowerCase().includes(searchLower);
+            }
+          }
+          
+          if (product.categoryId) {
+            const category = allCategories.find(c => c.id === product.categoryId);
+            if (category) {
+              categoryMatch = category.name.toLowerCase().includes(searchLower) || 
+                              category.label.toLowerCase().includes(searchLower);
+            }
+          }
           
           return nameMatch || descMatch || brandMatch || categoryMatch;
         });
@@ -534,16 +566,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Legacy string-based collection filtering (festival, summer, etc.)
       if (collectionParam && isNaN(parseInt(collectionParam))) {
         try {
+          // Find the category IDs for lehengas, sarees, kurtis and tops
+          const lehengaCategory = allCategories.find(c => c.name === "lehengas");
+          const sareeCategory = allCategories.find(c => c.name === "sarees");
+          const kurtiCategory = allCategories.find(c => c.name === "kurtis");
+          const topCategory = allCategories.find(c => c.name === "tops");
+          
           // Use the legacy approach for predefined text-based collections
           if (collectionParam === "festival") {
             products = products.filter(product => {
-              if (!product.category) return false;
-              return product.category === "lehengas" || product.category === "sarees";
+              if (!product.categoryId) return false;
+              return (lehengaCategory && product.categoryId === lehengaCategory.id) || 
+                     (sareeCategory && product.categoryId === sareeCategory.id);
             });
           } else if (collectionParam === "summer") {
             products = products.filter(product => {
-              if (!product.category) return false;
-              return product.category === "kurtis" || product.category === "tops";
+              if (!product.categoryId) return false;
+              return (kurtiCategory && product.categoryId === kurtiCategory.id) || 
+                     (topCategory && product.categoryId === topCategory.id);
             });
           }
         } catch (err) {
@@ -786,7 +826,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Basic recommendation fallback - find products in the same category
       const recommendations = products
-        .filter(p => p.id !== id && p.category === product.category)
+        .filter(p => p.id !== id && p.categoryId === product.categoryId)
         .slice(0, 4);
       
       res.json(recommendations);
