@@ -66,8 +66,8 @@ export function Footer() {
             <h3 className="text-lg font-medium mb-4">Customer Service</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/contact">
-                  <div className="text-gray-400 hover:text-white cursor-pointer">Contact Us</div>
+                <Link href="/contact" className="text-gray-400 hover:text-white cursor-pointer">
+                  Contact Us
                 </Link>
               </li>
               <li>
