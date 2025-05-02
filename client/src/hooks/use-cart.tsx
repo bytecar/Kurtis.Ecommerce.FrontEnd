@@ -54,8 +54,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return sum + price * item.quantity;
   }, 0);
 
-  // Add item to cart
-  const addItem = (product: Product, size: string, quantity: number) => {
+  // Add item to cart - memoized to prevent dependency cycles
+  const addItem = useCallback((product: Product, size: string, quantity: number) => {
     setItems((prevItems) => {
       // Check if item already exists
       const existingItemIndex = prevItems.findIndex(
@@ -80,10 +80,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return [...prevItems, { product, size, quantity }];
       }
     });
-  };
+  }, [toast]);
 
-  // Update item quantity
-  const updateQuantity = (productId: number, size: string, quantity: number) => {
+  // Remove item from cart - need to define before updateQuantity since it uses it
+  const removeItem = useCallback((productId: number, size: string) => {
+    setItems((prevItems) =>
+      prevItems.filter(
+        (item) => !(item.product.id === productId && item.size === size)
+      )
+    );
+    toast({
+      title: "Item removed",
+      description: "Item has been removed from your cart",
+    });
+  }, [toast]);
+
+  // Update item quantity - memoized to prevent dependency cycles
+  const updateQuantity = useCallback((productId: number, size: string, quantity: number) => {
     if (quantity <= 0) {
       removeItem(productId, size);
       return;
@@ -96,25 +109,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
           : item
       )
     );
-  };
+  }, [removeItem]);
 
-  // Remove item from cart
-  const removeItem = (productId: number, size: string) => {
-    setItems((prevItems) =>
-      prevItems.filter(
-        (item) => !(item.product.id === productId && item.size === size)
-      )
-    );
-    toast({
-      title: "Item removed",
-      description: "Item has been removed from your cart",
-    });
-  };
-
-  // Clear cart
-  const clearCart = () => {
+  // Clear cart - memoized to prevent dependency cycles
+  const clearCart = useCallback(() => {
     setItems([]);
-  };
+  }, []);
 
   return (
     <CartContext.Provider
