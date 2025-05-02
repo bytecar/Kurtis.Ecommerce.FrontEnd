@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { apiRequest, queryClient, getQueryFn } from "@/lib/queryClient";
 import { Product } from "@shared/schema";
@@ -47,9 +47,21 @@ export function RecentlyViewedProvider({ children }: { children: ReactNode }) {
     }
   }, [user, apiItems]);
 
+  // Cache of already added product IDs to prevent duplicate API calls
+  const addedProductsRef = useRef<Set<number>>(new Set());
+
   // Add product to recently viewed
   const addMutation = useMutation({
     mutationFn: async (productId: number) => {
+      // Skip if we already added this product in the current session
+      if (addedProductsRef.current.has(productId)) {
+        console.log(`Product ${productId} already in recently viewed cache, skipping API call`);
+        return null;
+      }
+
+      // Add to our cache
+      addedProductsRef.current.add(productId);
+
       if (user) {
         await apiRequest("POST", "/api/recently-viewed", { productId });
         return queryClient.invalidateQueries({ queryKey: ["/api/recently-viewed"] });
@@ -91,9 +103,10 @@ export function RecentlyViewedProvider({ children }: { children: ReactNode }) {
     }
   });
 
-  const addToRecentlyViewed = (productId: number) => {
+  // Memoize the function to prevent dependency cycles
+  const addToRecentlyViewed = useCallback((productId: number) => {
     addMutation.mutate(productId);
-  };
+  }, [addMutation]);
 
   return (
     <RecentlyViewedContext.Provider

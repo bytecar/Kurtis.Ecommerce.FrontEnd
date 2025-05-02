@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient, getQueryFn } from "@/lib/queryClient";
@@ -76,8 +76,8 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     return items.some((item) => item.id === productId);
   };
 
-  // Add to wishlist
-  const addToWishlist = (product: Product) => {
+  // Use callback to prevent dependency cycles
+  const addToWishlist = useCallback((product: Product) => {
     if (user) {
       addMutation.mutate(product.id);
       toast({
@@ -91,10 +91,10 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         variant: "destructive",
       });
     }
-  };
+  }, [user, addMutation, toast]);
 
   // Remove from wishlist
-  const removeFromWishlist = (productId: number) => {
+  const removeFromWishlist = useCallback((productId: number) => {
     if (user) {
       removeMutation.mutate(productId);
       toast({
@@ -102,16 +102,16 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         description: "Item has been removed from your wishlist",
       });
     }
-  };
+  }, [user, removeMutation, toast]);
 
-  // Toggle wishlist status
-  const toggleWishlist = (product: Product) => {
+  // Toggle wishlist status - memoized to prevent dependency cycles
+  const toggleWishlist = useCallback((product: Product) => {
     if (isInWishlist(product.id)) {
       removeFromWishlist(product.id);
     } else {
       addToWishlist(product);
     }
-  };
+  }, [isInWishlist, removeFromWishlist, addToWishlist]);
 
   return (
     <WishlistContext.Provider
