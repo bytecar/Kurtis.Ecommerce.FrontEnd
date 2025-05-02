@@ -17,8 +17,8 @@
   --popover-foreground: 20 14.3% 4.1%;
   --card: 35 20% 99%;  /* Off-white with warm undertone */
   --card-foreground: 20 14.3% 4.1%;
-  --border: 30 10% 90%;  /* Soft beige border */
-  --input: 30 10% 90%;
+  --border: 20 15% 60%;  /* Stronger border color for visibility */
+  --input: 20 15% 60%;
   
   /* Primary colors - Festive inspiration */
   --primary: 350 75% 41%;  /* Vibrant Indian red */
@@ -67,8 +67,8 @@
   --popover-foreground: 35 25% 90%;
   --card: 240 10% 16%;  /* Deep indigo card */
   --card-foreground: 35 25% 90%;
-  --border: 240 10% 25%;  /* Deep indigo border */
-  --input: 240 10% 25%;
+  --border: 240 30% 70%;  /* Bold border color for visibility in dark mode */
+  --input: 240 30% 70%;
   
   /* Primary colors - Festive inspiration (more vibrant in dark mode) */
   --primary: 350 80% 50%;  /* Brighter Indian red */
@@ -128,4 +128,40 @@
 
 .grow-on-hover img {
   transition: transform 0.3s ease-in-out;
+}
+
+/* Bold borders for all components */
+.border {
+  @apply border-[1px] border-solid !important;
+}
+
+/* Make all component borders more visible */
+.card, 
+.dialog, 
+.dropdown-menu, 
+.select, 
+.popover, 
+.tooltip, 
+.toast, 
+.sheet, 
+.tabs, 
+.accordion, 
+.collapsible, 
+.hover-card,
+.button,
+.input,
+.table,
+.table th,
+.table td,
+.badge {
+  @apply border-[1px] border-solid !important;
+}
+
+/* Enhanced table borders */
+table {
+  @apply border-[1px] border-solid !important;
+}
+
+th, td {
+  @apply border-[1px] border-solid !important;
 }
