@@ -1034,7 +1034,7 @@ export function InventoryManagement() {
                                     </div>
                                     <span>{product.name}</span>
                                   </TableCell>
-                                  <TableCell>{product.brand}</TableCell>
+                                  <TableCell>{product.brandId}</TableCell>
                                   <TableCell>
                                     <Button
                                       variant={isInCollection ? "destructive" : "outline"}

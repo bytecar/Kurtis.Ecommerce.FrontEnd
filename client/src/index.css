@@ -17,8 +17,8 @@
   --popover-foreground: 20 14.3% 4.1%;
   --card: 35 20% 99%;  /* Off-white with warm undertone */
   --card-foreground: 20 14.3% 4.1%;
-  --border: 20 15% 60%;  /* Stronger border color for visibility */
-  --input: 20 15% 60%;
+  --border: 0 0% 0%;  /* Black border color for visibility in light mode */
+  --input: 0 0% 0%;
   
   /* Primary colors - Festive inspiration */
   --primary: 350 75% 41%;  /* Vibrant Indian red */
@@ -67,8 +67,8 @@
   --popover-foreground: 35 25% 90%;
   --card: 240 10% 16%;  /* Deep indigo card */
   --card-foreground: 35 25% 90%;
-  --border: 240 30% 70%;  /* Bold border color for visibility in dark mode */
-  --input: 240 30% 70%;
+  --border: 0 0% 100%;  /* White border color for visibility in dark mode */
+  --input: 0 0% 100%;
   
   /* Primary colors - Festive inspiration (more vibrant in dark mode) */
   --primary: 350 80% 50%;  /* Brighter Indian red */
@@ -132,7 +132,7 @@
 
 /* Bold borders for all components */
 .border {
-  @apply border-[1px] border-solid !important;
+  @apply border-[2px] border-solid !important;
 }
 
 /* Make all component borders more visible */
@@ -154,14 +154,14 @@
 .table th,
 .table td,
 .badge {
-  @apply border-[1px] border-solid !important;
+  @apply border-[2px] border-solid !important;
 }
 
 /* Enhanced table borders */
 table {
-  @apply border-[1px] border-solid !important;
+  @apply border-[2px] border-solid !important;
 }
 
 th, td {
-  @apply border-[1px] border-solid !important;
+  @apply border-[2px] border-solid !important;
 }
