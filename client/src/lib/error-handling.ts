@@ -51,6 +51,40 @@ const errorLogs: Array<{
 }> = [];
 
 /**
+ * Get error logs
+ */
+export function getErrorLogs(limit?: number) {
+  if (limit) {
+    return errorLogs.slice(-limit);
+  }
+  return errorLogs;
+}
+
+/**
+ * Clear error logs
+ */
+export function clearErrorLogs() {
+  errorLogs.length = 0;
+}
+
+/**
+ * Get error title based on category
+ */
+export function getErrorTitle(category: ErrorCategory): string {
+  const titles: Record<ErrorCategory, string> = {
+    [ErrorCategory.API]: 'API Error',
+    [ErrorCategory.VALIDATION]: 'Validation Error',
+    [ErrorCategory.AUTHENTICATION]: 'Authentication Error',
+    [ErrorCategory.AUTHORIZATION]: 'Authorization Error',
+    [ErrorCategory.DATA]: 'Data Error',
+    [ErrorCategory.UI]: 'UI Error',
+    [ErrorCategory.NETWORK]: 'Network Error',
+    [ErrorCategory.UNKNOWN]: 'Unknown Error',
+  };
+  return titles[category] || 'Error';
+}
+
+/**
  * Main error handling function - all errors should go through this
  */
 export function handleError(

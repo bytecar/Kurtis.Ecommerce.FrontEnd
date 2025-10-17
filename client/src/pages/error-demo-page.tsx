@@ -8,19 +8,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AlertCircle, BugOff, BadgeAlert, Clock, RefreshCw, Ban, AlertTriangle, XCircle } from 'lucide-react';
 import { ErrorBoundary, withErrorBoundary } from '@/components/common/ErrorBoundary';
 import { ErrorAlert, ErrorAlertList } from '@/components/common/ErrorAlert';
-import { handleError, ErrorCategory, ErrorSeverity } from '@/lib/error-handling';
+import { handleError, ErrorSeverity, ErrorCategory, getErrorLogs, clearErrorLogs, getErrorTitle } from '@/lib/error-handling';
 import { toast } from '@/hooks/use-toast';
-import { clearErrorLogs, getErrorLogs } from '@/lib/error-handling';
 import { apiRequest } from '@/lib/queryClient';
 
 // Component that will throw an error when the button is clicked
 const ErrorThrower: React.FC = () => {
   const [shouldThrow, setShouldThrow] = useState(false);
-  
+
   if (shouldThrow) {
     throw new Error('This is a demonstration error thrown from a component');
   }
-  
+
   return (
     <div className="flex flex-col items-center p-4">
       <Button 
@@ -41,24 +40,13 @@ const ErrorThrowerWithBoundary = withErrorBoundary(ErrorThrower, {
 });
 
 // Error category selector
-function getErrorTitle(category: ErrorCategory): string {
-  switch (category) {
-    case ErrorCategory.API: return 'API Error';
-    case ErrorCategory.VALIDATION: return 'Validation Error';
-    case ErrorCategory.AUTHENTICATION: return 'Authentication Error';
-    case ErrorCategory.AUTHORIZATION: return 'Authorization Error';
-    case ErrorCategory.DATA: return 'Data Error';
-    case ErrorCategory.UI: return 'UI Error';
-    case ErrorCategory.NETWORK: return 'Network Error';
-    default: return 'Error';
-  }
-}
+// Note: getErrorTitle is now imported from lib/error-handling
 
 const ErrorDemoPage: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('Sample error message');
   const [errorSeverity, setErrorSeverity] = useState<ErrorSeverity>(ErrorSeverity.ERROR);
   const [errorCategory, setErrorCategory] = useState<ErrorCategory>(ErrorCategory.API);
-  
+
   const [errorList, setErrorList] = useState<Array<{title: string; message: string; severity?: ErrorSeverity}>>([
     { 
       title: 'Could not connect to server', 
@@ -71,11 +59,11 @@ const ErrorDemoPage: React.FC = () => {
       severity: ErrorSeverity.WARNING
     }
   ]);
-  
+
   const handleCreateError = () => {
     // Create and handle an error with our error handling system
     const error = new Error(errorMessage);
-    
+
     handleError(
       error,
       true, // Show toast notification
@@ -90,7 +78,7 @@ const ErrorDemoPage: React.FC = () => {
       }
     );
   };
-  
+
   const handleAddToErrorList = () => {
     setErrorList([
       ...errorList,
@@ -101,17 +89,17 @@ const ErrorDemoPage: React.FC = () => {
       }
     ]);
   };
-  
+
   const handleClearErrorList = () => {
     setErrorList([]);
   };
-  
+
   const handleRemoveError = (index: number) => {
     const newList = [...errorList];
     newList.splice(index, 1);
     setErrorList(newList);
   };
-  
+
   const handleApiError = async () => {
     try {
       // Attempt to access a non-existent endpoint
@@ -121,7 +109,7 @@ const ErrorDemoPage: React.FC = () => {
       console.log('API error caught in component');
     }
   };
-  
+
   const handleShowToast = () => {
     // Map severity to toast variant
     const variant = 
@@ -130,14 +118,14 @@ const ErrorDemoPage: React.FC = () => {
       errorSeverity === ErrorSeverity.ERROR ? "destructive" :
       errorSeverity === ErrorSeverity.CRITICAL ? "destructive" :
       undefined;
-    
+
     toast({
       title: getErrorTitle(errorCategory),
       description: errorMessage,
       variant,
     });
   };
-  
+
   const handleClearErrorLogs = () => {
     clearErrorLogs();
     toast({
@@ -145,7 +133,7 @@ const ErrorDemoPage: React.FC = () => {
       description: "All error logs have been cleared from memory",
     });
   };
-  
+
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-3xl font-bold tracking-tight mb-6">Error Handling Demo</h1>
@@ -153,7 +141,7 @@ const ErrorDemoPage: React.FC = () => {
         This page demonstrates the various error handling capabilities of the application.
         Try out different error types, severities, and view how they are displayed to users.
       </p>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
         <Card>
           <CardHeader>
@@ -169,7 +157,7 @@ const ErrorDemoPage: React.FC = () => {
                 onChange={(e) => setErrorMessage(e.target.value)}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="error-severity">Error Severity</Label>
               <Select 
@@ -207,7 +195,7 @@ const ErrorDemoPage: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="error-category">Error Category</Label>
               <Select 
@@ -249,7 +237,7 @@ const ErrorDemoPage: React.FC = () => {
             </Button>
           </CardFooter>
         </Card>
-        
+
         <div className="space-y-6">
           <Card>
             <CardHeader>
@@ -264,7 +252,7 @@ const ErrorDemoPage: React.FC = () => {
               </ErrorBoundary>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Error Alert Demo</CardTitle>
@@ -277,7 +265,7 @@ const ErrorDemoPage: React.FC = () => {
                 errors={errorList} 
                 onClose={handleRemoveError} 
               />
-              
+
               {errorList.length === 0 && (
                 <p className="text-muted-foreground text-center py-4">
                   No errors to display
@@ -297,7 +285,7 @@ const ErrorDemoPage: React.FC = () => {
           </Card>
         </div>
       </div>
-      
+
       <Card>
         <CardHeader>
           <CardTitle>Error Logs</CardTitle>
@@ -309,7 +297,7 @@ const ErrorDemoPage: React.FC = () => {
               <TabsTrigger value="prettified">Prettified</TabsTrigger>
               <TabsTrigger value="raw">Raw</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="prettified">
               <div className="space-y-4">
                 {getErrorLogs(5).map((log, index) => (
@@ -332,7 +320,7 @@ const ErrorDemoPage: React.FC = () => {
                     )}
                   </div>
                 ))}
-                
+
                 {getErrorLogs(5).length === 0 && (
                   <p className="text-muted-foreground text-center py-10">
                     No error logs available. Try creating some errors!
@@ -340,7 +328,7 @@ const ErrorDemoPage: React.FC = () => {
                 )}
               </div>
             </TabsContent>
-            
+
             <TabsContent value="raw">
               <pre className="bg-muted p-4 rounded-md overflow-auto text-xs">
                 {JSON.stringify(getErrorLogs(5), null, 2)}

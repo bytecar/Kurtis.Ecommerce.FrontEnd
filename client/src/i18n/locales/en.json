@@ -65,7 +65,12 @@
     "festivalCollection": "Festival Collection",
     "weddingCollection": "Wedding Collection",
     "casualWear": "Casual Wear",
-    "accessoriesHeader": "Accessories"
+    "accessoriesHeader": "Accessories",
+    "shopNow": "Shop Now",
+    "viewCollections": "View All Collections",
+    "heroImageAlt": "Hero image of ethnic fashion",
+    "testimonials": "What Our Customers Say",
+    "whyChooseUs": "Why Choose Us"
   },
   "product": {
     "description": "Description",
@@ -504,5 +509,38 @@
     "deliveredOrders": "Delivered Orders",
     "cancelledOrders": "Cancelled Orders",
     "returnedOrders": "Returned Orders"
+  },
+  "products": {
+    "featured": "Featured Products",
+    "new": "New Arrivals",
+    "categories": "Categories",
+    "allProducts": "All Products",
+    "noFeaturedProducts": "No featured products available at the moment"
+  },
+  "collections": {
+    "womensEthnic": "Women's Ethnic",
+    "womensEthnicDesc": "Explore our collection of beautiful ethnic wear for women",
+    "mensEthnic": "Men's Ethnic",
+    "mensEthnicDesc": "Discover traditional and contemporary ethnic wear for men",
+    "festive": "Festive Collection",
+    "festiveDesc": "Special occasion and festive wear",
+    "explore": "Explore Now"
+  },
+  "features": {
+    "freeShipping": "Free Shipping",
+    "freeShippingDesc": "On orders over ₹999",
+    "easyReturns": "Easy Returns",
+    "easyReturnsDesc": "30-day return policy",
+    "securePayments": "Secure Payments",
+    "securePaymentsDesc": "100% secure transactions",
+    "support": "24/7 Support",
+    "supportDesc": "Dedicated customer service"
+  },
+  "newsletter": {
+    "title": "Stay Updated",
+    "subtitle": "Subscribe to our newsletter for the latest updates and exclusive offers",
+    "emailPlaceholder": "Enter your email",
+    "subscribe": "Subscribe",
+    "privacyNotice": "We respect your privacy and won't spam you"
   }
 }
