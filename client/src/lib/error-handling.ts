@@ -94,23 +94,23 @@ export function handleError(
 ): void {
   const errorMessage = typeof error === 'string' ? error : error.message;
   const errorStack = typeof error === 'string' ? undefined : error.stack;
-  
+
   // Default values
   const severity = context?.severity || ErrorSeverity.ERROR;
   const category = context?.category || ErrorCategory.UNKNOWN;
   const componentName = context?.componentName;
   const additionalContext = context?.context || {};
-  
+
   // Log the error to the console with our logging system
-  const logLevel = severity === ErrorSeverity.INFO 
-    ? LogLevel.INFO 
-    : severity === ErrorSeverity.WARNING 
-      ? LogLevel.WARNING 
+  const logLevel = severity === ErrorSeverity.INFO
+    ? LogLevel.INFO
+    : severity === ErrorSeverity.WARNING
+      ? LogLevel.WARNING
       : LogLevel.ERROR;
-  
+
   // Map error category to log category
   const logCategory: LogCategory = mapErrorToLogCategory(category);
-  
+
   // Add to error logs
   errorLogs.unshift({
     message: errorMessage,
@@ -121,12 +121,12 @@ export function handleError(
     stack: errorStack,
     context: additionalContext,
   });
-  
+
   // Trim logs to a reasonable size
   if (errorLogs.length > 100) {
     errorLogs.pop();
   }
-  
+
   // Log to our logger
   logger.log(
     logLevel,
@@ -138,13 +138,13 @@ export function handleError(
       stack: errorStack,
     }
   );
-  
+
   // Show toast notification if requested
   if (showToast) {
-    const toastVariant = severity === ErrorSeverity.ERROR || severity === ErrorSeverity.CRITICAL 
-      ? 'destructive' 
+    const toastVariant = severity === ErrorSeverity.ERROR || severity === ErrorSeverity.CRITICAL
+      ? 'destructive'
       : undefined;
-    
+
     toast({
       title: getCategoryTitle(category),
       description: errorMessage,
@@ -237,23 +237,23 @@ export function formatErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
   }
-  
+
   if (typeof error === 'string') {
     return error;
   }
-  
+
   if (typeof error === 'object' && error !== null) {
     if ('message' in error) {
       return String(error.message);
     }
-    
+
     try {
       return JSON.stringify(error);
     } catch {
       return 'Unknown error object';
     }
   }
-  
+
   return 'Unknown error';
 }
 
@@ -286,27 +286,27 @@ export function createError(
   const error = new Error(message) as EnhancedError;
   error.severity = severity;
   error.category = category;
-  
+
   if (metadata.code) {
     error.code = metadata.code;
   }
-  
+
   if (metadata.componentName) {
     error.componentName = metadata.componentName;
   }
-  
+
   if (metadata.context) {
     error.context = metadata.context;
   }
-  
+
   if (metadata.originalError) {
     error.originalError = metadata.originalError;
-    
+
     // Copy the stack trace if available
     if (metadata.originalError.stack) {
       error.stack = metadata.originalError.stack;
     }
   }
-  
+
   return error;
 }
