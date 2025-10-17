@@ -200,22 +200,7 @@ function getCategoryTitle(category: ErrorCategory): string {
   }
 }
 
-/**
- * Get error logs for display
- */
-export function getErrorLogs(limit?: number): typeof errorLogs {
-  if (limit && limit > 0) {
-    return errorLogs.slice(0, limit);
-  }
-  return [...errorLogs];
-}
 
-/**
- * Clear error logs (useful for testing)
- */
-export function clearErrorLogs(): void {
-  errorLogs.length = 0;
-}
 
 /**
  * Utility function to detect network errors
