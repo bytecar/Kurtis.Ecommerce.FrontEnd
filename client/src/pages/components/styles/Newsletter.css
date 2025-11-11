@@ -47,15 +47,16 @@
 }
 
 .newsletter-form {
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
+   width: 100%;
+   max-width: 500px;
+   margin: 0 auto;
+   justify-content: center;   
 }
 
 .newsletter-input-group {
   display: flex;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1rem;  
 }
 
 .newsletter-input {
@@ -67,10 +68,7 @@
 }
 
 .newsletter-privacy {
-  font-size: 0.8rem;
-  color: var(--muted-foreground);
-  opacity: 0.7;
-  text-align: center;
+  font-size: 0.8rem;  
 }
 
 .newsletter-decoration {

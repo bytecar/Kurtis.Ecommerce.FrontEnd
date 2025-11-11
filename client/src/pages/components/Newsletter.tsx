@@ -68,8 +68,8 @@ export const Newsletter: React.FC = () => {
                 {isSubmitting ? t('common.submitting') : t('newsletter.subscribe')}
               </Button>
             </div>
-            <p className="newsletter-privacy">{t('newsletter.privacyNotice')}</p>
           </form>
+         <p className="newsletter-privacy">{t('newsletter.privacyNotice')}</p>
         </div>
         
         <div className="newsletter-decoration">

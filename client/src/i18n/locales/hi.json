@@ -49,7 +49,8 @@
     "submit": "सबमिट करें",
     "remove": "हटाएं",
     "update": "अपडेट करें",
-    "language": "भाषा"
+    "language": "भाषा",
+    "backToSite": "साइट पर वापस जाएं"
   },
   "home": {
     "heroTitle": "प्रामाणिक एथनिक वियर की खोज करें",
@@ -65,7 +66,12 @@
     "festivalCollection": "त्योहार कलेक्शन",
     "weddingCollection": "शादी कलेक्शन",
     "casualWear": "कैजुअल वियर",
-    "accessoriesHeader": "एक्सेसरीज"
+    "accessoriesHeader": "एक्सेसरीज",
+    "shopNow": "अभी खरीदें",
+    "viewCollections": "सभी संग्रह देखें",
+    "heroImageAlt": "एथनिक फैशन की हीरो छवि",
+    "testimonials": "हमारे ग्राहक क्या कहते हैं",
+    "whyChooseUs": "हमें क्यों चुनें"
   },
   "product": {
     "description": "विवरण",
@@ -332,6 +338,39 @@
     "returnRequested": "रिटर्न सफलतापूर्वक अनुरोधित किया गया",
     "reorderSuccess": "आइटम सफलतापूर्वक कार्ट में जोड़े गए"
   },
+  "collections": {
+    "womensEthnic": "महिलाओं की एथनिक",
+    "womensEthnicDesc": "महिलाओं के लिए सुंदर एथनिक वियर का हमारा संग्रह देखें",
+    "mensEthnic": "पुरुषों की एथनिक",
+    "mensEthnicDesc": "पुरुषों के लिए पारंपरिक और समकालीन एथनिक वियर की खोज करें",
+    "festive": "त्योहार संग्रह",
+    "festiveDesc": "विशेष अवसर और त्योहार के कपड़े",
+    "explore": "अभी खोजें"
+  },
+  "features": {
+    "freeShipping": "मुफ्त शिपिंग",
+    "freeShippingDesc": "₹999 से अधिक के आर्डर पर",
+    "easyReturns": "आसान रिटर्न",
+    "easyReturnsDesc": "30 दिन की वापसी नीति",
+    "securePayments": "सुरक्षित भुगतान",
+    "securePaymentsDesc": "100% सुरक्षित लेनदेन",
+    "support": "24/7 सहायता",
+    "supportDesc": "समर्पित ग्राहक सेवा"
+  },
+  "newsletter": {
+    "title": "अपडेट रहें",
+    "subtitle": "नवीनतम अपडेट और विशेष ऑफर के लिए हमारे न्यूज़लेटर की सदस्यता लें",
+    "emailPlaceholder": "अपना ईमेल दर्ज करें",
+    "subscribe": "सदस्यता लें",
+    "privacyNotice": "हम आपकी गोपनीयता का सम्मान करते हैं और आपको स्पैम नहीं करेंगे"
+  },
+  "products": {
+    "featured": "विशेष उत्पाद",
+    "new": "नए आइटम",
+    "categories": "श्रेणियां",
+    "allProducts": "सभी उत्पाद",
+    "noFeaturedProducts": "इस समय कोई विशेष उत्पाद उपलब्ध नहीं हैं"
+  },
   "categories": {
     "kurta": "कुर्ता",
     "saree": "साड़ी",
@@ -402,6 +441,7 @@
     "inventory": "इन्वेंट्री",
     "categories": "श्रेणियां",
     "reports": "रिपोर्ट्स",
+    "returns": "रिटर्न प्रबंधन",
     "settings": "सेटिंग्स",
     "addProduct": "प्रोडक्ट जोड़ें",
     "editProduct": "प्रोडक्ट संपादित करें",

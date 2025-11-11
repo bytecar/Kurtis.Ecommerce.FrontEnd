@@ -10,4 +10,5 @@ export interface Product {
   imageUrls: string[];
   createdAt: Date | null;
   updatedAt: Date | null;
+  averageRating: number | null;
 }

@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { User } from '@shared/schema';
-import { storage } from './storage';
+import { storage } from "./storage";
 
 // Environment variable for JWT secret
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-for-development-only';
@@ -72,27 +72,26 @@ export function generateToken(user: User): string {
   
   // Cast JWT_SECRET as jwt.Secret type to fix typings
   return jwt.sign(
-    payload, 
-    JWT_SECRET as jwt.Secret, 
-    { expiresIn: JWT_EXPIRES_IN }
-  );
+    payload,
+    JWT_SECRET as jwt.Secret
+  ) as string;
 }
 
 // Verify JWT token
 export function verifyToken(token: string): JwtPayload | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET as jwt.Secret);
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
     // Ensure the decoded token has the required JwtPayload structure
     if (decoded && typeof decoded === 'object' && 'sub' in decoded) {
       // Convert the decoded JWT payload to our specific JwtPayload type
       const payload: JwtPayload = {
-        sub: decoded.sub as number,
-        username: decoded.username as string,
-        email: decoded.email as string | null,
-        role: decoded.role as string,
-        permissions: decoded.permissions as string[],
-        iat: decoded.iat,
-        exp: decoded.exp
+        sub: Number(decoded.sub),
+        username: String(decoded.username),
+        email: decoded.email == null ? null : String(decoded.email),
+        role: String(decoded.role),
+        permissions: Array.isArray(decoded.permissions) ? decoded.permissions.map(String) : [],
+        iat: typeof decoded.iat === 'number' ? decoded.iat : undefined,
+        exp: typeof decoded.exp === 'number' ? decoded.exp : undefined
       };
       return payload;
     }
@@ -108,7 +107,7 @@ export function authenticateJWT(req: Request, res: Response, next: NextFunction)
   // Get token from Authorization header or from cookies
   const authHeader = req.headers.authorization;
   const tokenFromHeader = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
-  const tokenFromCookie = req.cookies?.jwt;
+  const tokenFromCookie = (req as any).cookies?.jwt;
   const token = tokenFromHeader || tokenFromCookie;
   
   if (!token) {
@@ -123,7 +122,7 @@ export function authenticateJWT(req: Request, res: Response, next: NextFunction)
   
   // Get user from database to ensure they still exist and are active
   storage.getUser(payload.sub).then(user => {
-    if (!user || user.status !== 'active') {
+    if (!user || (user as any).status !== 'active') {
       return res.status(401).json({ error: 'User not found or inactive' });
     }
     

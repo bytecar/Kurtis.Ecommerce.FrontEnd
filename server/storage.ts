@@ -32,7 +32,7 @@ import {
   InsertBrand,
 } from "@shared/schema";
 
-const MemoryStore = createMemoryStore(session);
+export const MemoryStore = createMemoryStore(session);
 
 export interface IStorage {
   // User management
@@ -1147,7 +1147,7 @@ export class MemStorage implements IStorage {
       const username = `user${i + 1}`;
       const email = `user${i + 1}@example.com`;
       const fullName = fullNames[i];
-      const role = roles[i % 3]; // Distribute roles evenly
+      const role = roles[0]; // Distribute roles evenly
       const gender = genders[i % 2]; // Alternating genders
       
       // Assign profile picture based on gender
@@ -1600,7 +1600,7 @@ export class MemStorage implements IStorage {
         categoryId: selectedCategory.id,
         gender: genders[i % 2],
         sizes: [...new Set(productSizes)], // Remove duplicates
-        averageRating: parseFloat(averageRating),
+        averageRating: averageRating,
         ratingCount,
         featured,
         isNew,
