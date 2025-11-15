@@ -1,6 +1,7 @@
 import { createContext, ReactNode, useContext, useEffect, useState, useRef, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { apiRequest, queryClient, getQueryFn } from "@/lib/queryClient";
+import { queryClient, getQueryFn } from "@/lib/queryClient";
+import { apiRequestAuthUsers } from "@/lib/apiRequest";
 import { Product } from "@shared/schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -63,7 +64,7 @@ export function RecentlyViewedProvider({ children }: { children: ReactNode }) {
       addedProductsRef.current.add(productId);
 
       if (user) {
-        await apiRequest("POST", "/api/recently-viewed", { productId });
+          await apiRequestAuthUsers("POST", "/api/recently-viewed", { productId });
         return queryClient.invalidateQueries({ queryKey: ["/api/recently-viewed"] });
       } else {
         // For guests, check if we already have the product data

@@ -1,7 +1,8 @@
 import { createContext, ReactNode, useContext, useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient, getQueryFn } from "@/lib/queryClient";
+import { queryClient, getQueryFn } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/apiRequest";
 import { Product, Wishlist as WishlistType } from "@shared/schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 

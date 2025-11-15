@@ -1,7 +1,8 @@
 import { createContext, ReactNode, useContext, useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
+import { apiRequestAuthUsers } from "@/lib/apiRequest";
 import { Product } from "@shared/schema";
 
 // Define cart item type
