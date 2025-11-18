@@ -1,23 +1,52 @@
 {
-   "include": [ "client/src/**/*", "shared/**/*", "server/**/*" ],
+   "include": [ "src/**/*", "shared/**/*"],
    "exclude": [ "node_modules", "build", "dist", "**/*.test.ts" ],
+   // Visit https://aka.ms/tsconfig to read more about this file
    "compilerOptions": {
       "incremental": true,
       "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
       "noEmit": true,
-      "module": "ESNext",
-      "target": "ES2015",
-      "downlevelIteration": true,
-      "strict": true,
+      // File Layout
+      "rootDir": ".",
+      "outDir": "./dist",
+
+      // Environment Settings
+      // See also https://aka.ms/tsconfig/module
+      "module": "esnext",
+      "target": "es2015",
+      "lib": [ "esnext", "DOM", "dom.iterable" ],
+      // For nodejs:
+      // and npm install -D @types/node
+
+      // Other Outputs
+      "sourceMap": true,
+      "declaration": true,
+      "declarationMap": true,
+
+      // Stricter Typechecking Options
+      //"noUncheckedIndexedAccess": true,
+      //"exactOptionalPropertyTypes": true,
+
+      // Style Options
+      // "noImplicitReturns": true,
+      // "noImplicitOverride": true,
+      // "noUnusedLocals": true,
+      // "noUnusedParameters": true,
+      // "noFallthroughCasesInSwitch": true,
+      // "noPropertyAccessFromIndexSignature": true,
+
+      // Recommended Options
+      "strict": false,
       "jsx": "preserve",
       "esModuleInterop": true,
-      "skipLibCheck": true,
-      "allowImportingTsExtensions": true,
+      "moduleDetection": "force",
       "moduleResolution": "bundler",
+      "skipLibCheck": true,
       "baseUrl": ".",
-      "types": [ "node", "vite/client", "jest", "@testing-library/jest-dom" ],
+      "allowImportingTsExtensions": true,
+      "types": [ "node", "jest", "@testing-library/jest-dom" ],
       "paths": {
-         "@/*": [ "./client/src/*" ],
+         "@/*": [ "./src/*" ],
          "@shared/*": [ "./shared/*" ]
       }
    }

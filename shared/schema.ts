@@ -1,3 +1,5 @@
+// schema.ts - Combined Drizzle + Zod Schemas (Part 1)
+
 import {
   pgTable,
   text,
@@ -11,7 +13,7 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Users
+/* ---------------- USERS ---------------- */
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
@@ -30,35 +32,27 @@ export const users = pgTable("users", {
   birthdate: timestamp("birthdate"),
 });
 
-export const insertUserSchema = createInsertSchema(users)
-  .pick({
-    username: true,
-    password: true,
-    email: true,
-    fullName: true,
-    role: true,
-    gender: true,
-    status: true,
-    profilePicture: true,
-    lastLogin: true,
-    phoneNumber: true,
-    address: true,
-    birthdate: true,
-  })
-  .extend({
-    // Make email and fullName optional for flexibility in admin user creation
-    email: z.string().email().optional(),
-    fullName: z.string().optional(),
-    gender: z.string().optional(),
-    status: z.string().default("active"),
-    profilePicture: z.string().optional(),
-    lastLogin: z.date().optional(),
-    phoneNumber: z.string().optional(),
-    address: z.string().optional(),
-    birthdate: z.date().optional(),
-  });
+export const insertUserSchema = createInsertSchema(users).extend({
+  email: z.string().email().optional(),
+  fullName: z.string().optional(),
+  gender: z.string().optional(),
+  status: z.string().default("active"),
+  profilePicture: z.string().optional(),
+  lastLogin: z.date().optional(),
+  phoneNumber: z.string().optional(),
+  address: z.string().optional(),
+  birthdate: z.date().optional(),
+  username: z.string(),
+  password: z.string(),    
 
-// Categories
+});
+
+export const insertLoginSchema = createInsertSchema(users).extend({
+    username: z.string(),
+    password: z.string(),    
+});
+
+/* ---------------- CATEGORIES ---------------- */
 export const categories = pgTable("categories", {
   id: serial("id").primaryKey(),
   name: text("name").notNull().unique(),
@@ -69,14 +63,12 @@ export const categories = pgTable("categories", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertCategorySchema = createInsertSchema(categories).pick({
-  name: true,
-  label: true,
-  description: true,
-  gender: true,
+export const insertCategorySchema = createInsertSchema(categories).extend({
+  description: z.string().optional(),
+  gender: z.string().optional(),
 });
 
-// Brands
+/* ---------------- BRANDS ---------------- */
 export const brands = pgTable("brands", {
   id: serial("id").primaryKey(),
   name: text("name").notNull().unique(),
@@ -87,22 +79,21 @@ export const brands = pgTable("brands", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertBrandSchema = createInsertSchema(brands).pick({
-  name: true,
-  label: true,
-  description: true,
-  logo: true,
+export const insertBrandSchema = createInsertSchema(brands).extend({
+  description: z.string().optional(),
+  logo: z.string().optional(),
 });
 
-// Products
+
+/* ---------------- PRODUCTS ---------------- */
 export const products = pgTable("products", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description").notNull(),
   price: integer("price").notNull(),
   discountedPrice: integer("discounted_price"),
-  brandId: integer("brand_id").notNull(), // Foreign key to brands table
-  categoryId: integer("category_id").notNull(), // Foreign key to categories table
+  brandId: integer("brand_id").notNull(),
+  categoryId: integer("category_id").notNull(),
   gender: text("gender").notNull(),
   sizes: json("sizes").$type<string[]>(),
   averageRating: doublePrecision("average_rating").default(0),
@@ -114,23 +105,21 @@ export const products = pgTable("products", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertProductSchema = createInsertSchema(products).pick({
-  name: true,
-  description: true,
-  price: true,
-  discountedPrice: true,
-  brandId: true,
-  categoryId: true,
-  gender: true,
-  sizes: true,
-  averageRating: true,
-  ratingCount: true,
-  imageUrls: true,
-  featured: true,
-  isNew: true,
+export const insertProductSchema = createInsertSchema(products).extend({
+  discountedPrice: z.number().optional(),
+  sizes: z.array(z.string()).optional(),
+  imageUrls: z.array(z.string()),
+  averageRating: z.number().optional(),
+  ratingCount: z.number().optional(),
+  featured: z.boolean().optional(),
+  isNew: z.boolean().optional(),    
+  brandId: z.number().optional(),
+  name: z.string().optional(),
+  categoryId: z.number().optional(),  
+  id: z.number().optional(),
 });
 
-// Inventory
+/* ---------------- INVENTORY ---------------- */
 export const inventory = pgTable("inventory", {
   id: serial("id").primaryKey(),
   productId: integer("product_id").notNull(),
@@ -139,13 +128,11 @@ export const inventory = pgTable("inventory", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertInventorySchema = createInsertSchema(inventory).pick({
-  productId: true,
-  size: true,
-  quantity: true,
+export const insertInventorySchema = createInsertSchema(inventory).extend({
+  quantity: z.number().optional(),
 });
 
-// Reviews
+/* ---------------- REVIEWS ---------------- */
 export const reviews = pgTable("reviews", {
   id: serial("id").primaryKey(),
   productId: integer("product_id").notNull(),
@@ -155,14 +142,13 @@ export const reviews = pgTable("reviews", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertReviewSchema = createInsertSchema(reviews).pick({
-  productId: true,
-  userId: true,
-  rating: true,
-  comment: true,
+export const insertReviewSchema = createInsertSchema(reviews).extend({
+    comment: z.string().optional(),
+    userId: z.number().optional(),
+    productId: z.number().optional(),
 });
 
-// Orders
+/* ---------------- ORDERS ---------------- */
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
   userId: integer("user_id"),
@@ -179,19 +165,11 @@ export const orders = pgTable("orders", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertOrderSchema = createInsertSchema(orders).pick({
-  userId: true,
-  email: true,
-  fullName: true,
-  address: true,
-  city: true,
-  state: true,
-  postalCode: true,
-  phone: true,
-  total: true,
+export const insertOrderSchema = createInsertSchema(orders).extend({
+  userId: z.number().optional(),
 });
 
-// Order Items
+/* ---------------- ORDER ITEMS ---------------- */
 export const orderItems = pgTable("order_items", {
   id: serial("id").primaryKey(),
   orderId: integer("order_id").notNull(),
@@ -201,15 +179,9 @@ export const orderItems = pgTable("order_items", {
   price: integer("price").notNull(),
 });
 
-export const insertOrderItemSchema = createInsertSchema(orderItems).pick({
-  orderId: true,
-  productId: true,
-  size: true,
-  quantity: true,
-  price: true,
-});
+export const insertOrderItemSchema = createInsertSchema(orderItems);
 
-// Wishlists
+/* ---------------- WISHLISTS ---------------- */
 export const wishlists = pgTable("wishlists", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
@@ -217,12 +189,10 @@ export const wishlists = pgTable("wishlists", {
   addedAt: timestamp("added_at").defaultNow(),
 });
 
-export const insertWishlistSchema = createInsertSchema(wishlists).pick({
-  userId: true,
-  productId: true,
-});
+export const insertWishlistSchema = createInsertSchema(wishlists);
 
-// Returns
+
+/* ---------------- RETURNS ---------------- */
 export const returns = pgTable("returns", {
   id: serial("id").primaryKey(),
   orderId: integer("order_id").notNull(),
@@ -233,13 +203,11 @@ export const returns = pgTable("returns", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertReturnSchema = createInsertSchema(returns).pick({
-  orderId: true,
-  orderItemId: true,
-  reason: true,
-});
+export const insertReturnSchema = createInsertSchema(returns).extend({
+    orderId: z.number(),
+});;
 
-// Recently Viewed
+/* ---------------- RECENTLY VIEWED ---------------- */
 export const recentlyViewed = pgTable("recently_viewed", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
@@ -247,16 +215,66 @@ export const recentlyViewed = pgTable("recently_viewed", {
   viewedAt: timestamp("viewed_at").defaultNow(),
 });
 
-export const insertRecentlyViewedSchema = createInsertSchema(
-  recentlyViewed,
-).pick({
-  userId: true,
-  productId: true,
+export const insertRecentlyViewedSchema = createInsertSchema(recentlyViewed);
+
+/* ---------------- USER PREFERENCES ---------------- */
+export const userPreferences = pgTable("user_preferences", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  favoriteCategories: json("favorite_categories").notNull().$type<string[]>(),
+  favoriteColors: json("favorite_colors").notNull().$type<string[]>(),
+  favoriteOccasions: json("favorite_occasions").notNull().$type<string[]>(),
+  priceRangeMin: integer("price_range_min"),
+  priceRangeMax: integer("price_range_max"),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Type definitions
+export const insertUserPreferencesSchema = createInsertSchema(
+  userPreferences
+).extend({
+  favoriteCategories: z.array(z.string()),
+  favoriteColors: z.array(z.string()),
+  favoriteOccasions: z.array(z.string()),
+  priceRangeMin: z.number().optional(),
+  priceRangeMax: z.number().optional(),
+});
+
+/* ---------------- COLLECTIONS ---------------- */
+export const collections = pgTable("collections", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  imageUrl: text("image_url"),
+  active: boolean("active").default(true),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertCollectionSchema = createInsertSchema(collections).extend({
+  imageUrl: z.string().optional(),
+  active: z.boolean().optional(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
+});
+
+/* ---------------- PRODUCT COLLECTIONS ---------------- */
+export const productCollections = pgTable("product_collections", {
+  id: serial("id").primaryKey(),
+  productId: integer("product_id").notNull(),
+  collectionId: integer("collection_id").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertProductCollectionSchema = createInsertSchema(productCollections);
+
+
+/* ---------------- TYPE EXPORTS ---------------- */
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type LoginUser = z.infer<typeof insertLoginSchema>;
 
 export type Category = typeof categories.$inferSelect;
 export type InsertCategory = z.infer<typeof insertCategorySchema>;
@@ -288,73 +306,12 @@ export type InsertReturn = z.infer<typeof insertReturnSchema>;
 export type RecentlyViewed = typeof recentlyViewed.$inferSelect;
 export type InsertRecentlyViewed = z.infer<typeof insertRecentlyViewedSchema>;
 
-// User preferences for recommendations
-export const userPreferences = pgTable("user_preferences", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
-  favoriteCategories: json("favorite_categories").notNull().$type<string[]>(),
-  favoriteColors: json("favorite_colors").notNull().$type<string[]>(),
-  favoriteOccasions: json("favorite_occasions").notNull().$type<string[]>(),
-  priceRangeMin: integer("price_range_min"),
-  priceRangeMax: integer("price_range_max"),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const insertUserPreferencesSchema = createInsertSchema(
-  userPreferences,
-).pick({
-  userId: true,
-  favoriteCategories: true,
-  favoriteColors: true,
-  favoriteOccasions: true,
-  priceRangeMin: true,
-  priceRangeMax: true,
-});
-
 export type UserPreferences = typeof userPreferences.$inferSelect;
 export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
-
-// Collections
-export const collections = pgTable("collections", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  description: text("description").notNull(),
-  imageUrl: text("image_url"),
-  active: boolean("active").default(true),
-  startDate: timestamp("start_date"),
-  endDate: timestamp("end_date"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const insertCollectionSchema = createInsertSchema(collections).pick({
-  name: true,
-  description: true,
-  imageUrl: true,
-  active: true,
-  startDate: true,
-  endDate: true,
-});
-
-// Product Collections (many-to-many relationship between products and collections)
-export const productCollections = pgTable("product_collections", {
-  id: serial("id").primaryKey(),
-  productId: integer("product_id").notNull(),
-  collectionId: integer("collection_id").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const insertProductCollectionSchema = createInsertSchema(
-  productCollections,
-).pick({
-  productId: true,
-  collectionId: true,
-});
 
 export type Collection = typeof collections.$inferSelect;
 export type InsertCollection = z.infer<typeof insertCollectionSchema>;
 
 export type ProductCollection = typeof productCollections.$inferSelect;
-export type InsertProductCollection = z.infer<
-  typeof insertProductCollectionSchema
->;
+export type InsertProductCollection = z.infer<typeof insertProductCollectionSchema>;
+
