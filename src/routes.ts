@@ -183,9 +183,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { password, ...safeUser } = users;
         return safeUser;
       });
-      
-      res.json(safeUsers);      
-        return users;
+
+      res.json(safeUsers);
+      return users;
     } catch (error) {
       console.error("Error fetching users:", error);
       res.status(500).json({ error: "Failed to fetch users" });
@@ -210,7 +210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove sensitive information
       const { password, ...safeUser } = user.data;
 
-      res.json(safeUser);        
+      res.json(safeUser);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ error: "Failed to fetch user" });
@@ -922,12 +922,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Handle imageUrls separately if present
       let updatedData: Partial<Product> = validatedData;
-      
+
       if (imageUrls !== undefined) {
         // Process imageUrls into a proper string array
         const imageUrlArray: string[] = Array.isArray(imageUrls)
           ? imageUrls.map(url => String(url))
-            : [];
+          : [];
 
         // Add properly typed imageUrls to the update data
         updatedData = {
@@ -1389,7 +1389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Get authenticated user
       const user = getUserSafely(req);
-      const returns = await ReturnsAPI.getReturnsByUser(user.id);
+      const returns = await ReturnsAPI.getReturnsByUser();
       res.json(returns);
     } catch (error) {
       console.error("Error fetching user returns:", error);
