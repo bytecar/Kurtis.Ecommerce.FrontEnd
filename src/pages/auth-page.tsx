@@ -34,14 +34,14 @@ import { Loader2 } from "lucide-react";
 // Registration schema - extending the insertUserSchema
 const registerSchema = insertUserSchema.extend({
   username: z.string().min(1, "Username is required"),
-  password: z.string().min(6, "Password must be at least 6 characters"),  
+  password: z.string().min(6, "Password must be at least 6 characters"),
   email: z.string().email("Invalid email address"),
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
   role: z.string().optional(), // Only allow 'user' role for registration
-  status: z.string().optional(), // Default status to 'active'
+  status: z.string().optional().default("active"), // Default status to 'active'
 }).refine(data => data.password === data.confirmPassword, {
-      message: "Passwords don't match",
-      path: ["confirmPassword"],   
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 type LoginFormValues = z.infer<typeof insertLoginSchema>;
@@ -71,10 +71,10 @@ export default function AuthPage() {
   // Login form setup
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(insertLoginSchema),
-      defaultValues: {
-          email: "",
-          password: "",
-          clientId: "client-app-one"
+    defaultValues: {
+      email: "",
+      password: "",
+      clientId: "client-app-one"
     },
   });
 
@@ -83,11 +83,11 @@ export default function AuthPage() {
     resolver: zodResolver(registerSchema),
     defaultValues: {
       username: "",
-      password: "",      
+      password: "",
       email: "",
       fullName: "",
       role: "customer",
-      status: "active", 
+      status: "active",
     },
   });
 
