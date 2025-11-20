@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 import type { PageRequest, PageResponse } from '../helpers/pagination.js';
 import { showToast, mapAPIErrorToMessage } from './toast.js';
-=======
-import type { PageRequest, PageResponse } from '../helpers/pagination';
-import { showToast, mapAPIErrorToMessage } from './toast';
->>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 /**
  * Example client helper to fetch pages and accumulate results for infinite scroll
  * fetchPage is a function that accepts PageRequest and returns PageResponse<T>

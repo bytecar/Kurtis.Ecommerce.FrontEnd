@@ -1,9 +1,5 @@
 import { API_ROUTES } from "../config/api.config";
-<<<<<<< HEAD
 import { APIError } from "../utils/apiError.js";
-=======
-import { APIError } from "../utils/apiError";
->>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
 export async function httpRequest(
     service: keyof typeof API_ROUTES,

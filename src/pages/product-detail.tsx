@@ -53,11 +53,7 @@ export default function ProductDetail() {
   const { 
     data: inventory,
     isLoading: isInventoryLoading
-<<<<<<< HEAD
   } = useQuery<Inventory[]>({
-=======
-  } = useQuery({
->>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
       queryKey: [`/api/inventory/product/${id}`],
       queryFn: async () => await InventoriesAPI.getInventoryByProduct(id),
     enabled: !isNaN(id),

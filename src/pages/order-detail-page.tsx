@@ -73,11 +73,7 @@ const OrderStatusBadge = ({ status }: { status: string }) => {
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: number }>();
   const orderId = id;
-<<<<<<< HEAD
 
-=======
-  
->>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
   // Fetch order details
   const {
     data: order,

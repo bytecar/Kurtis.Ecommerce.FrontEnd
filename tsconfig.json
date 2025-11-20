@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "include": ["src"],
   "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
   "compilerOptions": {
@@ -24,57 +23,3 @@
     }
   }
 }
-=======
-   "include": [ "src/**/*", "shared/**/*"],
-   "exclude": [ "node_modules", "build", "dist", "**/*.test.ts" ],
-   // Visit https://aka.ms/tsconfig to read more about this file
-   "compilerOptions": {
-      "incremental": true,
-      "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
-      "noEmit": true,
-      // File Layout
-      "rootDir": ".",
-      "outDir": "./dist",
-
-      // Environment Settings
-      // See also https://aka.ms/tsconfig/module
-      "module": "esnext",
-      "target": "es2015",
-      "lib": [ "esnext", "DOM", "dom.iterable" ],
-      // For nodejs:
-      // and npm install -D @types/node
-
-      // Other Outputs
-      "sourceMap": true,
-      "declaration": true,
-      "declarationMap": true,
-
-      // Stricter Typechecking Options
-      //"noUncheckedIndexedAccess": true,
-      //"exactOptionalPropertyTypes": true,
-
-      // Style Options
-      // "noImplicitReturns": true,
-      // "noImplicitOverride": true,
-      // "noUnusedLocals": true,
-      // "noUnusedParameters": true,
-      // "noFallthroughCasesInSwitch": true,
-      // "noPropertyAccessFromIndexSignature": true,
-
-      // Recommended Options
-      "strict": false,
-      "jsx": "preserve",
-      "esModuleInterop": true,
-      "moduleDetection": "force",
-      "moduleResolution": "bundler",
-      "skipLibCheck": true,
-      "baseUrl": ".",
-      "allowImportingTsExtensions": true,
-      "types": [ "node", "jest", "@testing-library/jest-dom" ],
-      "paths": {
-         "@/*": [ "./src/*" ],
-         "@shared/*": [ "./shared/*" ]
-      }
-   }
-}
->>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758

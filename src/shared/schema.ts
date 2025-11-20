@@ -43,7 +43,6 @@ export const insertUserSchema = createInsertSchema(users).extend({
   address: z.string().optional(),
   birthdate: z.date().optional(),
   username: z.string(),
-<<<<<<< HEAD:src/shared/schema.ts
   password: z.string(),
   confirmPassword: z.string().optional(),
   role: z.string().optional(),
@@ -53,15 +52,6 @@ export const insertLoginSchema = createInsertSchema(users).extend({
   email: z.string(),
   password: z.string(),
   clientId: z.string().optional(),
-=======
-  password: z.string(),    
-
-});
-
-export const insertLoginSchema = createInsertSchema(users).extend({
-    username: z.string(),
-    password: z.string(),    
->>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758:shared/schema.ts
 });
 
 /* ---------------- CATEGORIES ---------------- */
@@ -102,13 +92,8 @@ export const products = pgTable("products", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description").notNull(),
-<<<<<<< HEAD:src/shared/schema.ts
   price: doublePrecision("price").notNull(),
   discountedPrice: doublePrecision("discounted_price"),
-=======
-  price: integer("price").notNull(),
-  discountedPrice: integer("discounted_price"),
->>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758:shared/schema.ts
   brandId: integer("brand_id").notNull(),
   categoryId: integer("category_id").notNull(),
   gender: text("gender").notNull(),
@@ -124,16 +109,12 @@ export const products = pgTable("products", {
 
 export const insertProductSchema = createInsertSchema(products).extend({
   discountedPrice: z.number().optional(),
-<<<<<<< HEAD:src/shared/schema.ts
   price: z.number(),
-=======
->>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758:shared/schema.ts
   sizes: z.array(z.string()).optional(),
   imageUrls: z.array(z.string()),
   averageRating: z.number().optional(),
   ratingCount: z.number().optional(),
   featured: z.boolean().optional(),
-<<<<<<< HEAD:src/shared/schema.ts
   isNew: z.boolean().optional(),
   gender: z.string().optional(),
   brandId: z.number(),
@@ -142,13 +123,6 @@ export const insertProductSchema = createInsertSchema(products).extend({
   categoryId: z.number(),
   id: z.number().optional(),
   tempImageUrl: z.string().optional(),
-=======
-  isNew: z.boolean().optional(),    
-  brandId: z.number().optional(),
-  name: z.string().optional(),
-  categoryId: z.number().optional(),  
-  id: z.number().optional(),
->>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758:shared/schema.ts
 });
 
 /* ---------------- INVENTORY ---------------- */
@@ -175,15 +149,9 @@ export const reviews = pgTable("reviews", {
 });
 
 export const insertReviewSchema = createInsertSchema(reviews).extend({
-<<<<<<< HEAD:src/shared/schema.ts
   comment: z.string().optional(),
   userId: z.number().optional(),
   productId: z.number().optional(),
-=======
-    comment: z.string().optional(),
-    userId: z.number().optional(),
-    productId: z.number().optional(),
->>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758:shared/schema.ts
 });
 
 /* ---------------- ORDERS ---------------- */
@@ -242,11 +210,7 @@ export const returns = pgTable("returns", {
 });
 
 export const insertReturnSchema = createInsertSchema(returns).extend({
-<<<<<<< HEAD:src/shared/schema.ts
   orderId: z.number(),
-=======
-    orderId: z.number(),
->>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758:shared/schema.ts
 });;
 
 /* ---------------- RECENTLY VIEWED ---------------- */
