@@ -1,6 +1,10 @@
 import React from 'react';
 import { Link } from 'wouter';
+<<<<<<< HEAD
 import { NewArrivalsProps } from '@/shared/types/component.types';
+=======
+import { NewArrivalsProps } from '@shared/types/component.types';
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 import { ProductCard } from '@/components/products/ProductCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatedHeading } from './AnimatedHeading.js';

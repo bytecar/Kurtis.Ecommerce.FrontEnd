@@ -1,6 +1,10 @@
 import React from 'react';
 import { Link } from 'wouter';
+<<<<<<< HEAD
 import { FeaturedProductsProps } from '@/shared/types/component.types';
+=======
+import { FeaturedProductsProps } from '@shared/types/component.types';
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 import { ProductGrid } from '@/components/products/ProductGrid';
 import { AnimatedHeading } from './AnimatedHeading.js';
 import { useTranslation } from 'react-i18next';

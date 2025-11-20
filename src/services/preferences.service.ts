@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { httpRequest } from './http.js';
 export const PreferencesAPI = {
     getUserPreferences: () => httpRequest('preferences', `/api/user/preferences`, 'GET'),
@@ -15,4 +16,10 @@ export const PreferencesAPI = {
             throw error;
         }
     }
+=======
+import { httpRequest } from './http';
+export const PreferencesAPI = {
+    getUserPreferences: (userId: number) => httpRequest('preferences', `/api/user/${userId}/preferences`, 'GET'),
+    saveUserPreferences: (preferences: any) => httpRequest('preferences', `/api/user/preferences`, 'POST', preferences),
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 };

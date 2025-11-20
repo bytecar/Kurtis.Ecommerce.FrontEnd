@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
+<<<<<<< HEAD
 import { HeroProps } from '@/shared/types/component.types';
+=======
+import { HeroProps } from '@shared/types/component.types';
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 

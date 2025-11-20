@@ -1,7 +1,12 @@
 import React from 'react';
 import { Link } from 'wouter';
+<<<<<<< HEAD
 import { CollectionsProps } from '@/shared/types/component.types';
 import { AnimatedHeading } from './AnimatedHeading.js';
+=======
+import { CollectionsProps } from '@shared/types/component.types';
+import { AnimatedHeading } from './AnimatedHeading';
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 import { useTranslation } from 'react-i18next';
 
 // Import CSS

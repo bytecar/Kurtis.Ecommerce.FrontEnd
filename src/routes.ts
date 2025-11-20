@@ -1,8 +1,14 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
+<<<<<<< HEAD
 import { setupAuth, hashPassword } from "./auth.js";
 import { z } from "zod";
 import { insertProductSchema, insertInventorySchema, insertReviewSchema, insertOrderSchema, insertOrderItemSchema, insertReturnSchema, User, Product, ProductWithRelations, Brand, Category, orders } from "@/shared/schema";
+=======
+import { setupAuth, hashPassword } from "./auth";
+import { z } from "zod";
+import { insertProductSchema, insertInventorySchema, insertReviewSchema, insertOrderSchema, insertOrderItemSchema, insertReturnSchema, User, Product } from "@shared/schema";
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -20,11 +26,18 @@ import { PreferencesAPI } from './services/preferences.service';
 import { CategoriesAPI } from './services/categories.service';
 import { BrandsAPI } from './services/brands.service';
 import { UsersAPI } from './services/users.service';
+<<<<<<< HEAD
 import { OrderItemsAPI } from './services/orderItems.service';
 import { authenticateJWT, requirePermission, requireRole } from './services/jwt.service';
 // --- end services ---
 import { productQuerySchema } from './validators/schemas.js';
 import { validateQuery } from './middleware/validate.js';
+=======
+import { authenticateJWT, requirePermission, requireRole } from './services/jwt.service';
+// --- end services ---
+import { productQuerySchema } from './validators/schemas';
+import { validateQuery } from './middleware/validate';
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 //import { MetadataAPI } from "./services/metadata.service";
 import express from "express";
 
@@ -152,7 +165,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/categories", async (req, res) => {
     try {
       const categories = await CategoriesAPI.getAllCategories();
+<<<<<<< HEAD
       res.json(categories.data);
+=======
+      res.json(categories);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
     } catch (error) {
       console.error("Error fetching categories:", error);
       res.status(500).json({ error: "Failed to fetch categories" });
@@ -161,9 +178,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get all brands
   app.get("/api/brands", async (req, res) => {
+<<<<<<< HEAD
     try {
       const brands = await BrandsAPI.getAllBrands();
       res.json(brands.data);
+=======
+      try {
+          const brands = await BrandsAPI.getAllBrands();
+      res.json(brands);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
     } catch (error) {
       console.error("Error fetching brands:", error);
       res.status(500).json({ error: "Failed to fetch brands" });
@@ -176,15 +199,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/users", authenticateJWT, requireRole("admin"), async (req, res) => {
     try {
 
+<<<<<<< HEAD
       const users = await UsersAPI.getAllUsers();
 
       // Remove sensitive information
       const safeUsers = users.data.map((users: { [x: string]: any; password: any; }) => {
+=======
+        const users = await UsersAPI.getAllUsers();
+
+      // Remove sensitive information
+      const safeUsers = users.map((users: { [x: string]: any; password: any; }) => {
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
         const { password, ...safeUser } = users;
         return safeUser;
       });
-
-      res.json(safeUsers);
+      
+      res.json(safeUsers);      
+        return users;
     } catch (error) {
       console.error("Error fetching users:", error);
       res.status(500).json({ error: "Failed to fetch users" });
@@ -209,7 +240,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove sensitive information
       const { password, ...safeUser } = user.data;
 
-      res.json(safeUser);
+      res.json(safeUser);        
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ error: "Failed to fetch user" });
@@ -241,7 +272,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check if username is already taken
       const existingUser = await UsersAPI.getUserByUsername(result.data.username);
+<<<<<<< HEAD
       if (existingUser.data) {
+=======
+      if (existingUser) {
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
         return res.status(409).json({ error: "Username already exists" });
       }
 
@@ -291,7 +326,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if username is already taken if it's being updated
       if (result.data.username) {
         const existingUser = await UsersAPI.getUserByUsername(result.data.username);
+<<<<<<< HEAD
         if (existingUser.data && existingUser.data.id !== id) {
+=======
+        if (existingUser && existingUser.id !== id) {
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
           return res.status(409).json({ error: "Username already exists" });
         }
       }
@@ -384,7 +423,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get authenticated user safely
       const user = getUserSafely(req);
       const userId = user.id;
+<<<<<<< HEAD
       const preferences = await PreferencesAPI.getUserPreferences();
+=======
+      const preferences = await PreferencesAPI.getUserPreferences(userId);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       if (!preferences.data) {
         return res.status(404).json({ error: "Preferences not found" });
@@ -421,8 +464,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         priceRangeMax: priceRangeMax || null
       };
 
+<<<<<<< HEAD
       const userPreferences = await PreferencesAPI.saveUserPreferences(preferences);
       res.status(201).json(userPreferences.data);
+=======
+        const userPreferences = await PreferencesAPI.saveUserPreferences(preferences);
+      res.status(201).json(userPreferences);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
     } catch (error) {
       console.error("Error saving user preferences:", error);
       res.status(500).json({ error: "Failed to save user preferences" });
@@ -432,8 +480,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ======= Product Routes =======
 
   // Get metadata endpoints for filtering UI
+<<<<<<< HEAD
   app.get("/api/sizes", async (req, res) => {
     try {
+=======
+  app.get("/api/categories", async (req, res) => {
+    try {
+      const categories = await CategoriesAPI.getAllCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      res.status(500).json({ error: "Failed to fetch categories" });
+    }
+  });
+
+  app.get("/api/brands", async (req, res) => {
+    try {
+      const brands = await BrandsAPI.getAllBrands();
+      res.json(brands);
+    } catch (error) {
+      console.error("Error fetching brands:", error);
+      res.status(500).json({ error: "Failed to fetch brands" });
+    }
+  });
+
+  app.get("/api/sizes", async (req, res) => {
+    try {
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
       const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
       res.json(sizes);
     } catch (error) {
@@ -445,7 +518,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/ratings", async (req, res) => {
     try {
       const ratings = await ReviewsAPI.getAllReviews();
+<<<<<<< HEAD
       res.json(ratings.data);
+=======
+      res.json(ratings);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
     } catch (error) {
       console.error("Error fetching rating options:", error);
       res.status(500).json({ error: "Failed to fetch rating options" });
@@ -476,6 +553,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const collectionId = parseInt(collectionParam);
           if (!isNaN(collectionId)) {
             // Use collection-specific endpoint to retrieve products
+<<<<<<< HEAD
             productData = await ProductsAPI.getProductsInCollection(collectionId)
             products = productData.data;
             // Fall back to all products if none found in the collection
@@ -497,6 +575,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // No collection filter, get all products
         productData = await ProductsAPI.getAllProducts();
         products = productData.data;
+=======
+            products = await ProductsAPI.getProductsInCollection(collectionId);
+
+            // Fall back to all products if none found in the collection
+            if (!products || products.length === 0) {
+              products = await ProductsAPI.getAllProducts();
+            }
+          } else {
+            // If not a number, get all products for other filters
+            products = await ProductsAPI.getAllProducts();
+          }
+        } catch (err) {
+          console.error("Error retrieving collection products:", err);
+          products = await ProductsAPI.getAllProducts();
+        }
+      } else {
+        // No collection filter, get all products
+        products = await ProductsAPI.getAllProducts();
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
       }
       //console.log(products.data[1].name + "|||||" + products.data[1].price + "****************************************");        
 
@@ -506,10 +603,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get category and brand lookup data to match IDs to names
+<<<<<<< HEAD
       var allCategories = await CategoriesAPI.getAllCategories();
       var allBrands = await BrandsAPI.getAllBrands();
       allCategories = allCategories.data;
       allBrands = allBrands.data;
+=======
+      const allCategories = await CategoriesAPI.getAllCategories();
+      const allBrands = await BrandsAPI.getAllBrands();
+
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
       // Create maps for efficient lookups
       const categoryNameToIdMap = new Map(allCategories.map((cat: { name: any; id: any; }) => [cat.name, cat.id]));
       const brandNameToIdMap = new Map(allBrands.map((brand: { name: any; id: any; }) => [brand.name, brand.id]));
@@ -539,8 +642,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const filteredProducts = [];
 
         for (const product of products) {
+<<<<<<< HEAD
           var inventory = await InventoriesAPI.getInventoryByProduct(product.id);
           inventory = inventory.data;
+=======
+          const inventory = await InventoriesAPI.getInventoryByProduct(product.id);
+
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
           const hasSizes = inventory.some((item: { size: string | null; quantity: number; }) => {
             if (!item.size || item.size === null) return false;
             return size.includes(item.size) && item.quantity > 0;
@@ -580,8 +688,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const additionalFilteredProducts = [];
 
             for (const product of productsToCheck) {
+<<<<<<< HEAD
               var reviews = await ReviewsAPI.getReviewsByProduct(product.id);
               reviews = reviews.data;
+=======
+              const reviews = await ReviewsAPI.getReviewsByProduct(product.id);
+
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
               if (reviews.length > 0) {
                 const avgRating = reviews.reduce((sum: any, review: { rating: any; }) => sum + review.rating, 0) / reviews.length;
                 if (avgRating >= minimumRating) {
@@ -686,9 +799,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get featured products
   app.get("/api/products/featured", async (req, res) => {
     try {
+<<<<<<< HEAD
       const products = await ProductsAPI.getFeaturedProducts();
       // Use the featured flag to get featured products
       const featured = products.filter((p: { featured: boolean; }) => p.featured === true)
+=======
+      const products = await ProductsAPI.getAllProducts();
+      // Use the featured flag to get featured products
+      const featured = products
+        .filter((p: { featured: boolean; }) => p.featured === true)
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
         .slice(0, 12);
 
       // If there aren't enough featured products, fall back to products with discounts
@@ -708,12 +828,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+<<<<<<< HEAD
+=======
+  // Get collections
+  app.get("/api/collections", async (req, res) => {
+    try {
+      const collections = await CollectionsAPI.getAllCollections();
+      res.json(collections);
+    } catch (error) {
+      console.error("Error fetching collections:", error);
+      res.status(500).json({ error: "Failed to fetch collections" });
+    }
+  });
+
+  // Get a specific collection with its products
+  app.get("/api/collections/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid collection ID" });
+      }
+
+        const collection = await CollectionsAPI.getCollection(id);
+      if (!collection) {
+        return res.status(404).json({ error: "Collection not found" });
+      }
+
+        const products = await ProductsAPI.getProductsInCollection(id);
+
+      res.json({
+        ...collection,
+        products
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to retrieve collection details" });
+    }
+  });
+
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
   // Get new arrivals
   app.get("/api/products/trending", async (req, res) => {
     try {
       // First try to get products with the isNew flag set to true
+<<<<<<< HEAD
       const products = await ProductsAPI.getTrendingProducts();
       const newFlaggedProducts = products.filter((p: Product) => p.isNew === true);
+=======
+        const products = await ProductsAPI.getAllProducts();
+      const newFlaggedProducts = products.filter((p: { isNew: boolean; }) => p.isNew === true);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       if (newFlaggedProducts.length >= 6) {
         // If we have enough products marked as new, use those
@@ -723,12 +886,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Next, try to get products from the "New Arrivals" collection
+<<<<<<< HEAD
       const collections = await CollectionsAPI.getAllCollections();
       const newArrivalsCollection = collections.data.find((collection: { name: string; }) => collection.name === "New Arrivals");
 
       if (newArrivalsCollection) {
         // Get products from the "New Arrivals" collection
         const collectionProducts = await ProductsAPI.getProductsInCollection(newArrivalsCollection.id);
+=======
+        const collections = await CollectionsAPI.getAllCollections();
+      const newArrivalsCollection = collections.find((collection: { name: string; }) => collection.name === "New Arrivals");
+
+      if (newArrivalsCollection) {
+        // Get products from the "New Arrivals" collection
+          const collectionProducts = await ProductsAPI.getProductsInCollection(newArrivalsCollection.id);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
         // Combine flagged new products with collection products, avoiding duplicates
         const combinedProducts = [...newFlaggedProducts];
@@ -779,12 +951,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const productSales = new Map<number, number>();
 
       // Initialize all products with 0 sales
+<<<<<<< HEAD
       products.data.forEach((product: { id: number; }) => {
+=======
+      products.forEach((product: { id: number; }) => {
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
         productSales.set(product.id, 0);
       });
 
       // Calculate sales for each product based on order items
+<<<<<<< HEAD
       for (const order of orders.data) {
+=======
+      for (const order of orders) {
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
         const orderItems = await OrdersAPI.getOrderItemsByOrder(order.id);
 
         for (const item of orderItems.orderItems) {
@@ -862,12 +1042,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.isAuthenticated && req.isAuthenticated()) {
         // Get authenticated user safely
         const user = getUserSafely(req);
+<<<<<<< HEAD
         userPreferences = await PreferencesAPI.getUserPreferences();
         const recentlyViewed = await RecentlyViewedAPI.getRecentlyViewed();
       }
 
       // Basic recommendation fallback - find products in the same category
       const recommendations = products.data.filter((p: { id: number; categoryId: any; }) => p.id !== id && p.categoryId === product.product.categoryId).slice(0, 4);
+=======
+        userPreferences = await PreferencesAPI.getUserPreferences(user.id);
+        const recentlyViewed = await RecentlyViewedAPI.getRecentlyViewedByUser(user.id);
+      }
+
+      // Basic recommendation fallback - find products in the same category
+      const recommendations = products
+        .filter((p: { id: number; categoryId: any; }) => p.id !== id && p.categoryId === product.categoryId)
+        .slice(0, 4);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       const recommendationsWithRelations = await populateProductsRelations(recommendations);
       res.json(recommendationsWithRelations);
@@ -921,12 +1112,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Handle imageUrls separately if present
       let updatedData: Partial<Product> = validatedData;
-
+      
       if (imageUrls !== undefined) {
         // Process imageUrls into a proper string array
         const imageUrlArray: string[] = Array.isArray(imageUrls)
           ? imageUrls.map(url => String(url))
-          : [];
+            : [];
 
         // Add properly typed imageUrls to the update data
         updatedData = {
@@ -936,7 +1127,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Update product
+<<<<<<< HEAD
       const product = await ProductsAPI.updateProduct(id, updatedData);
+=======
+      const product = await ProductsAPI.updateProduct(id, {});
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       if (!product) {
         return res.status(404).json({ error: "Product not found" });
@@ -971,11 +1166,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ======= Collection Routes =======
 
+<<<<<<< HEAD
+=======
+  // Get all collections
+  app.get("/api/collections", async (req, res) => {
+    try {
+      const collections = await CollectionsAPI.getAllCollections();
+      res.json(collections);
+    } catch (error) {
+      console.error("Error fetching collections:", error);
+      res.status(500).json({ error: "Failed to fetch collections" });
+    }
+  });
+
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
   // Get collection by ID
   app.get("/api/collections/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+<<<<<<< HEAD
       const collection = await CollectionsAPI.getCollection(id);
+=======
+        const collection = await CollectionsAPI.getCollection(id);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       if (!collection) {
         return res.status(404).json({ error: "Collection not found" });
@@ -1021,6 +1234,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const success = await CollectionsAPI.deleteCollection(id);
+<<<<<<< HEAD
+=======
+
+      if (!success) {
+        return res.status(404).json({ error: "Collection not found" });
+      }
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       // Success is null/void on 204
       res.status(204).end();
@@ -1060,7 +1280,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const productId = parseInt(req.params.productId);
       const collectionId = parseInt(req.params.collectionId);
 
+<<<<<<< HEAD
       const productCollection = await ProductsAPI.addProductToCollection(productId, collectionId);
+=======
+      const productCollection = await ProductsAPI.addProductToCollection(productId,collectionId);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       res.status(201).json(productCollection);
     } catch (error) {
@@ -1075,7 +1299,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const productId = parseInt(req.params.productId);
       const collectionId = parseInt(req.params.collectionId);
 
+<<<<<<< HEAD
       const success = await ProductsAPI.removeProductFromCollection(productId, collectionId);
+=======
+        const success = await ProductsAPI.removeProductFromCollection(productId, collectionId);
+
+      if (!success) {
+        return res.status(404).json({ error: "Product-collection association not found" });
+      }
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       // Success is null/void on 204
       res.status(204).end();
@@ -1091,7 +1323,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/inventory/product/:productId", async (req, res) => {
     try {
       const productId = parseInt(req.params.productId);
+<<<<<<< HEAD
       const inventory = await InventoriesAPI.getInventoryByProduct(productId);
+=======
+        const inventory = await InventoriesAPI.getInventoryByProduct(productId);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       res.json(inventory);
     } catch (error) {
@@ -1107,7 +1343,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertInventorySchema.parse(req.body);
 
       // Create inventory item
+<<<<<<< HEAD
       const inventory = await InventoriesAPI.createInventory(validatedData);
+=======
+        const inventory = await InventoriesAPI.createInventory(validatedData);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       res.status(201).json(inventory);
     } catch (error) {
@@ -1132,7 +1372,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Update inventory
+<<<<<<< HEAD
       const inventory = await InventoriesAPI.updateInventory(id, { quantity });
+=======
+        const inventory = await InventoriesAPI.updateInventory(id, { quantity });
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       if (!inventory) {
         return res.status(404).json({ error: "Inventory item not found" });
@@ -1150,7 +1394,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/products/:id/reviews", async (req, res) => {
     try {
       const productId = parseInt(req.params.id);
+<<<<<<< HEAD
       const reviews = await ReviewsAPI.getReviewsByProduct(productId);
+=======
+        const reviews = await ReviewsAPI.getReviewsByProduct(productId);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       res.json(reviews);
     } catch (error) {
@@ -1162,8 +1410,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/reviews", authenticateJWT, requireRole("admin"), async (req, res) => {
     try {
 
+<<<<<<< HEAD
       // Note: Backend might not have getAllReviews
       const reviews = await ReviewsAPI.getAllReviews();
+=======
+        const reviews = await ReviewsAPI.getAllReviews();
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       res.json(reviews);
     } catch (error) {
@@ -1187,7 +1439,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create review
+<<<<<<< HEAD
       const review = await ReviewsAPI.createReview(validatedData);
+=======
+        const review = await ReviewsAPI.createReview(validatedData);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       res.status(201).json(review);
     } catch (error) {
@@ -1205,7 +1461,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
 
       // Delete review
+<<<<<<< HEAD
       const success = await ReviewsAPI.deleteReview(id);
+=======
+        const success = await ReviewsAPI.deleteReview(id);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       if (!success) {
         return res.status(404).json({ error: "Review not found" });
@@ -1225,7 +1485,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get authenticated user
       const user = getUserSafely(req);
 
+<<<<<<< HEAD
       const orders = await OrdersAPI.getOrdersByUser(user.id);
+=======
+        const orders = await OrdersAPI.getOrdersByUser(user.id);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       res.json(orders);
     } catch (error) {
@@ -1237,8 +1501,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/orders/recent", authenticateJWT, requireRole("admin"), async (req, res) => {
     try {
 
+<<<<<<< HEAD
       const ordersRecent = await OrdersAPI.getRecentOrders();
       const orders = ordersRecent.data;
+=======
+        const orders = await OrdersAPI.getRecentOrders();
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       // Sort by createdAt descending and take the first 10
       const recentOrders = [...orders]
@@ -1281,7 +1549,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
 
       const id = parseInt(req.params.id);
+<<<<<<< HEAD
       const order = await OrdersAPI.getOrder(id);
+=======
+        const order = await OrdersAPI.getOrder(id);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       if (!order) {
         return res.status(404).json({ error: "Order not found" });
@@ -1295,7 +1567,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Not authorized to view this order" });
       }
 
+<<<<<<< HEAD
       const orderItems = await OrdersAPI.getOrderItemsByOrder(id);
+=======
+        const orderItems = await OrdersAPI.getOrderItemsByOrder(id);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       res.json(orderItems.orderItems);
     } catch (error) {
@@ -1316,7 +1592,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       validatedData.userId = user.id;
 
       // Create order
+<<<<<<< HEAD
       const order = await OrdersAPI.createOrder(validatedData);
+=======
+        const order = await OrdersAPI.createOrder(validatedData);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       res.status(201).json(order);
     } catch (error) {
@@ -1334,7 +1614,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertOrderItemSchema.parse(req.body);
 
       // Create order item
+<<<<<<< HEAD
       const orderItem = await OrderItemsAPI.addOrderItem(validatedData.orderId, validatedData);
+=======
+      const orderItem = await OrdersAPI.createOrderItems(validatedData);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       res.status(201).json(orderItem);
     } catch (error) {
@@ -1358,7 +1642,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Update order
+<<<<<<< HEAD
       const order = await OrdersAPI.updateOrderStatus(id, status);
+=======
+        const order = await OrdersAPI.updateOrderStatus(id, status);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       if (!order) {
         return res.status(404).json({ error: "Order not found" });
@@ -1375,7 +1663,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all returns (admin only)
   app.get("/api/returns", authenticateJWT, requireRole("admin"), async (req, res) => {
     try {
+<<<<<<< HEAD
       const returns = await ReturnsAPI.getAllReturns();
+=======
+        const returns = await ReturnsAPI.getAllReturns();
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
       res.json(returns);
     } catch (error) {
       console.error("Error fetching returns:", error);
@@ -1388,7 +1680,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Get authenticated user
       const user = getUserSafely(req);
+<<<<<<< HEAD
       const returns = await ReturnsAPI.getReturnsByUser(user.id);
+=======
+
+        const returns = await ReturnsAPI.getReturnsByUser(user.id);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
       res.json(returns);
     } catch (error) {
       console.error("Error fetching user returns:", error);
@@ -1538,7 +1835,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const productId = parseInt(req.params.productId);
 
       // Remove from wishlist
+<<<<<<< HEAD
       const success = await WishlistAPI.removeFromWishlist(user.id, productId);
+=======
+        const success = await WishlistAPI.removeFromWishlist(user.id, productId);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       // Success is null/void on 204
       res.status(204).end();
@@ -1564,6 +1865,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Get authenticated user (safe now since we checked authentication)
           const user = getUserSafely(req);
 
+<<<<<<< HEAD
           const userPreferencesRet = await PreferencesAPI.getUserPreferences();
           const userPreferences = userPreferencesRet;
           // If user has preferences, try to get personalized collections using AI
@@ -1576,6 +1878,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
               priceRange: userPreferences.priceRangeMin && userPreferences.priceRangeMax ?
                 { min: userPreferences.priceRangeMin, max: userPreferences.priceRangeMax } : undefined
             };
+=======
+          const userPreferences = await PreferencesAPI.getUserPreferences(user.id);
+
+          // If user has preferences, try to get personalized collections using AI
+          if (userPreferences) {                           
+              // Prepare user preference data for the AI
+              const preferenceData = {
+                favoriteCategories: userPreferences.favoriteCategories,
+                favoriteColors: userPreferences.favoriteColors,
+                gender: user.gender || undefined, // Convert null to undefined to match the expected type
+                priceRange: userPreferences.priceRangeMin && userPreferences.priceRangeMax ?
+                  { min: userPreferences.priceRangeMin, max: userPreferences.priceRangeMax } : undefined
+              };                          
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
           }
         } catch (prefError) {
           console.error("Error getting user preferences:", prefError);
@@ -1592,25 +1908,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: "festival",
           name: "Festival Ready",
           description: "Elegant ethnic wear for celebrating special occasions in style",
+<<<<<<< HEAD
           items: productsWithRelations.filter((p: ProductWithRelations) => {
             return p.category && (p.category.name === "lehengas" || p.category.name === "sarees");
           }).slice(0, 6)
+=======
+          items: products.filter((p: { category: string; }) => p.category === "lehengas" || p.category === "sarees").slice(0, 6)
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
         },
         {
           id: "summer",
           name: "Summer Essentials",
           description: "Stay cool and elegant with our summer ethnic fashion collection",
+<<<<<<< HEAD
           items: productsWithRelations.filter((p: ProductWithRelations) => {
             return p.category && (p.category.name === "kurtis" || p.category.name === "tops");
           }).slice(0, 6)
+=======
+          items: products.filter((p: { category: string; }) => p.category === "kurtis" || p.category === "tops").slice(0, 6)
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
         },
         {
           id: "wedding",
           name: "Wedding Season",
           description: "Stunning wedding outfits for the bride, groom, and wedding party",
+<<<<<<< HEAD
           items: productsWithRelations.filter((p: ProductWithRelations) => {
             return p.category && (p.category.name === "lehengas" || p.category.name === "sherwanis");
           }).slice(0, 6)
+=======
+          items: products.filter((p: { category: string; }) => p.category === "lehengas" || p.category === "sherwanis").slice(0, 6)
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
         }
       ];
 
@@ -1630,7 +1958,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = getUserSafely(req);
 
       // This already returns the Product objects directly
+<<<<<<< HEAD
       const products = await RecentlyViewedAPI.getRecentlyViewed();
+=======
+      const products = await RecentlyViewedAPI.getRecentlyViewedByUser(user.id);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       const productsWithRelations = await populateProductsRelations(products);
       res.json(productsWithRelations);
@@ -1659,7 +1991,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Add to recently viewed
+<<<<<<< HEAD
       const recentlyViewedItem = await RecentlyViewedAPI.addRecentlyViewed(productId);
+=======
+        const recentlyViewedItem = await RecentlyViewedAPI.addRecentlyViewed(user.id, productId);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       res.status(201).json(recentlyViewedItem);
     } catch (error) {
@@ -1685,13 +2021,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const users = await UsersAPI.getAllUsers();
 
       // Calculate total sales
+<<<<<<< HEAD
       const totalSales = orders.data.reduce((sum: any, order: { total: any; }) => sum + order.total, 0);
+=======
+      const totalSales = orders.reduce((sum: any, order: { total: any; }) => sum + order.total, 0);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
       // Calculate sales by category
       // Calculate sales by category
       const salesByCategory: { category: string; sales: number }[] = [];
       const categorySales: Record<string, number> = {};
 
+<<<<<<< HEAD
       for (const order of orders.data) {
         const orderItems = await OrdersAPI.getOrderItemsByOrder(order.id);
         // orderItems is the Order object, so we access .orderItems
@@ -1703,6 +2044,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 categorySales[product.product.categoryId] = 0;
               }
               categorySales[product.product.categoryId] += item.price * item.quantity;
+=======
+      for (const order of orders) {
+        const orderItems = await OrdersAPI.getOrderItemsByOrder(order.id);
+
+        for (const item of orderItems) {
+          const product = await ProductsAPI.getProduct(item.productId);
+          if (product) {
+            if (!categorySales[product.category]) {
+              categorySales[product.category] = 0;
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
             }
           }
         }
@@ -1736,6 +2087,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const reviewsList = Array.isArray(reviews) ? reviews : (reviews.data || []);
 
       const ratingDistribution = [
+<<<<<<< HEAD
         { rating: 1, count: reviewsList.filter((r: { rating: number; }) => r.rating === 1).length },
         { rating: 2, count: reviewsList.filter((r: { rating: number; }) => r.rating === 2).length },
         { rating: 3, count: reviewsList.filter((r: { rating: number; }) => r.rating === 3).length },
@@ -1746,6 +2098,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Calculate average rating
       const avgRating = reviewsList.length > 0
         ? reviewsList.reduce((sum: any, review: { rating: any; }) => sum + review.rating, 0) / reviewsList.length
+=======
+        { rating: 1, count: reviews.filter((r: { rating: number; }) => r.rating === 1).length },
+        { rating: 2, count: reviews.filter((r: { rating: number; }) => r.rating === 2).length },
+        { rating: 3, count: reviews.filter((r: { rating: number; }) => r.rating === 3).length },
+        { rating: 4, count: reviews.filter((r: { rating: number; }) => r.rating === 4).length },
+        { rating: 5, count: reviews.filter((r: { rating: number; }) => r.rating === 5).length }
+      ];
+
+      // Calculate average rating
+      const avgRating = reviews.length > 0
+        ? reviews.reduce((sum: any, review: { rating: any; }) => sum + review.rating, 0) / reviews.length
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
         : 0;
 
       // Compile stats
@@ -1755,9 +2119,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const stats = {
         totalSales,
+<<<<<<< HEAD
         totalOrders: orders.data.length,
         totalProducts: productsList.length,
         totalCustomers: usersList.filter((u: { role: string; }) => u.role === "customer").length,
+=======
+        totalOrders: orders.length,
+        totalProducts: products.length,
+        totalCustomers: users.filter((u: { role: string; }) => u.role === "customer").length,
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
         avgRating,
         salesByCategory,
         salesByMonth,
@@ -1837,8 +2207,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Apply discount to all selected products
           for (const id of selectedIds) {
             const product = await ProductsAPI.getProduct(id);
+<<<<<<< HEAD
             if (product.data) {
               const discountedPrice = product.data.price - (product.data.price * (discount / 100));
+=======
+            if (product) {
+              const discountedPrice = product.price - (product.price * (discount / 100));
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
               await ProductsAPI.updateProduct(id, { discountedPrice });
               updatedCount++;
             }
@@ -1846,6 +2221,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       } else if (action === "category") {
         // Change category for all selected products
+<<<<<<< HEAD
         if (newCategoryId !== undefined) {
           for (const id of selectedIds) {
             const product = await ProductsAPI.getProduct(id);
@@ -1853,6 +2229,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               await ProductsAPI.updateProduct(id, { categoryId: newCategoryId });
               updatedCount++;
             }
+=======
+        for (const id of selectedIds) {
+            const product = await ProductsAPI.getProduct(id);
+          if (product) {
+              await ProductsAPI.updateProduct(id, { category: newCategory });
+            updatedCount++;
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
           }
         }
       } else if (action === "stock") {
@@ -1861,17 +2244,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Update inventory for all selected products
           for (const id of selectedIds) {
             const inventoryItems = await InventoriesAPI.getInventoryByProduct(id);
+<<<<<<< HEAD
             const sizeItem = inventoryItems.data.find((item: { size: string; }) => item.size === sizeToUpdate);
+=======
+            const sizeItem = inventoryItems.find((item: { size: string; }) => item.size === sizeToUpdate);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 
             if (sizeItem) {
               // stockChange is guaranteed to be defined here by the outer if check
               const newQuantity = Math.max(0, sizeItem.quantity + (stockChange as number));
+<<<<<<< HEAD
               await InventoriesAPI.updateInventory(sizeItem.id, { quantity: newQuantity });
+=======
+                await InventoriesAPI.updateInventory(sizeItem.id, { quantity: newQuantity });
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
               updatedCount++;
             } else {
               // Create new inventory if size doesn't exist (only if adding stock)
               if (stockChange > 0 && sizeToUpdate) {
+<<<<<<< HEAD
                 await InventoriesAPI.createInventory({
+=======
+                  await InventoriesAPI.createInventory({
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
                   productId: id,
                   size: sizeToUpdate,
                   quantity: stockChange
@@ -1890,6 +2285,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+<<<<<<< HEAD
+=======
+  // Update user endpoint to handle 401 more securely
+  app.get('/api/users', (req: Request, res: Response) => {
+    if (req.isAuthenticated()) {
+      return res.json(req.user);
+    }
+    // Return 401 without detailed error message for security
+    res.status(401).json({ error: 'Unauthorized' });
+  });
+
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
   const httpServer = createServer(app);
 
   return httpServer;

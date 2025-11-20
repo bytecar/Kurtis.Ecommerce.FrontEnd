@@ -60,7 +60,11 @@ function Router() {
           <AdminRoute path="/admin/dashboard" component={DashboardPage} />
           <AdminRoute path="/admin/reviews" component={ReviewPage} />
           <AdminRoute path="/admin/customers" component={() => <CustomerManagement/>} />
+<<<<<<< HEAD
           <AdminRoute path="/admin/ratings" component={() => <RatingManagement/>} />
+=======
+          <AdminRoute path="/admin/ratings" component={() => <RatingManagement />} />
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
           <AdminRoute path="/admin/returns" component={AdminReturnsPage} />
           
           {/* Content Manager routes */}

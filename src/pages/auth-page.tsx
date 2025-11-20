@@ -4,7 +4,11 @@ import { useLocation } from "wouter";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+<<<<<<< HEAD
 import { insertLoginSchema, insertUserSchema } from "@/shared/schema";
+=======
+import { insertLoginSchema, insertUserSchema } from "@shared/schema";
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 import {
   Card,
   CardContent,
@@ -34,6 +38,7 @@ import { Loader2 } from "lucide-react";
 // Registration schema - extending the insertUserSchema
 const registerSchema = insertUserSchema.extend({
   username: z.string().min(1, "Username is required"),
+<<<<<<< HEAD
   password: z.string().min(6, "Password must be at least 6 characters"),  
   email: z.string().email("Invalid email address"),
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
@@ -42,6 +47,18 @@ const registerSchema = insertUserSchema.extend({
 }).refine(data => data.password === data.confirmPassword, {
       message: "Passwords don't match",
       path: ["confirmPassword"],   
+=======
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string(),
+  email: z.string().email("Invalid email address"),
+  fullName: z.string().min(2, "Full name must be at least 2 characters"),
+  role: z.literal("customer"), // Only allow 'user' role for registration
+}).refine(data => {
+   data.password === data.confirmPassword, {
+      message: "Passwords don't match",
+      path: ["confirmPassword"],
+   }
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
 });
 
 type LoginFormValues = z.infer<typeof insertLoginSchema>;
@@ -49,7 +66,11 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<string>("login");
+<<<<<<< HEAD
   const { user, login, register } = useAuth();
+=======
+  const { user, loginMutation, registerMutation } = useAuth();
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
   const [location, navigate] = useLocation();
 
   // Parse tab from URL
@@ -71,10 +92,16 @@ export default function AuthPage() {
   // Login form setup
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(insertLoginSchema),
+<<<<<<< HEAD
       defaultValues: {
           email: "",
           password: "",
           clientId: "client-app-one"
+=======
+    defaultValues: {
+      username: "",
+      password: "",
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
     },
   });
 
@@ -83,24 +110,40 @@ export default function AuthPage() {
     resolver: zodResolver(registerSchema),
     defaultValues: {
       username: "",
+<<<<<<< HEAD
       password: "",      
       email: "",
       fullName: "",
       role: "customer",
       status: "active", 
+=======
+      password: "",
+      confirmPassword: "",
+      email: "",
+      fullName: "",
+      role: "customer",
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
     },
   });
 
   // Handle login submission
   const onLoginSubmit = (data: LoginFormValues) => {
+<<<<<<< HEAD
     login.mutate(data);
+=======
+    loginMutation.mutate(data);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
   };
 
   // Handle registration submission
   const onRegisterSubmit = (data: RegisterFormValues) => {
     // Strip confirmPassword before sending to API
     const { confirmPassword, ...registerData } = data;
+<<<<<<< HEAD
     register.mutate(registerData);
+=======
+    registerMutation.mutate(registerData);
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
   };
 
   return (
@@ -131,12 +174,21 @@ export default function AuthPage() {
                   <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                     <FormField
                       control={loginForm.control}
+<<<<<<< HEAD
                       name="email"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>email</FormLabel>
                           <FormControl>
                             <Input placeholder="Enter your email" {...field} />
+=======
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Username</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter your username" {...field} />
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -162,9 +214,15 @@ export default function AuthPage() {
                     <Button
                       type="submit"
                       className="w-full"
+<<<<<<< HEAD
                       disabled={login.isPending}
                     >
                       {login.isPending ? (
+=======
+                      disabled={loginMutation.isPending}
+                    >
+                      {loginMutation.isPending ? (
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Logging in...
@@ -283,9 +341,15 @@ export default function AuthPage() {
                     <Button
                       type="submit"
                       className="w-full"
+<<<<<<< HEAD
                       disabled={register.isPending}
                     >
                       {register.isPending ? (
+=======
+                      disabled={registerMutation.isPending}
+                    >
+                      {registerMutation.isPending ? (
+>>>>>>> fc6a7514ce55db2e4e35223257173877c0e98758
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Creating account...
